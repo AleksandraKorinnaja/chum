@@ -1554,6 +1554,7 @@
   body.ui-v2 .talk-req .tr-t canvas{width:56px !important;height:56px !important;}
   body.ui-v2 .talk-req .v2pill{height:46px;font-size:19px;}
   body.ui-v2 .talk-btns .bigbtn{min-height:56px !important;font-size:22px !important;padding:0 32px !important;}
+  .reward .ic .rw-fish{width:80%;height:80%;object-fit:contain;}
   @media (max-width: 560px){ .run-row{flex-wrap:wrap;} .run-go{flex:1;} .runs-head h1{font-size:26px;} }</style>
 </head>
 <body>
@@ -3724,8 +3725,9 @@ function runEvents(){
     }
   }
 }
+const WAVE_MIN = 45;         // seconds per wave: new kinds of cats join every 45 s (was a minute)
 function runSpawns(dt){
-  const minute = Math.min(stage.waves.length-1, Math.floor(runT/60));
+  const minute = Math.min(stage.waves.length-1, Math.floor(runT/WAVE_MIN));   // each wave (and its new cat types) lasts WAVE_MIN seconds
   const [types, minCount, interval] = stage.waves[minute];
   let alive = 0;
   for(const c of cats) if(!c.dying && !c.prop && c.ai!=='swarm') alive++;
@@ -6610,7 +6612,7 @@ function stageCatsAround(m0, m1){
   return [...set];
 }
 function makeMission(){
-  const tier = missionsDone, m = Math.floor(runT/60);
+  const tier = missionsDone, m = Math.floor(runT/WAVE_MIN);
   const taken = new Set(missions.filter(x=>!x.done).map(x=>x.type+(x.cat||'')));
   const pool = [];
   // feed a cat type that's around right now (tougher cats need fewer)
@@ -7297,6 +7299,7 @@ function townZone(x, y){
 /* ---- the ground: streets, the piazza, grass, the pond, paths ---- */
 function drawTownGround(t){
   if(!townOn()) return;
+  if(!TOWN_PROPS){ drawSquareGround(t); return; }      // the low-poly square (TOWN_PROPS brings back the old blockout)
   const C = TOWN_COL;
   for(const [ox, oy] of townTiles(400)){
     ctx.save(); ctx.translate(ox, oy);
@@ -7331,6 +7334,146 @@ function drawTownGround(t){
     ctx.restore();
   }
 }
+/* ---- Cat Town's square, low-poly (after the Ooblets town square reference) ----
+   Big warm sandstone paving tiles everywhere, soft green lawns with a raised pale-stone curb, a chunky
+   flat-shaded tiered fountain, round puffy bushes, spotted mushrooms, slim lamp posts and wooden benches.
+   No black outlines: shapes are told apart by flat light and shade, like low-poly 3D.                 */
+const SQ = {tile:116, tiles:['#e8bd93','#e3b68b','#ebc39b','#dfb085','#e6ba8f'], grout:'rgba(250,226,198,0.9)', groutShadow:'rgba(160,105,65,0.25)',
+  grass:'#8fcd6b', grassLight:'#a6dc80', grassDark:'#79bb58', curb:'#f6e2c9', curbSide:'#d9b591', stone:'#ecb894', stoneLight:'#f6cfae', stoneDark:'#c98e6a',
+  water:'#9ad7e3', waterDeep:'#74c1d3'};
+function lpShade(hex, k){ const n = parseInt(hex.slice(1), 16), c = v => Math.max(0, Math.min(255, Math.round(v*k))); return `rgb(${c((n>>16)&255)},${c((n>>8)&255)},${c(n&255)})`; }
+function sqHash(i, j){ let h = (i*73856093) ^ (j*19349663); h = (h ^ (h >>> 13))*1274126177; return ((h ^ (h >>> 16)) >>> 0)/4294967295; }
+// a flat-shaded n-sided cylinder (or a cone/frustum with r2), base at height z0; light from the upper left
+function lpCyl(x, y, r, h, z0, col, opt){
+  opt = opt || {}; const n = opt.n || 12, r2 = opt.r2 ?? r, F = MESH_FLAT;
+  const [bx, by] = boxPt(x, y, z0), [tx, ty] = boxPt(x, y, z0 + h);
+  const ring = (cx, cy, rr) => Array.from({length:n}, (_, i)=>{ const a = i/n*Math.PI*2 + Math.PI/n; return [cx + Math.cos(a)*rr, cy + Math.sin(a)*rr*F, a]; });
+  const B = ring(bx, by, r), T = ring(tx, ty, r2);
+  for(let i=0;i<n;i++){
+    const j = (i + 1) % n, am = (B[i][2] + B[j][2])/2 + (j === 0 ? Math.PI : 0);
+    if(Math.sin(am) < -0.05) continue;                                   // back facets are hidden
+    const k = 0.78 + 0.22*Math.cos(am - Math.PI*0.85);                  // lit from the left-front
+    ctx.fillStyle = lpShade(col, k); ctx.beginPath(); ctx.moveTo(B[i][0], B[i][1]); ctx.lineTo(B[j][0], B[j][1]); ctx.lineTo(T[j][0], T[j][1]); ctx.lineTo(T[i][0], T[i][1]); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = lpShade(col, k*0.97); ctx.lineWidth = 1; ctx.stroke();  // hide hairline seams
+  }
+  ctx.fillStyle = opt.top || lpShade(col, 1.08); ctx.beginPath(); T.forEach(([px, py], i)=>i ? ctx.lineTo(px, py) : ctx.moveTo(px, py)); ctx.closePath(); ctx.fill();
+  return {tx, ty, r:r2, T};
+}
+// a round low-poly blob (bushes, tree tops): a faceted dome
+function lpBlob(cx, cy, R, col){
+  const n = 9;
+  for(let ring = 0; ring < 3; ring++){
+    const rr = R*(1 - ring*0.3), oy = -ring*R*0.22;
+    for(let i=0;i<n;i++){
+      const a0 = i/n*Math.PI*2 + ring*0.35, a1 = (i + 1)/n*Math.PI*2 + ring*0.35, am = (a0 + a1)/2;
+      const k = 0.8 + 0.2*Math.cos(am + Math.PI*0.75) + ring*0.07;
+      ctx.fillStyle = lpShade(col, k); ctx.beginPath(); ctx.moveTo(cx, cy + oy - rr*0.15);
+      ctx.lineTo(cx + Math.cos(a0)*rr, cy + oy + Math.sin(a0)*rr*0.86); ctx.lineTo(cx + Math.cos(a1)*rr, cy + oy + Math.sin(a1)*rr*0.86); ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = lpShade(col, k*0.98); ctx.lineWidth = 1; ctx.stroke();
+    }
+  }
+}
+function sqShadow(x, y, rx, ry, a){ ctx.fillStyle = `rgba(150,95,60,${a || 0.22})`; ctx.beginPath(); ctx.ellipse(x + rx*0.12, y + 2, rx, ry, 0, 0, Math.PI*2); ctx.fill(); }
+const SQUARE = (()=>{
+  const lawns = [{x0:-560, x1:560, y0:20, y1:520, r:150}, {x0:-1320, x1:-820, y0:-760, y1:-330, r:110}, {x0:820, x1:1320, y0:-760, y1:-330, r:110},
+                 {x0:-1320, x1:-820, y0:900, y1:1320, r:110}, {x0:820, x1:1320, y0:900, y1:1320, r:110}];
+  const things = [{t:'fountain', x:0, y:240}];
+  const bush = (x, y, s, c) => things.push({t:'bush', x, y, s, c});
+  bush(-470, 110, 1, '#f2d45a'); bush(-410, 70, 0.7, '#f2d45a'); bush(470, 470, 1.05, '#7cc35c'); bush(400, 500, 0.75, '#9fd36a'); bush(-470, 470, 0.85, '#7cc35c');
+  [[-1200, -660, '#f2d45a'], [1200, -440, '#7cc35c'], [-940, 1220, '#9fd36a'], [1210, 1000, '#f2d45a']].forEach(([x, y, c])=>bush(x, y, 0.95, c));
+  [[180, 470], [205, 452], [228, 478], [-360, 180], [-338, 200], [1000, -500], [-1080, 1080], [-1060, 1098]].forEach(([x, y], i)=>things.push({t:'mush', x, y, s:0.8 + (i%3)*0.18}));
+  [[-640, 0], [640, 0], [-640, 560], [640, 560], [-760, -280], [760, -280], [-760, 870], [760, 870]].forEach(([x, y])=>things.push({t:'lamp', x, y}));
+  [[-260, 590], [260, 590], [-1070, -270], [1070, -270]].forEach(([x, y])=>things.push({t:'bench', x, y}));
+  return {lawns, things};
+})();
+// paving + lawns, drawn on the ground (under everything)
+function drawSquareGround(t){
+  const v = getViewBounds(40), S = SQ.tile;
+  const i0 = Math.floor(v.left/S), i1 = Math.ceil(v.right/S), j0 = Math.floor(v.top/S), j1 = Math.ceil(v.bottom/S);
+  for(let j=j0;j<=j1;j++) for(let i=i0;i<=i1;i++){ ctx.fillStyle = SQ.tiles[Math.floor(sqHash(i, j)*SQ.tiles.length)]; ctx.fillRect(i*S, j*S, S, S); }
+  ctx.strokeStyle = SQ.groutShadow; ctx.lineWidth = 4;
+  ctx.beginPath(); for(let i=i0;i<=i1;i++){ ctx.moveTo(i*S + 1.5, j0*S); ctx.lineTo(i*S + 1.5, (j1 + 1)*S); } for(let j=j0;j<=j1;j++){ ctx.moveTo(i0*S, j*S + 1.5); ctx.lineTo((i1 + 1)*S, j*S + 1.5); } ctx.stroke();
+  ctx.strokeStyle = SQ.grout; ctx.lineWidth = 3;
+  ctx.beginPath(); for(let i=i0;i<=i1;i++){ ctx.moveTo(i*S, j0*S); ctx.lineTo(i*S, (j1 + 1)*S); } for(let j=j0;j<=j1;j++){ ctx.moveTo(i0*S, j*S); ctx.lineTo((i1 + 1)*S, j*S); } ctx.stroke();
+  // lawns, in every repeat of the town tile near the camera
+  for(const [ox, oy] of townTiles(300)) for(const L of SQUARE.lawns){
+    const x0 = L.x0 + ox, y0 = L.y0 + oy, w = L.x1 - L.x0, h = L.y1 - L.y0;
+    if(x0 > v.right || x0 + w < v.left || y0 > v.bottom || y0 + h < v.top) continue;
+    ctx.fillStyle = SQ.curbSide; roundRect(x0 - 16, y0 - 10, w + 32, h + 34, L.r + 16); ctx.fill();          // the curb's side, showing below
+    ctx.fillStyle = SQ.curb; roundRect(x0 - 16, y0 - 16, w + 32, h + 32, L.r + 16); ctx.fill();              // the curb's top
+    ctx.fillStyle = SQ.grass; roundRect(x0, y0, w, h, L.r); ctx.fill();
+    ctx.save(); roundRect(x0, y0, w, h, L.r); ctx.clip();
+    ctx.fillStyle = 'rgba(90,150,60,0.28)'; ctx.fillRect(x0, y0, w, 14);                                         // the curb's shadow on the grass
+    for(let k=0;k<10;k++){ const hx = x0 + sqHash(k, L.x0)*w, hy = y0 + sqHash(L.y0, k)*h;                      // soft lighter patches
+      ctx.fillStyle = k%2 ? SQ.grassLight : SQ.grassDark; ctx.globalAlpha = 0.45; ctx.beginPath(); ctx.ellipse(hx, hy, 60 + k*7, 26 + k*3, 0, 0, Math.PI*2); ctx.fill(); }
+    ctx.globalAlpha = 1;
+    // grass tufts and little flowers
+    const N = Math.round(w*h/5200);
+    for(let k=0;k<N;k++){
+      const fx = x0 + 14 + sqHash(k*7 + 1, L.x0 + 3)*(w - 28), fy = y0 + 14 + sqHash(L.y0 + 5, k*11 + 2)*(h - 28), r = sqHash(k, k + 9);
+      if(r < 0.55){ ctx.strokeStyle = SQ.grassDark; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(fx - 4, fy); ctx.lineTo(fx - 6, fy - 7); ctx.moveTo(fx, fy); ctx.lineTo(fx, fy - 9); ctx.moveTo(fx + 4, fy); ctx.lineTo(fx + 6, fy - 7); ctx.stroke(); }
+      else { const col = r < 0.75 ? '#ffffff' : r < 0.88 ? '#9cc7f2' : '#ffd96a';
+        ctx.fillStyle = col; for(let p=0;p<5;p++){ const a = p/5*Math.PI*2 + t*0; ctx.beginPath(); ctx.arc(fx + Math.cos(a)*3.2, fy + Math.sin(a)*2.4, 2.4, 0, Math.PI*2); ctx.fill(); }
+        ctx.fillStyle = '#f5b83c'; ctx.beginPath(); ctx.arc(fx, fy, 1.8, 0, Math.PI*2); ctx.fill(); }
+    }
+    ctx.restore();
+  }
+}
+// the low-poly tiered fountain
+function drawSquareFountain(o, t){
+  sqShadow(o.x, o.y + 6, 196, 196*MESH_FLAT*1.05, 0.2);
+  const base = lpCyl(o.x, o.y, 178, 30, 0, SQ.stone, {n:16, top:SQ.stoneLight});
+  ctx.fillStyle = SQ.waterDeep; ctx.beginPath(); ctx.ellipse(base.tx, base.ty + 2, 152, 152*MESH_FLAT, 0, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = SQ.water; ctx.beginPath(); ctx.ellipse(base.tx, base.ty + 4, 146, 146*MESH_FLAT - 4, 0, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle = 'rgba(255,255,255,0.7)'; ctx.lineWidth = 2;
+  for(let i=0;i<3;i++){ const k = (t*0.45 + i/3) % 1; ctx.globalAlpha = 1 - k; ctx.beginPath(); ctx.ellipse(base.tx, base.ty + 4, 36 + k*100, (36 + k*100)*MESH_FLAT, 0, 0, Math.PI*2); ctx.stroke(); }
+  ctx.globalAlpha = 1;
+  lpCyl(o.x, o.y, 34, 70, 26, SQ.stone, {n:8, r2:26});
+  const b1 = lpCyl(o.x, o.y, 44, 18, 92, SQ.stone, {n:10, r2:92, top:SQ.waterDeep});
+  ctx.fillStyle = SQ.water; ctx.beginPath(); ctx.ellipse(b1.tx, b1.ty + 2, 80, 80*MESH_FLAT - 4, 0, 0, Math.PI*2); ctx.fill();
+  lpCyl(o.x, o.y, 20, 40, 108, SQ.stone, {n:8, r2:16});
+  const b2 = lpCyl(o.x, o.y, 26, 12, 146, SQ.stone, {n:10, r2:52, top:SQ.waterDeep});
+  ctx.fillStyle = SQ.water; ctx.beginPath(); ctx.ellipse(b2.tx, b2.ty + 1, 44, 44*MESH_FLAT - 3, 0, 0, Math.PI*2); ctx.fill();
+  lpCyl(o.x, o.y, 10, 22, 156, SQ.stoneLight, {n:6, r2:4});
+  // water spilling over each bowl's rim, and a few drops
+  ctx.strokeStyle = 'rgba(200,238,248,0.8)'; ctx.lineWidth = 3; ctx.lineCap = 'round';
+  for(const [b, rr, drop] of [[b2, 52, 50], [b1, 92, 70]]){
+    for(let i=0;i<8;i++){ const a = i/8*Math.PI*2 + 0.2; if(Math.sin(a) < -0.2) continue;
+      const sx = b.tx + Math.cos(a)*rr, sy = b.ty + Math.sin(a)*rr*MESH_FLAT, ph = (t*1.6 + i*0.37) % 1;
+      ctx.beginPath(); ctx.moveTo(sx, sy); ctx.quadraticCurveTo(sx + Math.cos(a)*10, sy + drop*0.3, sx + Math.cos(a)*16, sy + drop); ctx.stroke();
+      ctx.fillStyle = 'rgba(230,250,255,0.9)'; ctx.beginPath(); ctx.arc(sx + Math.cos(a)*14, sy + drop*ph, 2.2, 0, Math.PI*2); ctx.fill(); }
+  }
+}
+function drawSquareBush(o){
+  const s = o.s || 1; sqShadow(o.x, o.y, 58*s, 20*s, 0.22);
+  const [cx, cy] = boxPt(o.x, o.y, 34*s); lpBlob(cx, cy, 52*s, o.c);
+}
+function drawSquareMush(o){
+  const s = o.s || 1; sqShadow(o.x, o.y, 12*s, 4*s, 0.2);
+  lpCyl(o.x, o.y, 6*s, 14*s, 0, '#f4ead8', {n:6, r2:5*s});
+  const [cx, cy] = boxPt(o.x, o.y, 16*s);
+  ctx.fillStyle = '#d9473f'; ctx.beginPath(); ctx.ellipse(cx, cy, 15*s, 11*s, 0, Math.PI, 0); ctx.lineTo(cx + 15*s, cy + 2*s); ctx.lineTo(cx - 15*s, cy + 2*s); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#ef6a5d'; ctx.beginPath(); ctx.ellipse(cx - 4*s, cy - 3*s, 8*s, 6*s, 0, Math.PI, 0); ctx.fill();
+  ctx.fillStyle = '#fff6ea'; for(const [dx, dy, r] of [[-6, -5, 2.6], [4, -7, 2.2], [8, -2, 1.8], [-1, -1, 1.6]]){ ctx.beginPath(); ctx.arc(cx + dx*s, cy + dy*s, r*s, 0, Math.PI*2); ctx.fill(); }
+}
+function drawSquareLamp(o, t){
+  sqShadow(o.x, o.y, 16, 6, 0.22);
+  lpCyl(o.x, o.y, 11, 10, 0, '#4a5f86', {n:6, r2:9});
+  lpCyl(o.x, o.y, 4, 120, 10, '#4a5f86', {n:6});
+  const lamp = lpCyl(o.x, o.y, 8, 24, 130, '#cfe4f2', {n:6, r2:12, top:'#4a5f86'});
+  lpCyl(o.x, o.y, 12, 6, 154, '#4a5f86', {n:6, r2:3});
+  const [lx, ly] = boxPt(o.x, o.y, 142);
+  const g = ctx.createRadialGradient(lx, ly, 2, lx, ly, 40); g.addColorStop(0, 'rgba(255,240,190,0.55)'); g.addColorStop(1, 'rgba(255,240,190,0)'); ctx.fillStyle = g; ctx.fillRect(lx - 40, ly - 40, 80, 80);
+}
+function drawSquareBench(o){
+  sqShadow(o.x, o.y, 54, 12, 0.2);
+  const wood = '#c98a5c', leg = '#5b6b8f', P = boxPt, slat = (y, z, d) => meshPolyFlat([P(o.x - 48, y - d, z), P(o.x + 48, y - d, z), P(o.x + 48, y, z), P(o.x - 48, y, z)], lpShade(wood, z > 30 ? 0.92 : 1.05));
+  for(const dx of [-40, 40]) lpCyl(o.x + dx, o.y - 6, 3.5, 20, 0, leg, {n:4});
+  for(let k=0;k<3;k++) slat(o.y - k*7, 20, 6);
+  for(let k=0;k<2;k++){ const z = 30 + k*10; meshPolyFlat([P(o.x - 48, o.y - 24, z), P(o.x + 48, o.y - 24, z), P(o.x + 48, o.y - 24, z + 7), P(o.x - 48, o.y - 24, z + 7)], lpShade(wood, 0.9 + k*0.08)); }
+  for(const dx of [-40, 40]) lpCyl(o.x + dx, o.y - 24, 3, 46, 0, leg, {n:4});
+}
+function meshPolyFlat(pts, fill){ ctx.fillStyle = fill; ctx.beginPath(); pts.forEach(([px, py], i)=>i ? ctx.lineTo(px, py) : ctx.moveTo(px, py)); ctx.closePath(); ctx.fill(); }
 /* ---- simple meshes (drawn in world coordinates; heights lean away from the camera like the house blocks) ---- */
 const MESH_FLAT = 0.55;     // how deep (squashed) ground-plane circles look from this camera
 function meshPoly(pts, fill, stroke){ ctx.beginPath(); pts.forEach(([px, py], i)=>i ? ctx.lineTo(px, py) : ctx.moveTo(px, py)); ctx.closePath(); if(fill){ ctx.fillStyle = fill; ctx.fill(); } if(stroke){ ctx.strokeStyle = TOWN_COL.line; ctx.lineWidth = 3; ctx.lineJoin = 'round'; ctx.stroke(); } }
@@ -7442,9 +7585,10 @@ function townHides(x, y, w, back){
 function townItems(items, t){
   if(!townOn()) return;
   const v = getViewBounds(350);
-  for(const [ox, oy] of townTiles(350)) for(const o of TOWN.things){
+  const THINGS = TOWN_PROPS ? TOWN.things : SQUARE.things;
+  for(const [ox, oy] of townTiles(350)) for(const o of THINGS){
     const x = o.x + ox, y = o.y + oy; if(x < v.left || x > v.right || y < v.top || y > v.bottom) continue;
-    const w = o.w || (o.t==='fountain' ? 340 : o.t==='tree' ? 110*(o.s || 1) : 80), tall = o.t==='house' ? (o.h || 200) + 120 : o.t==='tree' ? 170*(o.s || 1) : o.t==='fountain' ? 200 : 0;
+    const w = o.w || (o.t==='fountain' ? 340 : o.t==='tree' ? 110*(o.s || 1) : 80), tall = o.t==='house' ? (o.h || 200) + 120 : o.t==='tree' ? 170*(o.s || 1) : o.t==='fountain' ? 200 : o.t==='bush' ? 90*(o.s || 1) : o.t==='lamp' ? 160 : 0;
     const fade = tall && townHides(x, y, w, tall);
     items.push([y, x, y, ()=>{
       if(fade) ctx.globalAlpha = 0.35;
@@ -7452,10 +7596,12 @@ function townItems(items, t){
       const p = Object.assign({}, o, {x, y});
       if(o.t==='house') drawTownHouse(p);
       else if(o.t==='tree') drawTownTree(p);
-      else if(o.t==='fountain') drawFountain(p, t);
+      else if(o.t==='fountain') (TOWN_PROPS ? drawFountain : drawSquareFountain)(p, t);
+      else if(o.t==='bush') drawSquareBush(p);
+      else if(o.t==='mush') drawSquareMush(p);
       else if(o.t==='bed') drawFlowerBed(p);
-      else if(o.t==='bench') drawBench(p);
-      else if(o.t==='lamp') drawLampPost(p, t);
+      else if(o.t==='bench') (TOWN_PROPS ? drawBench : drawSquareBench)(p);
+      else if(o.t==='lamp') (TOWN_PROPS ? drawLampPost : drawSquareLamp)(p, t);
       else if(o.t==='kit'){ ctx.fillStyle = 'rgba(0,0,0,0.18)'; ctx.beginPath(); ctx.ellipse(x, y + 2, o.h*0.4, o.h*0.08, 0, 0, Math.PI*2); ctx.fill(); kitSprite(o.k, x, y, o.h); }
       ctx.globalAlpha = 1;
     }]);
@@ -7681,6 +7827,9 @@ function openChest(){
     player.artifacts.push(k);
     rewards.unshift({ic:a.ic, name:a.name, text:'Artifact! '+a.desc, evo:true, proj:a.proj});
   }
+  { const fg = rollCatchGrade(player.stats.luck*(n >= 5 ? 2 : n >= 3 ? 1.4 : 1)), fft = fishTypeFor(fg), fn = mapFishCount(fg, n >= 5 ? 2 : n >= 3 ? 1.5 : 1);
+    addFish(fft, fn); runCaught[fg] += fn; fishWarned = 0;
+    rewards.push({ic:spImgHTML(fft, 'rw-fish'), name:fn+' '+fishName(fft), text:'Into your bucket · '+((FISH_ABILITY_INFO[fishAbility(fft)]||{}).name||'fish')}); }
   const g = Math.round(rand(10,30)*stage.goldMul*player.stats.greed*(n >= 5 ? 3 : n >= 3 ? 1.8 : 1));
   runGold += g;
   rewards.push({ic:'🪙', name:'Gold', text:'+'+g+' gold'});
@@ -8104,7 +8253,7 @@ function firstSighting(key){
   if(key==='royal') return 'Cat Town · Princess Rosalind’s request (after your first run)';
   for(const s of STAGES){
     let t = Infinity;
-    s.waves.forEach((w,m)=>{ if(w[0].some(k=>catFor(s, k)===key)) t = Math.min(t, m*60); });
+    s.waves.forEach((w,m)=>{ if(w[0].some(k=>catFor(s, k)===key)) t = Math.min(t, m*WAVE_MIN); });
     for(const e of s.events) if(e[2] && (catFor(s, e[2])===key || (e[1]==='boss' && bossFor(s)===key))) t = Math.min(t, e[0]);
     if(s.roster==='park' && PARK_SPECIAL_WAVES[key] !== undefined) t = Math.min(t, PARK_SPECIAL_WAVES[key]*60);
     if(t < Infinity) return `${s.name}${isUnlocked(s.key)?'':' 🔒'} · ${t >= 60 ? 'after '+fmtTime(t) : 'early'}`;
@@ -9541,8 +9690,11 @@ function takeFish(){
 }
 function fishStats(g){ return g < 0 ? FISH_SCRAPS : FISH_GRADES[g]; }
 // a catch found in the map goes in your bucket; a fish upgrade lifts every fish thrown this run
+// how many fish a find in the map (a 🐟 pickup or a treasure box) is worth: about 50 common fish, fewer of the fancy ones
+var MAP_FISH = [[45,55], [30,40], [18,26], [10,14], [5,8]];
+function mapFishCount(g, k){ const [a, b] = MAP_FISH[g]; return Math.round(rand(a, b)*(k||1)); }
 function gainMapFish(){
-  const g = rollCatchGrade(player ? player.stats.luck : 1), n = rollHaul(g, 0.35), ft = fishTypeFor(g);
+  const g = rollCatchGrade(player ? player.stats.luck : 1), n = mapFishCount(g), ft = fishTypeFor(g);
   addFish(ft, n); runCaught[g] += n; fishWarned = 0;
   showLootCard(spImgHTML(ft, 'lc-fish'), FISH_TIER[g]+' catch · into your bucket', n+' '+fishName(ft), abilityText(ft));
 }

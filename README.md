@@ -135,13 +135,21 @@ The first time the game starts, an animated opening plays **in Cat Town itself**
 - One-time items: **1 / 2 / 3** (or **Q** for the first), or tap the item slots at the bottom right. Party Treats fire instantly. Yarn Balls and Cucumbers are **placed by hand**: pick one, then click / tap where it should land (an aiming circle shows its area, time slows while you aim, and you can reach up to 480 px away). Pressing the same number again places it at the circle; Esc, right-click or tapping the slot again cancels.
 
 ## Cat Town's layout
-Cat Town is now an open map to fight in: cobbled streets, winding paths, the round stone piazza where you start, and the big tiered **fountain** in the middle (with water arcs, ripples and sparkles). The layout repeats every `TOWN_TILE` pixels, so it never ends.
-- **No clutter:** the houses, trees, flower beds, benches, lamps, park, garden and the manholes and flower pots between the cobbles are switched off.
-- **The story still has its set:** the trattoria, your fish shop and the gelato shop (with their lamps and pots) only stand on the north side of the piazza during the opening story.
-- **Bringing it all back:** set `TOWN_PROPS = true` in `index.html` to restore the full town blockout. The layout is the `TOWN` list (`ground` for streets and paths, `things` for what stands up).
-- **See-through:** the fountain fades while you or a cat is behind it, and nothing blocks movement.
+Cat Town is a low-poly town square, styled after the Ooblets square reference: soft, warm and pastel, seen through the 3D camera.
+- **Paving:** big warm sandstone tiles everywhere, with light grout and a slight colour shift from tile to tile.
+- **Lawns:** soft green lawns with a raised pale-stone curb, light and dark patches, grass tufts and little white, blue and yellow flowers. The big central lawn holds the fountain, and four smaller lawns sit around it.
+- **Low-poly pieces:** drawn flat-shaded with light from the upper left and no black outlines.
+  - a pink-sandstone fountain with three tiers, rippling water and water spilling over each bowl;
+  - round puffy bushes in yellow and green;
+  - red spotted mushrooms;
+  - slim blue lamp posts with glowing lanterns;
+  - wooden benches with blue legs.
+- **Nothing blocks you or the cats.** The fountain, bushes and lamps fade while someone is behind them. The layout repeats every `TOWN_TILE` pixels.
+- **The story still has its set:** the trattoria, your fish shop and the gelato shop only stand on the square during the opening story.
+- **Editing it:** `SQUARE` in `index.html` lists the lawns and pieces, and `SQ` holds the colours. Setting `TOWN_PROPS = true` brings back the old town blockout (streets, houses, park and garden).
 
 ## How a run works
+- **New cats arrive faster:** each area's waves change every **45 seconds** (`WAVE_MIN`, was a minute), so new kinds of cats join about 25% sooner. Timed events (swarms, elites, bosses) keep their own schedule.
 **The 3D look:** the run maps look like a tilted, gently curved 3D diorama.
 - **The ground** (floor, decorations, zones, plates, shots):
   - It's drawn flat, then a small WebGL pass tilts it so it falls away toward the top.
@@ -305,7 +313,7 @@ Each card also shows:
       - **Sneak up from behind:** touching any fish with the hook from behind snags it, whatever the bait.
       - **A bite is reeled in on its own.** The whole catch of that species goes in your bucket, for example 60–100 of a common fish or 3–5 of a legendary one; better bait lands a bit more.
       - **Fits any screen:** the sea fills the screen above the bait bar and gets taller on a phone in portrait.
-    - **In the maps:** 🐟 **+FISH** pickups put a small catch in your bucket. ⬆️ **FISH UPGRADE** pickups (from 1:30) make every fish you throw for the rest of the run count as one grade better. The results screen shows how many fish you threw and found.
+    - **In the maps:** every find is a proper catch of about **50 fish** (45–55 common ones; fancier fish come in smaller numbers, down to 5–8 legendary). 🐟 **+FISH** pickups drop from cats, and every **treasure box** now holds a catch too (rare boxes 1.5× and luckier, legendary 2×). ⬆️ **FISH UPGRADE** pickups (from 1:30) make every fish you throw for the rest of the run count as one grade better. The results screen shows how many fish you threw and found.
 - **Fish types:** everything you throw is a real fish from **`assets/fx/fish_types.webp`** (30 species, from sardines to a golden arowana). Each fish grade adds more and fancier fish to the bucket Fish Toss picks from: 6 at first, 30 with the Golden Koi. Salmon Run throws salmon, Golden Catch throws a glowing golden arowana, and Tuxedo Cats' Fish Missiles are random fish.
 - **Gold** collected in a run is kept, even if you're overrun. You spend it on two things:
 - **Skill Tree:** three branches. Each node needs the one above it before you can buy it, and existing purchases carry over.
