@@ -337,12 +337,13 @@ The character sheet is **`assets/player/characters.png`** (`.webp` / `.jpg` also
 ## Performance
 - **Tilt-shift blur:** done inside the 3D camera's WebGL shader as a cheap 5-tap blur at the top and bottom of the view. A full-screen CSS `backdrop-filter` was much too slow on weaker graphics cards.
 - **No extra frame copy:** the WebGL context no longer keeps its drawing buffer (`preserveDrawingBuffer:false`).
-- **Automatic quality:** during a run the game watches the frame rate. If it stays under about 40 fps for 2 seconds, it drops one step and remembers it in `localStorage` (`chumstorm_quality`):
+- **Automatic quality:** during a run the game watches the frame rate. If it stays under about 45 fps for 1 second, it drops one step and remembers it in `localStorage` (`chumstorm_quality`):
   - **0:** full quality
   - **1:** no tilt-shift blur and no lens curve
   - **2:** also fewer particles
   - **3:** also a flat camera (no 3D tilt)
-- **Forcing a level:** add `?quality=0` … `?quality=3` to the URL to force a level, or `?quality=auto` to clear the saved one.
+- **Graphics switch:** the pause screen has **Auto / Fancy / Fast**. Auto steps down by itself, Fancy always uses full quality, and Fast always uses the flat camera with no blur and fewer particles. The choice is remembered (`chumstorm_quality_mode`).
+- **Forcing a level:** add `?quality=0` … `?quality=3` to the URL to force a level, or `?quality=auto` to clear the saved level and mode.
 - **Profiling:** with `?debug&prof`, `window.__prof` shows the average milliseconds per frame for update, render and each draw pass.
 
 ## Testing shortcuts
