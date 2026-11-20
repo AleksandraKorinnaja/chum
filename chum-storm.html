@@ -3746,7 +3746,7 @@ function runSpawns(dt){
 function manageProps(dt){
   propTimer -= dt;
   if(propTimer > 0) return;
-  propTimer = 1.5;
+  propTimer = 0.8;                             // breakable crates turn up about twice as often
   let near = 0;
   const lim = Math.max(W,H)*1.4;
   for(let i=cats.length-1;i>=0;i--){
@@ -3827,7 +3827,10 @@ function killCat(c, ang){
     else { addShake(6, 0.25); addHitstop(0.05); }
   } else {
     orbs.push({x:c.x, y:c.y, groundY:c.y, value:def.xp*catXpMul(def)*(treatT > 0 ? 2 : 1), vx:rand(-55,55), vy:rand(-200,-150), bounces:0, settled:false, ph:Math.random()*6});
-    if(Math.random() < 0.012*player.stats.luck) dropCoin(c.x, c.y, 1);
+    const dr = Math.random(), L = player.stats.luck;                      // ordinary cats drop things too now
+    if(dr < 0.012*L) pickups.push({x:c.x, y:c.y, kind:'chest', bob:0, pop:0.55, tier:rollTier(1)});
+    else if(dr < 0.07*L) pickups.push({x:c.x, y:c.y, kind:randomPowerupKind(), bob:Math.random()*6, pop:0.55});
+    else if(dr < 0.1*L) dropCoin(c.x, c.y, 1);
     spawnLoveBurst(c.x, c.y);
   }
   spawnPoof(c.x, c.y, def.fur);
@@ -3905,7 +3908,6 @@ function fireWeapon(w, s, kind){
   else if(kind==='anchor') fireAnchors(w, s);
 }
 function fireToss(w, s){
-  if(fishTotal() <= 0){ outOfFish(); return; }       // no fish in the bucket: nothing to throw
   const aim = computeAimAngle();
   player.facing = aim;
   player.dir = direction8(Math.cos(aim), Math.sin(aim));
@@ -5137,7 +5139,7 @@ function randomPowerupKind(){
     frenzy:  m < 3 ? 0 : 9,
     bait:    m < 4 || player.baitBonus >= 2 ? 0 : 4*L,
     foghorn: m < 2 ? 0 : 3*L,
-    catchfish: fishTotal() < 40 ? 30 : 9,
+    catchfish: 14,
     fishup:  m < 1.5 || runFishIdx() >= FISH_GRADES.length-1 ? 0 : 5,
   };
   let r = Math.random()*Object.values(w).reduce((a,b)=>a+b, 0);
@@ -5153,7 +5155,7 @@ function availableArtifacts(){
 function updateHunt(dt){
   huntT -= dt;
   if(huntT > 0) return;
-  huntT = rand(38, 50)*player.stats.hunt;
+  huntT = rand(16, 24)*player.stats.hunt;          // a treasure spot about every 20 s (was 40-50)
   if(pickups.some(p=>p.kind==='xspot')) return;
   const a = Math.random()*Math.PI*2, d = rand(650, 900);
   let x = player.x + Math.cos(a)*d, y = player.y + Math.sin(a)*d;
@@ -7840,7 +7842,7 @@ function openChest(){
     player.artifacts.push(k);
     rewards.unshift({ic:a.ic, name:a.name, text:'Artifact! '+a.desc, evo:true, proj:a.proj});
   }
-  { const fg = rollCatchGrade(player.stats.luck*(n >= 5 ? 2 : n >= 3 ? 1.4 : 1)), fft = fishTypeFor(fg), fn = mapFishCount(fg, n >= 5 ? 2 : n >= 3 ? 1.5 : 1);
+  { const fg = rollSpecialGrade(player.stats.luck*(n >= 5 ? 2 : n >= 3 ? 1.4 : 1)), fft = fishTypeFor(fg), fn = mapFishCount(fg, n >= 5 ? 2 : n >= 3 ? 1.5 : 1);
     addFish(fft, fn); runCaught[fg] += fn; fishWarned = 0;
     rewards.push({ic:spImgHTML(fft, 'rw-fish'), name:fn+' '+fishName(fft), text:'Into your bucket · '+((FISH_ABILITY_INFO[fishAbility(fft)]||{}).name||'fish')}); }
   const g = Math.round(rand(10,30)*stage.goldMul*player.stats.greed*(n >= 5 ? 3 : n >= 3 ? 1.8 : 1));
@@ -7890,7 +7892,7 @@ function updateHud(){
   }
   setIconText('gold-label', 'coin', '🪙', Math.floor(runGold));
   setIconText('fed-label', 'fishCur', '🐟', fedCount);
-  { const b = $('ammo-label').querySelector('b'), t = String(fishTotal()); if(b.textContent !== t) b.textContent = t; $('ammo-label').classList.toggle('low', fishTotal() < 50); }
+  { const b = $('ammo-label').querySelector('b'), t = '∞ + '+fishSpecial(); if(b.textContent !== t) b.textContent = t; $('ammo-label').classList.toggle('low', fishTotal() < 50); }
   const n = 1 + player.stats.amount;
   if(n !== lastProjShown){ const el = $('proj-label'); el.textContent = '🎯×'+n; if(lastProjShown){ el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); } lastProjShown = n; }
   const fl = $('frenzy-label'); fl.hidden = !(player.frenzyT > 0); if(player.frenzyT > 0) fl.textContent = '🔥 '+Math.ceil(player.frenzyT)+'s';
@@ -7937,7 +7939,7 @@ function startRun(opts){
   hazards = []; yarns = []; cucumbers = []; thrown = []; treatT = 0; placing = null; obstacles = [];
   decoState.clear();
   runT = 0; fedCount = 0; runGold = 0; spawnTimer = 0.5; eventIdx = 0; propTimer = 0; bossCountRun = 0;
-  runOver = false; levelQueue = 0; chestQueue = 0; bossFedRun = 0; chestTiers = []; huntT = 20; spottedNew = new Set(); lastProjShown = 0; lastDiscShown = -1; $('lvl-label').textContent = '';
+  runOver = false; levelQueue = 0; chestQueue = 0; bossFedRun = 0; chestTiers = []; huntT = 10; spottedNew = new Set(); lastProjShown = 0; lastDiscShown = -1; $('lvl-label').textContent = '';
   shakeT = shakeMag = hitstop = flashT = 0;
   speechTimer = rand(9,14);
   updateLighting();
@@ -9584,7 +9586,7 @@ function renderHarborUi(){
   $('hb-gold').textContent = save.gold.toLocaleString();
   { const rn = $('hb-runname'); if(rn){ rn.textContent = ACTIVE_RUN ? ACTIVE_RUN.name : ''; rn.style.display = ACTIVE_RUN ? '' : 'none'; } }
   { const all = ALL_CAT_DEFS.length, found = all - undiscoveredTotal(); $('hb-disc').innerHTML = `<span class="v2ic">?</span>Cats to discover ${found}/${all}`; }
-  $('hb-fish').innerHTML = `<span class="v2ic teal">🐟</span>Fish ${fishTotal()}`;
+  $('hb-fish').innerHTML = `<span class="v2ic teal">🐟</span>Fish ∞ + ${fishSpecial()}`;
   const bs = activeBounties();
   $('hb-requests').innerHTML = `<div class="rr-head">Requests</div>` + (bs.length ? bs.map(b=>`<div class="rr${b.done ? ' done' : ''}"><i class="v2av">${(b.giver||'?')[0]}</i><span class="rr-t">${bountyText(b)}<small>${b.giver} · ${b.done ? 'done! collect ' : ''}${b.reward} gold</small></span><em>${bountyCount(b)}</em></div>`).join('') : `<div class="rr empty">No requests yet. Locals drop by now and then.</div>`);
   renderPrompt();
@@ -9604,7 +9606,7 @@ function renderFishTab(){
     return `<div class="fish-row${b[i] ? ' cur' : ''}">
       ${fishImgHTML(i, 'fr-img')}
       <div><b>${fishName(FISH_GRADE_ICON[i])}</b><span class="fr-ab">${abilityText(FISH_GRADE_ICON[i])}</span><span>${i ? `Fish Toss +${Math.round(g.dmg*100)}% damage, ${Math.round((g.size-1)*100)}% bigger${g.pierce ? ', +1 pierce' : ''}` : 'Plain and cheap. Where every fisher starts.'}</span></div>
-      <div class="fr-buy"><span class="fr-own">You have ${b[i]}</span>${FISH_PRICE[i] ? `<button data-g="${i}" data-n="1" ${save.gold < price ? 'disabled' : ''}>${pack} for ${price} 🪙</button><button class="alt" data-g="${i}" data-n="5" ${save.gold < price*5 ? 'disabled' : ''}>×5</button>` : '<em>Catch it yourself!</em>'}</div></div>`;
+      <div class="fr-buy"><span class="fr-own">${i ? "You have "+b[i] : "∞"}</span>${FISH_PRICE[i] ? `<button data-g="${i}" data-n="1" ${save.gold < price ? 'disabled' : ''}>${pack} for ${price} 🪙</button><button class="alt" data-g="${i}" data-n="5" ${save.gold < price*5 ? 'disabled' : ''}>×5</button>` : i ? '<em>Catch it yourself!</em>' : '<em>Always free · never runs out</em>'}</div></div>`;
   }).join('');
   el.querySelectorAll('.fr-buy button').forEach(btn=>btn.onclick = ()=>gilBuy(+btn.dataset.g, +btn.dataset.n));
   $('gil-buy').style.display = 'none'; $('gil-haggle').style.display = hb.haggle.tried ? 'none' : '';
@@ -9635,7 +9637,7 @@ function gilHaggle(){
    Bucket empty → Fish Toss stops; 🐟 catches wash up near you every few seconds until you grab one. Fill it at Old Gil's stall, by fishing off
    your boat, or with 🐟 pickups in the maps; ⬆️ fish upgrades make every fish thrown this run a grade better. */
 var FISH_PACK  = [100, 50, 25, 10, 0];                // Old Gil sells fish by the crate…
-var FISH_PRICE = [40, 90, 180, 320, 0];               // …at this price per crate (the Golden Koi isn't for sale)
+var FISH_PRICE = [0, 90, 180, 320, 0];                 // …at this price per crate (the Golden Koi isn't for sale)
 var FISH_HAUL  = [[60,100], [30,50], [15,25], [6,10], [3,5]];   // how many come up in one catch at the boat
 var FISH_SCRAPS = {name:'Fish scraps', ic:'🦴', dmg:-0.25, size:0.9, pierce:0, all:0, filter:'grayscale(0.7) brightness(0.9)', line:'Heads and tails. Better than nothing.'};
 var CATCH_WEIGHTS = [52, 28, 13, 5.5, 1.5];          // what bites at the boat (and what 🐟 pickups hold)
@@ -9667,6 +9669,9 @@ function spImgHTML(ft, cls){ const u = fishTypesReady ? fishIconURL(ft) : ''; re
 var FISH_TIER = ['Common', 'Nice', 'Great', 'Rare', 'Legendary'];
 var lastThrownSp = 0;
 function fishTotal(){ return fishBag().reduce((a, b)=>a + b, 0); }
+function fishSpecial(){ const b = fishBag(); return b[1] + b[2] + b[3] + b[4]; }   // nice fish and up: the ones you catch, buy or find
+// a roll for a catch worth finding: never a common fish (those are infinite)
+function rollSpecialGrade(luck){ let g = 0; for(let k=0;k<20 && g===0;k++) g = rollCatchGrade(luck); return Math.max(1, g); }
 function bestFish(){ const b = fishBag(); for(let g = b.length-1; g >= 0; g--) if(b[g] > 0) return g; return -1; }
 // the HUD / fish-pickup "grade": the best fish in the bucket (plus this run's upgrades)
 function runFishIdx(){ const f = bestFish(), u = runFishUp||0; return f < 0 ? (u ? Math.min(FISH_GRADES.length-1, u-1) : -1) : Math.min(FISH_GRADES.length-1, f + u); }
@@ -9685,6 +9690,7 @@ var fishDropT = 0;
 function outOfFish(){ if(fishWarned < 2){ fishWarned = 2; showBanner('🪣 Out of fish! Grab 🐟 in the map to keep throwing', 2200); } }
 // while the bucket is empty, a fish catch washes up near you every few seconds
 function fishRescue(dt){
+  return;                                      // (plain fish never run out now, so no rescue drops)
   if(!player || fishTotal() > 0) return;
   fishDropT -= dt; if(fishDropT > 0) return;
   fishDropT = 6;
@@ -9693,12 +9699,15 @@ function fishRescue(dt){
 }
 // take one fish out of the bucket for a throw (random, weighted by how many of each you have); -1 = scraps
 function takeFish(){
-  const b = fishBag(), n = fishTotal();
-  if(n <= 0){ outOfFish(); return -1; }
-  let r = Math.random()*n, g = 0;
-  for(; g < b.length; g++){ if(r < b[g]) break; r -= b[g]; }
-  g = Math.min(g, b.length-1); lastThrownSp = takeFishOfGrade(g); runThrown[g]++;
-  if(n - 1 === 50 && !fishWarned){ fishWarned = 1; showBanner('🪣 Only 50 fish left in your bucket', 1500); }
+  const b = fishBag(), n = fishSpecial();
+  let g = 0;
+  if(n > 0){                                    // better fish in the bucket: throw those (random, by how many of each)
+    let r = Math.random()*n; g = 1;
+    for(; g < b.length; g++){ if(r < b[g]) break; r -= b[g]; }
+    g = Math.min(g, b.length-1); lastThrownSp = takeFishOfGrade(g);
+    if(n === 1) showBanner('🪣 Out of special fish: back to plain fish', 1600);
+  } else lastThrownSp = fishTypeFor(0);         // plain fish never run out
+  runThrown[g]++;
   return Math.min(FISH_GRADES.length-1, g + (runFishUp||0));
 }
 function fishStats(g){ return g < 0 ? FISH_SCRAPS : FISH_GRADES[g]; }
@@ -9707,7 +9716,7 @@ function fishStats(g){ return g < 0 ? FISH_SCRAPS : FISH_GRADES[g]; }
 var MAP_FISH = [[45,55], [30,40], [18,26], [10,14], [5,8]];
 function mapFishCount(g, k){ const [a, b] = MAP_FISH[g]; return Math.round(rand(a, b)*(k||1)); }
 function gainMapFish(){
-  const g = rollCatchGrade(player ? player.stats.luck : 1), n = mapFishCount(g), ft = fishTypeFor(g);
+  const g = rollSpecialGrade(player ? player.stats.luck : 1), n = mapFishCount(g), ft = fishTypeFor(g);
   addFish(ft, n); runCaught[g] += n; fishWarned = 0;
   showLootCard(spImgHTML(ft, 'lc-fish'), FISH_TIER[g]+' catch · into your bucket', n+' '+fishName(ft), abilityText(ft));
 }
@@ -9720,8 +9729,8 @@ function gainFishUp(){
 function renderBucket(){
   const el = $('bucket-list'); if(!el) return;
   const b = fishBag(), n = fishTotal();
-  el.innerHTML = FISH_GRADES.map((g, i)=>`<div class="fb${b[i] ? '' : ' none'}" title="${spList(i)}">${fishImgHTML(i)}<b>${FISH_TIER[i]}</b><i>×${b[i]}</i></div>`).join('') +
-    (n ? `<div class="fb-note">Fish Toss throws whatever is in your bucket, one fish per throw. Fish you don't throw stay for next time.</div>`
+  el.innerHTML = FISH_GRADES.map((g, i)=>`<div class="fb${b[i] || !i ? '' : ' none'}" title="${spList(i)}">${fishImgHTML(i)}<b>${FISH_TIER[i]}</b><i>${i ? '×'+b[i] : '∞'}</i></div>`).join('') +
+    (true ? `<div class="fb-note">Plain fish never run out. Better fish (nice and up) are thrown first, one per throw, until they're used up: catch, buy or find more.</div>`
        : `<div class="fb-empty">Your bucket is empty, so Fish Toss can't throw anything until you grab 🐟 in the map. Buy fish from Old Gil or go fishing off your boat.</div>`);
   const st = $('btn-start'); if(st) st.textContent = `Let's go!`;
 }
@@ -9736,7 +9745,7 @@ function renderBucket(){
    bucket (cheap fish catch better fish), and you can cast as often as you like.                        */
 var BAITS = [
   {name:'Bread',  ic:'🍞', fish:-1, n:0, p:0},           // free
-  {name:'Worm',   ic:'🪱', fish:0,  n:5, p:1},           // costs 5 Sardines
+  {name:'Worm',   ic:'🪱', fish:-1, n:0, p:1},           // free
   {name:'Shrimp', ic:'🦐', fish:1,  n:3, p:2},           // costs 3 Mackerel
   {name:'Squid',  ic:'🦑', fish:2,  n:2, p:3},           // costs 2 Bluefin Tuna
 ];
@@ -9781,7 +9790,7 @@ function fishUi(){
   const f = fishing; if(!f) return;
   const B = BAITS[f.bait], bag = fishBag();
   $('fish-casts').textContent = '';
-  $('fish-bucket').innerHTML = FISH_GRADES.map((G, i)=>`<span class="fb-n" title="${spList(i)}">${fishImgHTML(i, 'fb-mini')}${bag[i]}</span>`).join('');
+  $('fish-bucket').innerHTML = FISH_GRADES.map((G, i)=>`<span class="fb-n" title="${spList(i)}">${fishImgHTML(i, 'fb-mini')}${i ? bag[i] : "∞"}</span>`).join('');
   const idle = f.st === 'ready' || f.st === 'caught' || f.st === 'lost';
   $('fish-baits').innerHTML = BAITS.map((b, i)=>`<button class="fbait${i===f.bait ? ' sel' : ''}${canAffordBait(b) ? '' : ' poor'}" data-i="${i}" ${idle ? '' : 'disabled'}><i>${b.ic}</i><b>${b.name}</b><span>${baitCostText(b)}</span></button>`).join('');
   $('fish-baits').querySelectorAll('.fbait').forEach(btn=>btn.onclick = ()=>{ if(!fishing) return; fishing.bait = +btn.dataset.i; save.bait = fishing.bait; persist(); fishUi(); });
@@ -11058,6 +11067,7 @@ if(DEBUG) window.CS = {
   fish:()=>{ if(state==='harbor'){ openFishing(); } },
   onlyFish:(ft, n)=>{ const sp = fishSp(); for(const k in sp) delete sp[k]; save.fishBag = [0,0,0,0,0]; addFish(ft, n || 200); },   // testing: a bucket of one species (not saved until something persists)
   giveItem:k=>gainItem(k || 'yarnball'),
+  pickupKinds:()=>{ const o = {}; for(const p of pickups) o[p.kind] = (o[p.kind]||0) + 1; return o; },
   catKeys:()=>{ const o = {}; for(const c of cats) if(c.def && !c.dying) o[c.def.key] = (o[c.def.key]||0) + 1; return o; },
   tut:()=>tut && {part:tut.part, i:tut.i, id:tut.steps[tut.i] && tut.steps[tut.i].id, prog:tut.prog}, tutStart:p=>{ save.tut = {run:0, harbor:0}; tutStart(p); },
   fishing:()=>fishing, bag:()=>fishBag().slice(), runFish:()=>runFishIdx(), fishStep:(dt)=>{ if(fishing){ fishUpdate(dt); fishDraw(); } },

@@ -151,6 +151,7 @@ Cat Town is a low-poly town square, styled after the Ooblets square reference: s
 ## How a run works
 - **New cats arrive faster, the crowd doesn't grow faster:** the kinds of cats in each area move ahead every **45 seconds** (`WAVE_MIN`), so new types join about 25% sooner. How many cats are around, and how quickly more come, still follows the original minute-by-minute pace. Timed events (swarms, elites, bosses) keep their own schedule.
 - **Newer cats are worth more XP:** each cat type gives ×1 XP plus 0.25 for every wave later it first appears in that area, up to ×3.5. In Cat Town, orange tabbies give ×1, black cats ×1.5, and the last arrivals up to ×3.5. Elites still give 5× on top.
+- **More treasure and drops:** a treasure spot turns up about every 20 seconds (the first at 0:10), breakable crates about twice as often, and ordinary cats now drop things: about 1 in 80 a treasure box, 1 in 17 a power-up, and sometimes a coin. Every fish find (🐟 pickups and treasure boxes) is always better fish (nice and up), about 50 at a time.
 **The 3D look:** the run maps look like a tilted, gently curved 3D diorama.
 - **The ground** (floor, decorations, zones, plates, shots):
   - It's drawn flat, then a small WebGL pass tilts it so it falls away toward the top.
@@ -283,7 +284,8 @@ Each card also shows:
   - survive to a set time on a stage
   When one is done, the local waits in the harbor with a 🪙 bubble. Talk to them to collect the gold.
 - **Your fish bucket is your ammo.** It holds real species (the 30 fish from `fish_types.webp`), each in one of five grades: Common, Nice, Great, Rare (+1 pierce) and Legendary.
-  - **Every fish Fish Toss throws comes out of the bucket**, picked at random from what's in it. The fish you see flying is the species that left your bucket, and it hits as hard as its grade: better fish do more damage and are bigger.
+  - **Plain fish are infinite.** Fish Toss never runs dry: common fish (Sardines and friends) are always in your bucket.
+  - **Better fish are thrown first:** while your bucket holds nice, great, rare or legendary fish, every throw uses one of those (picked at random from what you have), and the fish you see flying is that species. When they run out you're back to plain fish, and a banner tells you. Catch, buy or find more.
   - **What you catch is what you get:** hook a Pufferfish and Pufferfish go in your bucket. Hover a grade in the bucket to see which species you have.
   - **Every species has an ability** when Fish Toss throws it (`FISH_AB` in `index.html`). It's shown on the catch card, on fish pickups and at Old Gil's stall:
     - **Puff burst (AoE):** Pufferfish (widest) and Boxfish burst on impact and hit every cat around them.
@@ -300,13 +302,12 @@ Each card also shows:
     - **Lucky gold:** Goldfish and Golden Arowana have a 20% chance to drop a coin.
     - **Soothing:** Butterflyfish and Seahorse heal you a little with each hit.
     - Evolved weapons have no ability.
-  - **Fish you don't throw stay** for the next run. The HUD's **Fish** pill shows how many are left; it turns red under 50.
-  - **Empty bucket:** Fish Toss stops throwing ("Out of fish!"). Grab 🐟 in the map to keep going: while the bucket is empty, a catch washes up near you every 6 seconds, and 🐟 drops from cats are much more common while you have fewer than 40 fish.
+  - **Fish you don't throw stay** for the next run. The HUD's **Fish** pill shows "∞ + n", where n is how many better fish you have.
   - **New saves** start with 300 Sardines. **Older saves** are scaled up to the new crate sizes once.
   - **Three ways to get fish:**
-    - **Old Gil** sells crates: 100 Sardines for 40, 50 Mackerel for 90, 25 Bluefin Tuna for 180, 10 Swordfish for 320 (or ×5). The Golden Koi isn't for sale. You can **haggle** once per visit: a 55% chance of 20% off, otherwise prices go up 10%.
+    - **Old Gil** sells crates of the better fish: 50 Mackerel for 90, 25 Bluefin Tuna for 180, 10 Swordfish for 320 (or ×5). The Golden Koi isn't for sale. You can **haggle** once per visit: a 55% chance of 20% off, otherwise prices go up 10%.
     - **Fishing off your boat:** a full-screen side view under the boat. It costs no gold and has no cooldown: fish as much as you like.
-      - **Pick a bait:** Bread is free. Better bait is paid for with fish from your bucket: Worm costs 5 common fish, Shrimp 3 nice fish, Squid 2 great fish.
+      - **Pick a bait:** Bread and Worm are free. Better bait is paid for with fish from your bucket: Shrimp costs 3 nice fish, Squid 2 great fish.
       - **Cast**, then **steer the hook** with the mouse, touch or arrow keys. The line stays out until something bites or you reel in (Space / Reel in).
       - **The deeper you go, the rarer the fish:** Shallows (common), Reef (nice), Open sea (great), Deep (rare) and Abyss (legendary).
       - **Fish that see the hook come and bite.** Fish see only what's in front of them.
