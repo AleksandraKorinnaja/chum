@@ -81,16 +81,12 @@ The game opens on a **Your runs** screen.
 
 ## Tutorial
 A white **coach card** with a yellow ring teaches the game one step at a time. Each step finishes when you actually do it, or after a few seconds for tips that only need reading. A progress bar fills as you go, and a green tick shows before the next step.
-- **Part 1, in your first run** (straight after the story), at the bottom of the screen:
-  1. Move around.
-  2. Feed 5 cats.
-  3. Grab XP to reach level 2.
-  4. Dodge once.
-  5. Your fish bucket and fish abilities.
-  6. Missions, requests and undiscovered cats.
-  7. Items and treasure.
-  8. Feed them all!
-- **Part 2, on your first visit to the harbor**, above the walk prompt. A bouncing orange arrow points at the building for each step:
+- **Part 1, in your first run** (straight after the story): no text, just big flashing keys in the middle of the screen.
+  1. **W A S D** flashes, and each key lights up while you hold it (arrow keys count too). On a phone it's a sliding "hold & drag" hand. Walk a little way to finish it.
+  2. **Space** flashes. Dodge once to finish it.
+  - **Pop-ups wait** while the keys are showing: new-cat and mission cards, banners and item cards appear once you've done it, so nothing covers the keys.
+  - **Your first one-time item:** instead of the item card, an orange arrow points at its slot and the slot's number key (for example **1**) flashes above it ("Tap" on a phone). It goes away once you use an item, and doesn't come back (`save.itemHinted`).
+- **Part 2, on your first visit to the harbor**, in a card at the top of the screen (top right under the top bar; full width on phones, where it takes the Requests panel's place while it shows). A bouncing orange arrow points at the building for each step:
   1. Take a stroll.
   2. Go into the Big Fish Shop.
   3. Visit Old Gil.
@@ -139,24 +135,12 @@ The first time the game starts, an animated opening plays **in Cat Town itself**
 - One-time items: **1 / 2 / 3** (or **Q** for the first), or tap the item slots at the bottom right. Party Treats fire instantly. Yarn Balls and Cucumbers are **placed by hand**: pick one, then click / tap where it should land (an aiming circle shows its area, time slows while you aim, and you can reach up to 480 px away). Pressing the same number again places it at the circle; Esc, right-click or tapping the slot again cancels.
 
 ## Cat Town's layout
-Cat Town is blocked out as a little Italian town, built from simple 3D shapes (boxes, cylinders and ball-shaped treetops) that stand up on the tilted ground. The layout repeats every `TOWN_TILE` pixels, so it never ends.
-- **The piazza** (where you start):
-  - A big round stone square with a large tiered **fountain**, with water arcs, ripples and sparkles.
-  - Benches and lamp posts around it.
-  - The trattoria, your fish shop and the gelato shop along its north side.
-- **Streets and houses:**
-  - A paved east–west main street, a north street, and a north–south avenue.
-  - Rows of houses face the streets: pastel walls, windows with green shutters and flower boxes, an arched door and a terracotta roof. Some wear the Italian village art.
-  - Gaps between the houses leave lanes to walk through, and trees line the main street.
-- **The park** (south-east): grass, trees, a pond with ripples, flower beds, benches and a lamp along a winding path.
-- **The garden** (south-west): rows of raised flower beds and lemon trees on grass, with crossing paths.
+Cat Town is now an open map to fight in: cobbled streets, winding paths, the round stone piazza where you start, and the big tiered **fountain** in the middle (with water arcs, ripples and sparkles). The layout repeats every `TOWN_TILE` pixels, so it never ends.
+- **No clutter:** the houses, trees, flower beds, benches, lamps, park, garden and the manholes and flower pots between the cobbles are switched off.
+- **The story still has its set:** the trattoria, your fish shop and the gelato shop (with their lamps and pots) only stand on the north side of the piazza during the opening story.
+- **Bringing it all back:** set `TOWN_PROPS = true` in `index.html` to restore the full town blockout. The layout is the `TOWN` list (`ground` for streets and paths, `things` for what stands up).
+- **See-through:** the fountain fades while you or a cat is behind it, and nothing blocks movement.
 
-**It never gets in the way:**
-- Nothing blocks you or the cats.
-- Any house, tree, shop or the fountain fades to see-through while you or a cat is behind it.
-- Manholes and weeds stay off the grass, the garden and the piazza.
-
-**Editing it:** the layout is the `TOWN` list in `index.html` (`ground` for streets and grass, `things` for what stands up). `BOX3D.Z` sets how much tall things lean with the camera.
 ## How a run works
 **The 3D look:** the run maps look like a tilted, gently curved 3D diorama.
 - **The ground** (floor, decorations, zones, plates, shots):
@@ -276,13 +260,13 @@ Each card also shows:
   The cream panels on the sheet count as background when it's cut up. Until the sheet loads, the old drawn street shows instead.
   - 🏠 **Cat Home**: visit and squish your cats
   - 🎣 **Tackle & Skills**: the skill tree
-  - 🐟 **Chum Storm Fish Co.** (your shop): the wardrobe for your fisher's look
+  - 🐟 **Big Fish Shop** (your shop): walking in shows two big buttons, **Skills** (the skill tree) and **Cat Sanctuary** (your cats' home). Click one or press **1** / **2**.
   - 🐾 **Pet Store**: furniture for the Cat Home
   - 🐠 **Old Gil's Fish** on the pier: buy fish for your bucket
   - ⛵ **Your boat** at the end of the pier: go fishing (see below).
   - 🗺️ **Out of town** at the far left of the street: a yellow **Areas** sign with arrows on the cobbles. Walk past it (or press **E** by it, or tap **Areas** in the bottom bar) and a pop-up shows every area, your fishers and what is in your fish bucket. Pick and press **Let's go!** to start a run.
   - Your collected cats laze around in front of the shop (tap one to squish it).
-- **Locals with requests.** Now and then a local walks up with a ❗ and asks for something. Requests carry across runs (up to 3 at once) and show in the Requests panel, both in the harbor and during runs:
+- **Locals with requests.** Now and then a local walks up with a ❗ and asks for something. Requests carry across runs (up to 3 at once) and show in the Requests panel, both in the harbor and during runs: Talking to one opens their **mission brief** in the middle of the screen, in large text: who's asking, what they want, the reward, and Deal! / Not now.
   - find and feed a specific cat, often one you've never met
   - feed a number of one cat type
   - feed the Narwhal Cat
@@ -306,9 +290,9 @@ Each card also shows:
     - **Speedy:** Mackerel, Trout and Blue Tang fly 40% faster.
     - **Lucky gold:** Goldfish and Golden Arowana have a 20% chance to drop a coin.
     - **Soothing:** Butterflyfish and Seahorse heal you a little with each hit.
-    - Fish scraps and evolved weapons have no ability.
+    - Evolved weapons have no ability.
   - **Fish you don't throw stay** for the next run. The HUD's **Fish** pill shows how many are left; it turns red under 50.
-  - **Empty bucket:** you throw **fish scraps**, which do 25% less damage.
+  - **Empty bucket:** Fish Toss stops throwing ("Out of fish!"). Grab 🐟 in the map to keep going: while the bucket is empty, a catch washes up near you every 6 seconds, and 🐟 drops from cats are much more common while you have fewer than 40 fish.
   - **New saves** start with 300 Sardines. **Older saves** are scaled up to the new crate sizes once.
   - **Three ways to get fish:**
     - **Old Gil** sells crates: 100 Sardines for 40, 50 Mackerel for 90, 25 Bluefin Tuna for 180, 10 Swordfish for 320 (or ×5). The Golden Koi isn't for sale. You can **haggle** once per visit: a 55% chance of 20% off, otherwise prices go up 10%.
@@ -366,6 +350,14 @@ The character sheet is **`assets/player/characters.png`** (`.webp` / `.jpg` also
 - **Debug tools:** with `?debug`, the Wardrobe can **Export all layers as PSD** (a fresh file of every piece) or **Use a PSD** (load a file and save it as `avatar_layers.psd`).
 - **Without the PSD:** the game falls back to the sheets and the built-in placement.
 
+## UI size
+- **Bigger HUD and harbor UI:** everything is scaled up by `--ui` (1.25 on big screens, 1.15 on medium, about 1 on phones). Each piece grows from the corner it's anchored to, so nothing moves.
+- **Full-size pop-ups:** the panels (Tackle & Skills, Pet Store, Old Gil, Where to?, dialogue, pause, results) use `--pz`, which is full size on big screens and smaller on small ones.
+- **Text:** nothing in the panels is smaller than 13.5px.
+- **New cat, mission and item cards** pop up in the bottom-right corner, just above the item slots. When two show at once they sit side by side.
+- **Items have no Take button:** walk over an item and it goes into an empty slot by itself.
+- **The treasure box window** is bigger, with larger rewards and a bigger Collect button.
+
 ## Performance
 - **Tilt-shift blur:** done inside the 3D camera's WebGL shader as a cheap 5-tap blur at the top and bottom of the view. A full-screen CSS `backdrop-filter` was much too slow on weaker graphics cards.
 - **No extra frame copy:** the WebGL context no longer keeps its drawing buffer (`preserveDrawingBuffer:false`).
@@ -373,9 +365,9 @@ The character sheet is **`assets/player/characters.png`** (`.webp` / `.jpg` also
   - **0:** full quality
   - **1:** no tilt-shift blur and no lens curve
   - **2:** also fewer particles
-  - **3:** also a flat camera (no 3D tilt)
-- **Graphics switch:** the pause screen has **Auto / Fancy / Fast**. Auto steps down by itself, Fancy always uses full quality, and Fast always uses the flat camera with no blur and fewer particles. The choice is remembered (`chumstorm_quality_mode`).
-- **Forcing a level:** add `?quality=0` … `?quality=3` to the URL to force a level, or `?quality=auto` to clear the saved level and mode.
+  - The 3D world and camera are kept at every level. (Hitches over 250 ms, like a throttled background tab, are ignored.)
+- **Graphics switch:** the pause screen has **Auto / Fancy / Fast**. Auto steps down by itself, Fancy always uses full quality, and Fast always uses level 2 (no blur or lens curve, fewer particles, still 3D). The choice is remembered (`chumstorm_quality_mode`).
+- **Forcing a level:** add `?quality=0` … `?quality=2` to the URL to force a level, or `?quality=auto` to clear the saved level and mode.
 - **Profiling:** with `?debug&prof`, `window.__prof` shows the average milliseconds per frame for update, render and each draw pass.
 
 ## Testing shortcuts
