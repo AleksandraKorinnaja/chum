@@ -3727,8 +3727,9 @@ function runEvents(){
 }
 const WAVE_MIN = 45;         // seconds per wave: new kinds of cats join every 45 s (was a minute)
 function runSpawns(dt){
-  const minute = Math.min(stage.waves.length-1, Math.floor(runT/WAVE_MIN));   // each wave (and its new cat types) lasts WAVE_MIN seconds
-  const [types, minCount, interval] = stage.waves[minute];
+  // the crowd (how many, how often) follows the old minute-by-minute pace; only the cat TYPES move ahead every WAVE_MIN seconds
+  const W = stage.waves, minute = Math.min(W.length-1, Math.floor(runT/60)), typeWave = Math.min(W.length-1, Math.floor(runT/WAVE_MIN));
+  const [, minCount, interval] = W[minute], types = W[typeWave][0];
   let alive = 0;
   for(const c of cats) if(!c.dying && !c.prop && c.ai!=='swarm') alive++;
   let budget = 6;
@@ -3794,6 +3795,18 @@ function damageCat(c, dmg, ang, w, knock=1){
   c.knock.x += Math.cos(ang)*130*kb; c.knock.y += Math.sin(ang)*130*kb;
   if(c.hp <= 0) killCat(c, ang);
 }
+// Newer, rarer cats are worth more XP: ×(1 + 0.25 per wave later they first show up in this area), up to ×3.5.
+let xpRankStage = null, xpRank = {};
+function catXpMul(def){
+  if(!def || !stage) return 1;
+  if(xpRankStage !== stage){
+    xpRankStage = stage; xpRank = {};
+    stage.waves.forEach((w, m)=>w[0].forEach(k=>{ const key = catFor(stage, k); if(!(key in xpRank)) xpRank[key] = m; }));
+    for(const e of stage.events || []){ const key = e[2] && catFor(stage, e[1]==='boss' ? e[2] : e[2]); const m = Math.floor(e[0]/WAVE_MIN); if(key && !(key in xpRank)) xpRank[key] = m; }
+  }
+  const m = xpRank[def.key] ?? 0;
+  return Math.min(3.5, 1 + 0.25*m);
+}
 function killCat(c, ang){
   c.hp = 0; c.dying = true; c.dyingT = 0.32;
   c.knock.x += Math.cos(ang)*60; c.knock.y += Math.sin(ang)*60;
@@ -3804,7 +3817,7 @@ function killCat(c, ang){
   if(c.def){ bountyEvent('cat', c.def.key); if(c.isBoss) bountyEvent('boss'); }
   const def = c.def;
   if(c.isBoss || c.elite){
-    spawnBossRewardExplosion(c.x, c.y, def.xp*(c.elite?5:1));
+    spawnBossRewardExplosion(c.x, c.y, def.xp*catXpMul(def)*(c.elite?5:1));
     pickups.push({x:c.x, y:c.y, kind:'chest', bob:0, pop:0.55, tier:c.isBoss ? Math.max(3, rollTier(2)) : rollTier(1)});
     showBanner('🧰 Treasure dropped!', 1300);
     const coins = c.isBoss ? 12 : 5;
@@ -3813,7 +3826,7 @@ function killCat(c, ang){
     if(c.isBoss){ bossFedRun++; addShake(12, 0.5); addHitstop(0.12); flash('255,220,120',0.3); }
     else { addShake(6, 0.25); addHitstop(0.05); }
   } else {
-    orbs.push({x:c.x, y:c.y, groundY:c.y, value:def.xp*(treatT > 0 ? 2 : 1), vx:rand(-55,55), vy:rand(-200,-150), bounces:0, settled:false, ph:Math.random()*6});
+    orbs.push({x:c.x, y:c.y, groundY:c.y, value:def.xp*catXpMul(def)*(treatT > 0 ? 2 : 1), vx:rand(-55,55), vy:rand(-200,-150), bounces:0, settled:false, ph:Math.random()*6});
     if(Math.random() < 0.012*player.stats.luck) dropCoin(c.x, c.y, 1);
     spawnLoveBurst(c.x, c.y);
   }

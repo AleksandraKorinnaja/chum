@@ -149,7 +149,8 @@ Cat Town is a low-poly town square, styled after the Ooblets square reference: s
 - **Editing it:** `SQUARE` in `index.html` lists the lawns and pieces, and `SQ` holds the colours. Setting `TOWN_PROPS = true` brings back the old town blockout (streets, houses, park and garden).
 
 ## How a run works
-- **New cats arrive faster:** each area's waves change every **45 seconds** (`WAVE_MIN`, was a minute), so new kinds of cats join about 25% sooner. Timed events (swarms, elites, bosses) keep their own schedule.
+- **New cats arrive faster, the crowd doesn't grow faster:** the kinds of cats in each area move ahead every **45 seconds** (`WAVE_MIN`), so new types join about 25% sooner. How many cats are around, and how quickly more come, still follows the original minute-by-minute pace. Timed events (swarms, elites, bosses) keep their own schedule.
+- **Newer cats are worth more XP:** each cat type gives ×1 XP plus 0.25 for every wave later it first appears in that area, up to ×3.5. In Cat Town, orange tabbies give ×1, black cats ×1.5, and the last arrivals up to ×3.5. Elites still give 5× on top.
 **The 3D look:** the run maps look like a tilted, gently curved 3D diorama.
 - **The ground** (floor, decorations, zones, plates, shots):
   - It's drawn flat, then a small WebGL pass tilts it so it falls away toward the top.
