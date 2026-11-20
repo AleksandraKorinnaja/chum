@@ -1397,7 +1397,36 @@
   .coach-goal{display:inline-block;margin-top:6px;font-size:12px;font-weight:900;color:#E2582C;letter-spacing:.02em;}
   .coach-bar{height:6px;border-radius:3px;background:#E8DCCB;margin-top:10px;overflow:hidden;}
   .coach-bar i{display:block;height:100%;background:#F8C630;border-radius:3px;transition:width .15s;}
-  @media (max-width: 640px){ #coach{bottom:calc(120px + var(--sab));} body.harbor-mode #coach{bottom:calc(180px + var(--sab));} .coach-txt p{font-size:13px;} }</style>
+  @media (max-width: 640px){ #coach{bottom:calc(120px + var(--sab));} body.harbor-mode #coach{bottom:calc(180px + var(--sab));} .coach-txt p{font-size:13px;} }
+  /* ---- Your runs (save files) ---- */
+  #runs-screen{display:none;position:absolute;inset:0;z-index:40;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;background:rgba(46,58,63,0.62);}
+  .runs-card{width:min(640px, 100%);max-height:calc(100dvh - 32px);overflow:auto;box-sizing:border-box;background:#FFFFFF;border-radius:26px;padding:22px 24px;color:#3B2E2A;
+    box-shadow:0 5px 0 rgba(59,46,42,0.18), 0 10px 22px rgba(59,46,42,0.12);display:flex;flex-direction:column;gap:14px;font-family:'Nunito',sans-serif;}
+  .runs-head{display:flex;align-items:center;gap:12px;}
+  .runs-head .sp{flex:1;}
+  .runs-head h1{margin:0;font-family:'Fredoka','Nunito',sans-serif;font-size:34px;font-weight:700;text-transform:uppercase;color:#E2582C;letter-spacing:.02em;text-shadow:0 3px 0 #F8C630;}
+  .runs-h{font-size:15px;font-weight:800;}
+  .runs-list{display:flex;flex-direction:column;gap:10px;}
+  .run-row{display:flex;align-items:center;gap:10px;border:2px solid #EFE5D6;border-radius:16px;padding:10px 12px;}
+  .run-row.cur{border-color:#F8C630;background:#FFFBEA;}
+  .run-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+  .run-name{border:0;background:none;padding:2px 4px;margin-left:-4px;border-radius:8px;font-family:'Fredoka','Nunito',sans-serif;font-size:19px;font-weight:700;color:#3B2E2A;width:100%;box-sizing:border-box;}
+  .run-name:hover, .run-name:focus{background:#F6EFE4;outline:none;}
+  .run-txt > span{font-size:12.5px;font-weight:700;color:#7A6A5E;display:flex;flex-wrap:wrap;align-items:center;gap:3px;}
+  .run-txt .v2coin{width:14px;height:14px;box-shadow:inset 0 0 0 2px #E0A81A;}
+  .run-del{flex-shrink:0;border:0;background:#F6EFE4;border-radius:999px;min-width:36px;height:36px;cursor:pointer;font:inherit;font-size:15px;font-weight:800;color:#7A6A5E;padding:0 10px;}
+  .run-del.sure{background:#E5404B;color:#fff;}
+  .run-go{flex-shrink:0;width:auto !important;margin:0 !important;padding:0 20px !important;min-height:42px !important;font-size:17px !important;}
+  .runs-empty{font-size:14px;font-weight:700;color:#7A6A5E;padding:6px 0;}
+  .runs-new{display:flex;flex-direction:column;gap:8px;border-top:2px dashed #E8DCCB;padding-top:14px;}
+  .runs-new-row{display:flex;gap:10px;flex-wrap:wrap;}
+  #run-new-name{flex:1;min-width:160px;height:46px;box-sizing:border-box;border:2px solid #D9C3A5;border-radius:999px;padding:0 18px;font-family:'Fredoka','Nunito',sans-serif;font-size:17px;color:#3B2E2A;background:#FFFFFF;}
+  #run-new-name:focus{outline:none;border-color:#F8C630;}
+  #run-new-go{width:auto !important;margin:0 !important;padding:0 24px !important;}
+  .runs-note{font-size:12.5px;font-weight:700;color:#7A6A5E;}
+  body.ui-v2 .hb-top .hb-runname{font-family:'Fredoka','Nunito',sans-serif;font-weight:600 !important;padding:0 16px !important;max-width:180px;overflow:hidden;text-overflow:ellipsis;}
+  @media (max-width: 1000px){ body.ui-v2 .hb-top .hb-runname{display:none !important;} }
+  @media (max-width: 560px){ .run-row{flex-wrap:wrap;} .run-go{flex:1;} .runs-head h1{font-size:26px;} }</style>
 </head>
 <body>
 <div id="wrap">
@@ -1504,7 +1533,7 @@
   </div>
 
   <div id="harbor-ui">
-    <div class="hb-top"><span class="hb-gold v2pill"><span class="v2coin"></span><span id="hb-coin" hidden></span>Gold <span id="hb-gold">0</span></span><span class="hb-fish v2pill" id="hb-fish" title="Fish in your bucket"></span><span class="hb-disc v2pill" id="hb-disc"></span><span class="sp"></span><button id="hb-tut" class="v2round" title="Play the tutorial again" aria-label="Replay tutorial">?</button><button id="hb-story" class="v2round" title="Watch the opening story again" aria-label="Replay story">▶</button></div>
+    <div class="hb-top"><span class="hb-gold v2pill"><span class="v2coin"></span><span id="hb-coin" hidden></span>Gold <span id="hb-gold">0</span></span><span class="hb-fish v2pill" id="hb-fish" title="Fish in your bucket"></span><span class="hb-disc v2pill" id="hb-disc"></span><span class="sp"></span><span class="v2pill hb-runname" id="hb-runname"></span><button id="hb-runs" class="v2round" title="Your runs: switch or start a new one" aria-label="Your runs">☰</button><button id="hb-tut" class="v2round" title="Play the tutorial again" aria-label="Replay tutorial">?</button><button id="hb-story" class="v2round" title="Watch the opening story again" aria-label="Replay story">▶</button></div>
     <div id="hb-requests"></div>
     <button id="hb-prompt"></button>
     <div id="hb-nav"></div>
@@ -1521,6 +1550,7 @@
     </div>
   </div>
   <div id="coach" aria-live="polite"></div>
+  <div id="runs-screen"></div>
   <div id="new-cat-banner"></div>
   <div id="callout" class="callout"></div>
   <div id="loot-card"></div>
@@ -1969,8 +1999,26 @@ const MAX_COMFORT = DECOR.reduce((a,d)=>a+d.comfort, 0);
 function comfort(){ return DECOR.reduce((a,d)=>a + (save.decor && save.decor[d.key] ? d.comfort : 0), 0); }
 function happyMul(){ return 1 + 0.06*comfort(); }
 
+/* ---------- Runs: named save files ----------
+   localStorage 'chumstorm_runs_v1' = {active, list:[{id, name, created, played}]}. Each run keeps its own save
+   and cat collection under the usual keys with '@id' on the end; the very first run (id 'main') uses the
+   plain keys, so a save from before runs existed simply becomes "My run". Switching runs reloads the page.  */
+const RUNS_KEY = 'chumstorm_runs_v1';
+function loadRunsIndex(){
+  try{ const r = JSON.parse(localStorage.getItem(RUNS_KEY)||'null'); if(r && Array.isArray(r.list)) return r; }catch(e){}
+  const r = {active:null, list:[]};
+  try{ if(localStorage.getItem('chumstorm_save_v2')){ r.list.push({id:'main', name:'My run', created:Date.now(), played:Date.now()}); r.active = 'main'; } }catch(e){}
+  try{ localStorage.setItem(RUNS_KEY, JSON.stringify(r)); }catch(e){}
+  return r;
+}
+const RUNS = loadRunsIndex();
+const ACTIVE_RUN = RUNS.list.find(x=>x.id===RUNS.active) || null;
+function runKeyFor(id, base){ return id === 'main' ? base : base+'@'+id; }
+function runKey(base){ return runKeyFor(ACTIVE_RUN ? ACTIVE_RUN.id : 'scratch', base); }   // no run picked yet: a scratch save nobody keeps
+function saveRunsIndex(){ try{ localStorage.setItem(RUNS_KEY, JSON.stringify(RUNS)); }catch(e){} }
+
 /* ---------- Persistent save ---------- */
-const SAVE_KEY = 'chumstorm_save_v2';
+const SAVE_KEY = runKey('chumstorm_save_v2');
 function defaultSave(){
   return { gold:0, shop:{}, home:{}, decor:{}, homeGift:false, bounties:[], fishGrade:0, fishBag:[300,0,0,0,0], fishV:2, casts:5, unlocked:['brine','meadow'], char:'brine', stage:'meadow',
     stats:{ best:{}, cleared:{}, totalFed:0, totalGold:0, maxLevel:0, bossFed:0 } };
@@ -2090,6 +2138,7 @@ addEventListener('mousemove', e=>{ if(pointerActive && pointerKind==='mouse') se
 addEventListener('mouseup', ()=>{ if(pointerKind==='mouse') resetPointer(); });
 
 addEventListener('keydown', e=>{
+  if(document.body.classList.contains('runs-mode')) return;
   const key = e.key.toLowerCase();
   if(state==='levelup' && ['1','2','3','4'].includes(key)){ const cards = document.querySelectorAll('#upgrades .upg2'); if(cards[+key-1]) cards[+key-1].click(); return; }
   if(state==='intro'){ if([' ','enter','e','arrowright'].includes(key)){ e.preventDefault(); introNext(); } else if(key==='escape') finishIntro(); return; }
@@ -3407,7 +3456,7 @@ function sliceEnvSheet(){
 }
 
 /* ============== SAVE: CAT COLLECTION ============== */
-const COLLECTION_KEY = 'chumstorm_collection_v1';
+const COLLECTION_KEY = runKey('chumstorm_collection_v1');
 let collected = new Set();
 try{ collected = new Set(JSON.parse(localStorage.getItem(COLLECTION_KEY)||'[]')); }catch(e){}
 function saveCollection(){ try{ localStorage.setItem(COLLECTION_KEY, JSON.stringify([...collected])); }catch(e){} }
@@ -7772,6 +7821,7 @@ $('intro-go').addEventListener('click', e=>{ e.stopPropagation(); finishIntro();
 $('intro-ui').addEventListener('pointerdown', e=>{ if(e.target.closest('button')) return; introNext(); });
 $('hb-story').addEventListener('click', e=>{ e.stopPropagation(); playIntro(true); });
 $('hb-tut').addEventListener('click', e=>{ e.stopPropagation(); tutReplay(); });
+$('hb-runs').addEventListener('click', e=>{ e.stopPropagation(); showRuns(true); });
 $('caviar-btn').addEventListener('pointerdown', e=>{ e.preventDefault(); e.stopPropagation(); placePlate(); });
 $('roll-btn').addEventListener('pointerdown', e=>{ e.preventDefault(); e.stopPropagation(); startRoll(); });
 document.addEventListener('visibilitychange', ()=>{ if(document.hidden && state==='playing') pauseGame(); });
@@ -9168,6 +9218,7 @@ function renderPrompt(){
 }
 function renderHarborUi(){
   $('hb-gold').textContent = save.gold.toLocaleString();
+  { const rn = $('hb-runname'); if(rn){ rn.textContent = ACTIVE_RUN ? ACTIVE_RUN.name : ''; rn.style.display = ACTIVE_RUN ? '' : 'none'; } }
   { const all = ALL_CAT_DEFS.length, found = all - undiscoveredTotal(); $('hb-disc').innerHTML = `<span class="v2ic">?</span>Cats to discover ${found}/${all}`; }
   $('hb-fish').innerHTML = `<span class="v2ic teal">🐟</span>Fish ${fishTotal()}`;
   const bs = activeBounties();
@@ -10645,6 +10696,84 @@ if(DEBUG) window.CS = {
   catIcon:(k, size)=>catIconURL(ENEMIES[k], size || 72),
 };
 
+/* ---- "Your runs" screen: shown when the game opens; pick a run to continue, or start a new one ---- */
+function runSummary(r){
+  let s = null, coll = [];
+  try{ s = JSON.parse(localStorage.getItem(runKeyFor(r.id, 'chumstorm_save_v2'))||'null'); }catch(e){}
+  try{ coll = JSON.parse(localStorage.getItem(runKeyFor(r.id, 'chumstorm_collection_v1'))||'[]'); }catch(e){}
+  const best = s && s.stats ? Math.max(0, ...Object.values(s.stats.best||{})) : 0;
+  return {gold:s ? s.gold||0 : 0, cats:coll.length, best, areas:s && s.unlocked ? s.unlocked.filter(k=>STAGES.some(x=>x.key===k)).length : 1, fresh:!s || !s.seenIntro};
+}
+function timeAgo(t){
+  const m = Math.round((Date.now() - (t||0))/60000);
+  return m < 1 ? 'just now' : m < 60 ? m+' min ago' : m < 1440 ? Math.round(m/60)+' h ago' : Math.round(m/1440)+' d ago';
+}
+function showRuns(canClose){
+  const el = $('runs-screen');
+  const list = RUNS.list.slice().sort((a, b)=>(b.played||0) - (a.played||0));
+  el.innerHTML = `<div class="runs-card">
+    <div class="runs-head"><h1>Chum Storm</h1><span class="sp"></span>${canClose && ACTIVE_RUN ? '<button class="v2round v2x" id="runs-close" aria-label="Close">X</button>' : ''}</div>
+    <div class="runs-h">Your runs</div>
+    <div class="runs-list">${list.length ? list.map(r=>{ const S = runSummary(r); return `<div class="run-row${ACTIVE_RUN && r.id===ACTIVE_RUN.id ? ' cur' : ''}" data-id="${r.id}">
+        <div class="run-txt"><input class="run-name" maxlength="24" value="${escHTML(r.name)}" aria-label="Run name" title="Click to rename">
+          <span>${S.fresh ? 'Not started yet' : `<span class="v2coin"></span> ${S.gold.toLocaleString()} gold · 🐾 ${S.cats}/${ALL_CAT_DEFS.length} cats · ${S.areas} area${S.areas > 1 ? 's' : ''}${S.best ? ' · best '+fmtTime(S.best) : ''}`} · ${timeAgo(r.played)}</span></div>
+        <button class="run-del" title="Delete this run" aria-label="Delete">🗑</button>
+        <button class="bigbtn run-go">${ACTIVE_RUN && r.id===ACTIVE_RUN.id && canClose ? 'Back to it' : 'Continue'}</button></div>`; }).join('') : '<div class="runs-empty">No runs yet. Name your first one below!</div>'}</div>
+    <div class="runs-new"><div class="runs-h">New run</div>
+      <div class="runs-new-row"><input id="run-new-name" maxlength="24" placeholder="Name your run" value="${list.length ? 'Run '+(list.length + 1) : 'My run'}"><button class="bigbtn" id="run-new-go">Start new run</button></div>
+      <span class="runs-note">A fresh start: the story and the tutorial, a new fish shop and no cats yet. Your other runs stay saved.</span></div>
+  </div>`;
+  el.style.display = 'flex';
+  document.body.classList.add('runs-mode');
+  const close = $('runs-close'); if(close) close.onclick = ()=>hideRuns();
+  el.querySelectorAll('.run-row').forEach(row=>{
+    const id = row.dataset.id, r = RUNS.list.find(x=>x.id===id);
+    row.querySelector('.run-go').onclick = ()=>{ if(canClose && ACTIVE_RUN && id===ACTIVE_RUN.id) return hideRuns(); openRun(id); };
+    const name = row.querySelector('.run-name');
+    name.onchange = ()=>{ r.name = name.value.trim() || r.name; name.value = r.name; saveRunsIndex(); };
+    name.onkeydown = e=>{ e.stopPropagation(); if(e.key==='Enter') name.blur(); };
+    const del = row.querySelector('.run-del');
+    del.onclick = ()=>{
+      if(!del.classList.contains('sure')){ del.classList.add('sure'); del.textContent = 'Delete?'; setTimeout(()=>{ del.classList.remove('sure'); del.textContent = '🗑'; }, 2500); return; }
+      deleteRun(id);
+    };
+  });
+  const nm = $('run-new-name');
+  nm.onkeydown = e=>{ e.stopPropagation(); if(e.key==='Enter') $('run-new-go').click(); };
+  $('run-new-go').onclick = ()=>newRun(nm.value);
+}
+function hideRuns(){ $('runs-screen').style.display = 'none'; document.body.classList.remove('runs-mode'); }
+function escHTML(t){ return String(t).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function openRun(id){
+  const r = RUNS.list.find(x=>x.id===id); if(!r) return;
+  RUNS.active = id; r.played = Date.now(); saveRunsIndex();
+  try{ sessionStorage.setItem('chumstorm_skip_runs', '1'); }catch(e){}
+  location.reload();
+}
+function newRun(name){
+  const id = 'r'+Date.now().toString(36);
+  RUNS.list.push({id, name:(String(name||'').trim() || 'Run '+(RUNS.list.length + 1)).slice(0, 24), created:Date.now(), played:Date.now()});
+  saveRunsIndex();
+  try{ localStorage.removeItem(runKeyFor(id, 'chumstorm_save_v2')); localStorage.removeItem(runKeyFor(id, 'chumstorm_collection_v1')); }catch(e){}
+  openRun(id);                                  // a fresh save: the story plays, then the tutorial
+}
+function deleteRun(id){
+  try{ localStorage.removeItem(runKeyFor(id, 'chumstorm_save_v2')); localStorage.removeItem(runKeyFor(id, 'chumstorm_collection_v1')); }catch(e){}
+  RUNS.list = RUNS.list.filter(x=>x.id!==id);
+  if(RUNS.active === id) RUNS.active = null;
+  saveRunsIndex();
+  if(ACTIVE_RUN && ACTIVE_RUN.id === id){ try{ sessionStorage.removeItem('chumstorm_skip_runs'); }catch(e){} location.reload(); return; }
+  showRuns(true);
+}
+// on boot: straight in after picking a run (the page reloads), otherwise the runs screen first
+function runsGate(){
+  let skip = false;
+  try{ skip = sessionStorage.getItem('chumstorm_skip_runs') === '1'; sessionStorage.removeItem('chumstorm_skip_runs'); }catch(e){}
+  if(DEBUG && !/[?&]runs\b/.test(location.search) && ACTIVE_RUN) skip = true;   // ?debug goes straight in (add &runs to see the screen)
+  if(skip && ACTIVE_RUN){ ACTIVE_RUN.played = Date.now(); saveRunsIndex(); return true; }
+  showRuns(false);
+  return false;
+}
 /* ============== BOOT ============== */
 showMenu();
 (function loadingScreen(){
@@ -10658,7 +10787,7 @@ showMenu();
     finished = true;
     el.classList.add('done');
     if(state==='harbor') renderHarborUi(); else { renderMenu(); drawIdle(); }
-    if(state==='harbor' && wantIntro()) playIntro();
+    if(runsGate() && state==='harbor' && wantIntro()) playIntro();
     setTimeout(()=>{ el.style.display = 'none'; }, 480);
   }
   function onOne(){ loaded++; updateBar(); if(loaded >= total) setTimeout(finishNow, Math.max(0, MIN_MS-(performance.now()-startT))); }

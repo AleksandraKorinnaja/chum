@@ -69,6 +69,16 @@ There are three areas, each with its own ground:
 
 The environment sheet is otherwise only used for the breakable props: a pink pot in town, a flower crate in the park and a teal pot on the beach. The bones panel and the skull sign are not used.
 
+## Runs (save files)
+The game opens on a **Your runs** screen.
+- **Every run is a separate save:** gold, skills, fish bucket, Cat Home and cats found, requests, unlocked areas and tutorial progress.
+- **Each row shows:** the run's name, gold, cats found, areas, best time and when it was last played. Click a name to rename it, **Continue** to play it, and the bin (twice) to delete it.
+- **New run:** type a name and press **Start new run**. It starts completely fresh: the opening story, the tutorial, a new fish shop and no cats.
+- **During a game:** the **☰** button in the harbor's top bar opens the screen to switch or start a run. On wide screens the top bar also shows the current run's name.
+- **Saves from before runs existed** become the first run, called "My run", so nothing is lost.
+- **Storage:** `chumstorm_runs_v1` holds the list. Each run's save and collection use the usual keys with `@id` added; "My run" keeps the original keys. The graphics setting is shared by every run on the device.
+- **Debug:** `?debug` skips the screen and goes straight into the current run (add `&runs` to see it).
+
 ## Tutorial
 A white **coach card** with a yellow ring teaches the game one step at a time. Each step finishes when you actually do it, or after a few seconds for tips that only need reading. A progress bar fills as you go, and a green tick shows before the next step.
 - **Part 1, in your first run** (straight after the story), at the bottom of the screen:
