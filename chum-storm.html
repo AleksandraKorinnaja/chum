@@ -367,7 +367,7 @@
     .upg-ic{font-size:32px;} .upg-name{font-size:14.5px;} .upg-desc{font-size:12.5px;} .upg2 .hint, .upg2 .trick-line{display:none;} .pips i{width:7px;height:7px;}
   }
   /* tilt-shift: the top and bottom of the map are softly blurred, like a miniature */
-  #tiltshift{position:absolute;inset:0;pointer-events:none;z-index:1;backdrop-filter:blur(2.4px);-webkit-backdrop-filter:blur(2.4px);
+  #tiltshift{display:none !important;position:absolute;inset:0;pointer-events:none;z-index:1;   /* the blur is now done in the 3D camera's shader (a full-screen backdrop-filter was far too slow) */
     -webkit-mask-image:linear-gradient(to bottom,#000 0%,transparent 24%,transparent 76%,#000 100%);mask-image:linear-gradient(to bottom,#000 0%,transparent 24%,transparent 76%,#000 100%);}
   body.harbor-mode #tiltshift, body.home-mode #tiltshift, body.harbor-mode #glc, body.home-mode #glc{display:none;}
   #glc{visibility:hidden;}
@@ -1989,7 +1989,7 @@ let speechTimer = 0;
 function addShake(mag, dur){ shakeMag = Math.max(shakeMag, mag); shakeT = Math.max(shakeT, dur||0.18); }
 function addHitstop(t){ hitstop = Math.max(hitstop, t); }
 function flash(col, dur){ flashCol = col; flashDur = dur; flashT = dur; }
-function addP(p){ if(particles.length < 520) particles.push(p); }
+function addP(p){ if(particles.length < QUALITY.maxP) particles.push(p); }
 const rand = (a,b) => a + Math.random()*(b-a);
 const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
 function fmtTime(t){ t = Math.floor(t); return String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0'); }
@@ -6763,6 +6763,9 @@ function drawLighting(){
   }
   if(flashT > 0){ ctx.fillStyle = `rgba(${flashCol},${0.5*Math.max(0,flashT)/flashDur})`; ctx.fillRect(0,0,W,H); }
 }
+const PROF = DEBUG && /[?&]prof\b/.test(location.search);
+const __prof = PROF ? (window.__prof = {}) : null;
+function PT(k, fn){ if(!PROF) return fn(); const t0 = performance.now(); const r = fn(); const p = __prof[k] || (__prof[k] = {t:0, n:0}); p.t += performance.now() - t0; p.n++; return r; }
 function render(){
   ctx.setTransform(1,0,0,1,0,0);
   ctx.save();
@@ -6771,26 +6774,26 @@ function render(){
   const tilted = tiltOn(), over = tilted ? tiltOverscan() : 1;
   if(over !== 1){ ctx.translate(W/2, H/2); ctx.scale(1/over, 1/over); ctx.translate(-W/2, -H/2); }
   ctx.translate(Math.round(W/2-camera.x), Math.round(H/2-camera.y));
-  drawBackground(runT);
-  drawTownGround(runT);
-  drawDeco(runT);
-  drawPiazza();
-  drawZones(runT);
-  drawOrbs(runT);
-  drawPickups();
-  drawHazards(runT);
-  drawObstacles(runT);
-  drawItemGround(runT);
-  drawPlates(runT);
-  drawCatTelegraphs(runT);
+  PT('Background', ()=>drawBackground(runT));
+  PT('TownGround', ()=>drawTownGround(runT));
+  PT('Deco', ()=>drawDeco(runT));
+  PT('Piazza', ()=>drawPiazza());
+  PT('Zones', ()=>drawZones(runT));
+  PT('Orbs', ()=>drawOrbs(runT));
+  PT('Pickups', ()=>drawPickups());
+  PT('Hazards', ()=>drawHazards(runT));
+  PT('Obstacles', ()=>drawObstacles(runT));
+  PT('ItemGround', ()=>drawItemGround(runT));
+  PT('Plates', ()=>drawPlates(runT));
+  PT('CatTelegraphs', ()=>drawCatTelegraphs(runT));
   cats.sort((a,b)=>a.y-b.y);
   if(!tilted){ ctx.save(); drawUpright(); ctx.restore(); }     // flat camera: everything standing up, back to front (with the 3D camera it comes after the tilt)
-  drawOrbits();
-  drawFish();
-  drawShots();
-  drawDrops();
-  drawThrown();
-  drawParticles();
+  PT('Orbits', ()=>drawOrbits());
+  PT('Fish', ()=>drawFish());
+  PT('Shots', ()=>drawShots());
+  PT('Drops', ()=>drawDrops());
+  PT('Thrown', ()=>drawThrown());
+  PT('Particles', ()=>drawParticles());
   ctx.restore();
   const s = playerScreenPos();
   const bubble = $('speech-bubble');
@@ -6800,10 +6803,10 @@ function render(){
   ctx.save();
   if(over !== 1){ ctx.translate(W/2, H/2); ctx.scale(1/over, 1/over); ctx.translate(-W/2, -H/2); }
   ctx.translate(Math.round(W/2-camera.x), Math.round(H/2-camera.y));
-  drawPowerups(runT);
-  drawPowerupFx();
+  PT('Powerups', ()=>drawPowerups(runT));
+  PT('PowerupFx', ()=>drawPowerupFx());
   ctx.restore();
-  if(tilted){ applyTilt(); drawUpright(); drawLighting(); }
+  if(tilted){ PT('tilt', ()=>applyTilt()); PT('upright', ()=>drawUpright()); PT('lighting', ()=>drawLighting()); }
   drawPowerupArrows(runT);
   drawRoyalArrow(runT);
 }
@@ -6875,13 +6878,13 @@ function initTiltGL(){
   if(tiltGL !== null) return tiltGL;
   tiltGL = false;
   try{
-    const cv = $('glc'), gl = cv && (cv.getContext('webgl', {alpha:false, antialias:false, preserveDrawingBuffer:true}) || cv.getContext('experimental-webgl'));
+    const cv = $('glc'), gl = cv && (cv.getContext('webgl', {alpha:false, antialias:false, preserveDrawingBuffer:false, powerPreference:'high-performance'}) || cv.getContext('experimental-webgl'));
     if(!gl) return false;
     const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); if(!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)); return s; };
     const prog = gl.createProgram();
     gl.attachShader(prog, sh(gl.VERTEX_SHADER, 'attribute vec2 p; varying vec2 v; void main(){ v = vec2(p.x*0.5 + 0.5, 0.5 - p.y*0.5); gl_Position = vec4(p, 0.0, 1.0); }'));
     gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, `precision highp float;
-      uniform sampler2D tex; uniform vec2 res; uniform float k, focus, fish, over; uniform vec3 h0, h1; varying vec2 v;
+      uniform sampler2D tex; uniform vec2 res; uniform float k, focus, fish, over, blur; uniform vec3 h0, h1; varying vec2 v;
       float m(float u){ return 1.0 + k*(u - focus); }
       float srcU(float u){ return 0.5 + log((1.0 + k*(u - focus))/(1.0 + k*(0.5 - focus)))/k; }
       void main(){
@@ -6890,7 +6893,18 @@ function initTiltGL(){
         float sy = srcU(d.y), sx = 0.5 + (d.x - 0.5)/m(d.y);
         vec3 haze = mix(h0, h1, clamp(v.y/0.35, 0.0, 1.0));
         vec2 t = 0.5 + (vec2(sx, sy) - 0.5)/over;          // the ground was drawn zoomed out by over
-        vec3 col = (t.x < 0.0 || t.x > 1.0 || t.y < 0.0 || t.y > 1.0) ? haze : texture2D(tex, t).rgb;
+        vec3 col;
+        if(t.x < 0.0 || t.x > 1.0 || t.y < 0.0 || t.y > 1.0) col = haze;
+        else {
+          col = texture2D(tex, t).rgb;
+          // tilt-shift: the top and bottom of the view are softly blurred, like a miniature (cheap 5-tap blur)
+          float b = blur*clamp((abs(v.y - 0.5) - 0.26)/0.24, 0.0, 1.0);
+          if(b > 0.0){
+            vec2 o = b/res;
+            col = (col*2.0 + texture2D(tex, t + vec2(o.x, o.y)).rgb + texture2D(tex, t + vec2(-o.x, o.y)).rgb
+                 + texture2D(tex, t + vec2(o.x, -o.y)).rgb + texture2D(tex, t + vec2(-o.x, -o.y)).rgb)/6.0;
+          }
+        }
         float fog = clamp(1.0 - v.y/0.5, 0.0, 1.0)*0.42;
         gl_FragColor = vec4(mix(col, vec3(1.0, 0.965, 0.933), fog), 1.0);
       }`));
@@ -6901,7 +6915,7 @@ function initTiltGL(){
     gl.useProgram(prog);
     const loc = n => gl.getUniformLocation(prog, n), pa = gl.getAttribLocation(prog, 'p');
     gl.enableVertexAttribArray(pa); gl.vertexAttribPointer(pa, 2, gl.FLOAT, false, 0, 0);
-    tiltGL = {gl, prog, tex, buf, u:{res:loc('res'), k:loc('k'), focus:loc('focus'), fish:loc('fish'), h0:loc('h0'), h1:loc('h1'), over:loc('over')}};
+    tiltGL = {gl, prog, tex, buf, u:{res:loc('res'), k:loc('k'), focus:loc('focus'), fish:loc('fish'), h0:loc('h0'), h1:loc('h1'), over:loc('over'), blur:loc('blur')}};
   }catch(e){ console.warn('3D camera: WebGL unavailable, using the plain tilt', e); tiltGL = false; }
   return tiltGL;
 }
@@ -6917,6 +6931,7 @@ function applyTilt(){
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, canvas);
     gl.uniform2f(G.u.res, W, H); gl.uniform1f(G.u.k, TILT.k); gl.uniform1f(G.u.focus, TILT.focus); gl.uniform1f(G.u.fish, TILT.fish);
     gl.uniform3fv(G.u.h0, hexRGB(h0)); gl.uniform3fv(G.u.h1, hexRGB(h1)); gl.uniform1f(G.u.over, tiltOverscan());
+    gl.uniform1f(G.u.blur, QUALITY.level >= 1 ? 0 : 2.6);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     cv.style.visibility = 'visible';
     // the ground now shows on #glc underneath; this canvas is cleared for the things that stand up
@@ -7202,6 +7217,40 @@ function townItems(items, t){
 }
 
 /* ============== LOOP ============== */
+/* ---- Quality: steps down automatically on slow machines ----
+   During a run the frame time is watched; if it stays under ~40 fps for a couple of seconds the game
+   drops one step and remembers it (localStorage 'chumstorm_quality'):
+     0 full · 1 no tilt-shift blur, no lens curve · 2 + fewer particles · 3 + flat camera (no 3D tilt)
+   ?quality=0..3 forces a level (and ?quality=auto clears the saved one).                              */
+var QUALITY = {level:0, maxP:520, ema:16.7, slowT:0, warm:0};
+function applyQuality(){
+  const L = QUALITY.level;
+  TILT.fish = L >= 1 ? 0 : 0.1;
+  QUALITY.maxP = L >= 2 ? 220 : 520;
+  TILT.on = L < 3;
+  if(L >= 3){ const g = $('glc'); if(g) g.style.visibility = 'hidden'; }
+  tiltOverKey = '';
+}
+(function initQuality(){
+  const q = /[?&]quality=(\w+)/.exec(location.search);
+  if(q && q[1] === 'auto'){ try{ localStorage.removeItem('chumstorm_quality'); }catch(e){} }
+  else if(q){ QUALITY.level = clamp(+q[1]||0, 0, 3); QUALITY.forced = true; }
+  else { try{ QUALITY.level = clamp(+(localStorage.getItem('chumstorm_quality')||0), 0, 3); }catch(e){} }
+  applyQuality();
+})();
+function watchQuality(frameMs){
+  if(QUALITY.forced || QUALITY.level >= 3) return;
+  QUALITY.warm += frameMs;
+  if(QUALITY.warm < 3000) return;                      // ignore the first seconds (loading, the intro, a new run)
+  QUALITY.ema += (Math.min(frameMs, 100) - QUALITY.ema)*0.05;
+  QUALITY.slowT = QUALITY.ema > 25 ? QUALITY.slowT + frameMs : 0;
+  if(QUALITY.slowT > 2000){
+    QUALITY.level++; QUALITY.slowT = 0; QUALITY.warm = 0; QUALITY.ema = 16.7;
+    applyQuality();
+    try{ localStorage.setItem('chumstorm_quality', QUALITY.level); }catch(e){}
+    if(DEBUG) console.log('quality →', QUALITY.level);
+  }
+}
 let loopId = 0;
 function startLoop(){
   const id = ++loopId;
@@ -7209,12 +7258,14 @@ function startLoop(){
   requestAnimationFrame(function frame(now){
     if(id !== loopId || state !== 'playing') return;
     const dt = clamp((now-lastT)/1000, 0, 0.033);
+    if(document.visibilityState === 'visible') watchQuality(now - lastT);
     lastT = now;
     let sdt = dt;
     if(hitstop > 0){ hitstop -= dt; sdt = dt*0.12; }
     if(placing) sdt *= 0.35;                       // time slows while you aim an item
-    update(sdt);
-    render();
+    PT('UPDATE', ()=>update(sdt));
+    PT('RENDER', ()=>render());
+    if(PROF){ const p = __prof.FRAME || (__prof.FRAME = {t:0, n:0, last:now}); p.t += now - p.last; p.n++; p.last = now; }
     requestAnimationFrame(frame);
   });
 }

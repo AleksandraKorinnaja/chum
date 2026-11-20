@@ -334,6 +334,16 @@ The character sheet is **`assets/player/characters.png`** (`.webp` / `.jpg` also
 - **Debug tools:** with `?debug`, the Wardrobe can **Export all layers as PSD** (a fresh file of every piece) or **Use a PSD** (load a file and save it as `avatar_layers.psd`).
 - **Without the PSD:** the game falls back to the sheets and the built-in placement.
 
+## Performance
+- **Tilt-shift blur:** done inside the 3D camera's WebGL shader as a cheap 5-tap blur at the top and bottom of the view. A full-screen CSS `backdrop-filter` was much too slow on weaker graphics cards.
+- **No extra frame copy:** the WebGL context no longer keeps its drawing buffer (`preserveDrawingBuffer:false`).
+- **Automatic quality:** during a run the game watches the frame rate. If it stays under about 40 fps for 2 seconds, it drops one step and remembers it in `localStorage` (`chumstorm_quality`):
+  - **0:** full quality
+  - **1:** no tilt-shift blur and no lens curve
+  - **2:** also fewer particles
+  - **3:** also a flat camera (no 3D tilt)
+- **Forcing a level:** add `?quality=0` … `?quality=3` to the URL to force a level, or `?quality=auto` to clear the saved one.
+- **Profiling:** with `?debug&prof`, `window.__prof` shows the average milliseconds per frame for update, render and each draw pass.
 
 ## Testing shortcuts
 Add `?debug` to the URL: **L** level up · **T** skip 60 s · **C** spawn a treasure box · **U** spawn every power-up, an artifact and all three chest tiers, plus the three one-time items · **X** spawn a treasure spot now · **I** fill the item bag · **K** feed every cat · **H** heal · **G** +1000 gold (in the harbor) · **B** a local walks up now (in the harbor) · **P** the Princess comes for Sebastian (in the harbor; counts every other town cat as met for this visit) · **R** Sebastian appears now (in a Cat Town run with her request). Dispatch `new CustomEvent("cs-step", {detail: frames})` on `document` to advance the game or Cat Home by hand.
