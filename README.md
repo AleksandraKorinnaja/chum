@@ -257,22 +257,38 @@ Each card also shows:
   - dig up some treasure spots
   - survive to a set time on a stage
   When one is done, the local waits in the harbor with a 🪙 bubble. Talk to them to collect the gold.
-- **Your fish bucket is your ammo.** It holds fish of five grades: Sardines, Mackerel, Bluefin Tuna, Swordfish (+1 pierce) and Golden Koi.
-  - **Every fish Fish Toss throws comes out of the bucket**, picked at random from what's in it. Each fish hits as hard as its own grade: better fish do more damage and are bigger.
+- **Your fish bucket is your ammo.** It holds real species (the 30 fish from `fish_types.webp`), each in one of five grades: Common, Nice, Great, Rare (+1 pierce) and Legendary.
+  - **Every fish Fish Toss throws comes out of the bucket**, picked at random from what's in it. The fish you see flying is the species that left your bucket, and it hits as hard as its grade: better fish do more damage and are bigger.
+  - **What you catch is what you get:** hook a Pufferfish and Pufferfish go in your bucket. Hover a grade in the bucket to see which species you have.
+  - **Every species has an ability** when Fish Toss throws it (`FISH_AB` in `index.html`). It's shown on the catch card, on fish pickups and at Old Gil's stall:
+    - **Puff burst (AoE):** Pufferfish (widest) and Boxfish burst on impact and hit every cat around them.
+    - **Zap:** the Eel zaps up to two more cats nearby.
+    - **Stinger:** Lionfish and Stingray leave a stinging cloud that hurts cats inside it.
+    - **School:** Sardines split into two little fish on the first hit.
+    - **Lure light:** the Anglerfish steers itself towards the nearest cat.
+    - **Piercing / Lance:** Salmon goes through one more cat, the Marlin through two more.
+    - **Fierce:** Koi, Calico Koi, Red Betta and Moorish Idol have a 25% chance of a double-damage hit (CRIT!).
+    - **Bouncy:** Blue Betta, Clownfish, Goby and Fancy Goby bounce on to another cat.
+    - **Sticky:** Black Moor, Manta Ray and Flounder slow the cat they hit.
+    - **Heavy:** Bluefin Tuna, Catfish and Sunfish knock cats back much harder.
+    - **Speedy:** Mackerel, Trout and Blue Tang fly 40% faster.
+    - **Lucky gold:** Goldfish and Golden Arowana have a 20% chance to drop a coin.
+    - **Soothing:** Butterflyfish and Seahorse heal you a little with each hit.
+    - Fish scraps and evolved weapons have no ability.
   - **Fish you don't throw stay** for the next run. The HUD's **Fish** pill shows how many are left; it turns red under 50.
   - **Empty bucket:** you throw **fish scraps**, which do 25% less damage.
   - **New saves** start with 300 Sardines. **Older saves** are scaled up to the new crate sizes once.
   - **Three ways to get fish:**
     - **Old Gil** sells crates: 100 Sardines for 40, 50 Mackerel for 90, 25 Bluefin Tuna for 180, 10 Swordfish for 320 (or ×5). The Golden Koi isn't for sale. You can **haggle** once per visit: a 55% chance of 20% off, otherwise prices go up 10%.
-    - **Fishing off your boat:** a side view under the boat.
-      - **Pick a bait:** Bread (free), Worm (10 gold), Shrimp (30) or Squid (80).
-      - **Cast**, then **steer the hook** with the mouse, touch or arrow keys. Each cast lasts 25 seconds; Space reels in early.
-      - **The deeper you go, the rarer the fish:** Sardines near the surface, then Mackerel, Tuna and Swordfish, and Golden Koi by the sea floor.
+    - **Fishing off your boat:** a full-screen side view under the boat. It costs no gold and has no cooldown: fish as much as you like.
+      - **Pick a bait:** Bread is free. Better bait is paid for with fish from your bucket: Worm costs 5 common fish, Shrimp 3 nice fish, Squid 2 great fish.
+      - **Cast**, then **steer the hook** with the mouse, touch or arrow keys. The line stays out until something bites or you reel in (Space / Reel in).
+      - **The deeper you go, the rarer the fish:** Shallows (common), Reef (nice), Open sea (great), Deep (rare) and Abyss (legendary).
       - **Fish that see the hook come and bite.** Fish see only what's in front of them.
-      - **Rare fish swim away from weak bait.** Each bait is good up to a grade: Bread for Sardines, Worm for Mackerel, Shrimp for Tuna, Squid for Swordfish. Each grade above that makes a fish more likely to flee.
+      - **Rare fish swim away from weak bait.** Each bait is good up to a grade: Bread for common, Worm for nice, Shrimp for great, Squid for rare. Each grade above that makes a fish more likely to flee.
       - **Sneak up from behind:** touching any fish with the hook from behind snags it, whatever the bait.
-      - **A bite is reeled in on its own.** The whole catch goes in your bucket, for example 60–100 Sardines or 3–5 Golden Koi; better bait lands a bit more.
-      - **Casts:** you get 5, refilled after every run.
+      - **A bite is reeled in on its own.** The whole catch of that species goes in your bucket, for example 60–100 of a common fish or 3–5 of a legendary one; better bait lands a bit more.
+      - **Fits any screen:** the sea fills the screen above the bait bar and gets taller on a phone in portrait.
     - **In the maps:** 🐟 **+FISH** pickups put a small catch in your bucket. ⬆️ **FISH UPGRADE** pickups (from 1:30) make every fish you throw for the rest of the run count as one grade better. The results screen shows how many fish you threw and found.
 - **Fish types:** everything you throw is a real fish from **`assets/fx/fish_types.webp`** (30 species, from sardines to a golden arowana). Each fish grade adds more and fancier fish to the bucket Fish Toss picks from: 6 at first, 30 with the Golden Koi. Salmon Run throws salmon, Golden Catch throws a glowing golden arowana, and Tuxedo Cats' Fish Missiles are random fish.
 - **Gold** collected in a run is kept, even if you're overrun. You spend it on two things:
@@ -321,7 +337,7 @@ The character sheet is **`assets/player/characters.png`** (`.webp` / `.jpg` also
 
 ## Testing shortcuts
 Add `?debug` to the URL: **L** level up · **T** skip 60 s · **C** spawn a treasure box · **U** spawn every power-up, an artifact and all three chest tiers, plus the three one-time items · **X** spawn a treasure spot now · **I** fill the item bag · **K** feed every cat · **H** heal · **G** +1000 gold (in the harbor) · **B** a local walks up now (in the harbor) · **P** the Princess comes for Sebastian (in the harbor; counts every other town cat as met for this visit) · **R** Sebastian appears now (in a Cat Town run with her request). Dispatch `new CustomEvent("cs-step", {detail: frames})` on `document` to advance the game or Cat Home by hand.
-With `?debug`, `window.CS` in the browser console opens any screen or pop-up. For example: `CS.building('shop')`, `CS.talk('princess')`, `CS.pay()`, `CS.home()`, `CS.intro(25)`, `CS.run()`, `CS.levelUp()`, `CS.chest()`, `CS.pause()`, `CS.results()`, `CS.mission()`, `CS.discover('tortie')`, `CS.loot()`, `CS.banner()` and `CS.fish()` (fishing, in the harbor). `CS.bag()` shows the fish bucket and `CS.fishStep(dt)` advances the fishing game by hand. Screenshots of every screen are in **`docs/ui_screens/`** (open `index.html` there).
+With `?debug`, `window.CS` in the browser console opens any screen or pop-up. For example: `CS.building('shop')`, `CS.talk('princess')`, `CS.pay()`, `CS.home()`, `CS.intro(25)`, `CS.run()`, `CS.levelUp()`, `CS.chest()`, `CS.pause()`, `CS.results()`, `CS.mission()`, `CS.discover('tortie')`, `CS.loot()`, `CS.banner()` and `CS.fish()` (fishing, in the harbor). `CS.bag()` shows the fish bucket, `CS.onlyFish(species, n)` fills the bucket with one species for testing abilities (not saved), and `CS.fishStep(dt)` advances the fishing game by hand. Screenshots of every screen are in **`docs/ui_screens/`** (open `index.html` there).
 
 ## Important files
 - `index.html` — the whole game (HTML, CSS and JS in one file)

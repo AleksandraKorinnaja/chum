@@ -1346,6 +1346,27 @@
   #fish-say{min-width:200px;font-size:14px !important;}
   #fishing .fish-card{position:relative;}
   #fish-result{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);z-index:2;background:#FFFFFF;border-radius:20px;padding:14px 22px 14px 14px;box-shadow:0 5px 0 rgba(59,46,42,0.18), 0 10px 22px rgba(59,46,42,0.18);pointer-events:none;animation:slotPop .35s ease-out;}
+
+  /* ---- fishing: a full-screen mini game, the controls float over the sea ---- */
+  body.fishing-mode #harbor-ui, body.fishing-mode #hb-nav{visibility:hidden;}
+  #fishing{padding:0 !important;background:#e9c97a !important;}
+  #fishing .fish-card{position:absolute !important;inset:0;width:auto !important;max-height:none !important;background:none !important;box-shadow:none !important;border-radius:0 !important;padding:0 !important;overflow:hidden !important;}
+  #fish-cv{position:absolute !important;left:0;top:0;width:100% !important;height:calc(100% - 112px - var(--sab)) !important;max-height:none !important;aspect-ratio:auto !important;border-radius:0 !important;object-fit:contain;background:linear-gradient(#4fb3ee 0 22%, #1f78c4 22% 100%) !important;}
+  #fishing .fish-head{position:absolute;top:calc(14px + var(--sat));left:calc(16px + var(--sal));right:calc(16px + var(--sar));z-index:2;pointer-events:none;}
+  #fishing .fish-head > *{pointer-events:auto;}
+  #fishing .fish-head h2{background:#FFFFFF;border-radius:999px;padding:4px 18px;box-shadow:0 5px 0 rgba(59,46,42,0.18);}
+  #fish-bucket{gap:10px !important;padding:0 14px !important;}
+  #fish-bucket .fb-n{display:inline-flex;align-items:center;gap:3px;font-size:14px;font-weight:900;}
+  #fish-bucket .fb-mini{width:30px;height:20px;object-fit:contain;font-size:16px;display:inline-flex;align-items:center;justify-content:center;}
+  #fishing .fish-foot{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(26px + var(--sab));z-index:2;width:min(980px, calc(100% - 32px));box-sizing:border-box;
+    background:#FFFFFF;border-radius:26px;padding:12px 14px;box-shadow:0 5px 0 rgba(59,46,42,0.18), 0 10px 22px rgba(59,46,42,0.15);}
+  #fishing .fish-hint{position:absolute;left:0;right:0;bottom:calc(8px + var(--sab));z-index:2;color:#FFFFFF;opacity:.8;margin:0;}
+  .fbait.poor span{color:#E5404B;}
+  @media (max-width: 640px){ #fish-bucket{gap:6px !important;padding:0 8px !important;} #fish-bucket .fb-n{font-size:11px;} #fish-bucket .fb-mini{width:20px;height:14px;} #fishing .fish-head h2{font-size:18px;} #fishing .fish-hint{display:none;} }
+
+  #loot-card .lc-fish{width:110px;height:80px;object-fit:contain;}
+
+  #fish-result .fr-ab, .fish-row .fr-ab{display:block;color:#E2582C !important;font-weight:800 !important;}
 </style>
 </head>
 <body>
@@ -1466,7 +1487,7 @@
       <canvas id="fish-cv" width="680" height="440"></canvas>
       <div id="fish-result"></div>
       <div class="fish-foot"><div id="fish-baits"></div><div id="fish-say"></div><button class="bigbtn" id="fish-act">Cast</button></div>
-      <div class="fish-hint">Mouse, touch or arrow keys steer the hook · Space casts and reels in · Esc to stop</div>
+      <div class="fish-hint">Mouse, touch or arrow keys steer the hook · Space casts and reels in · Esc to leave</div>
     </div>
   </div>
   <div id="new-cat-banner"></div>
@@ -2537,6 +2558,69 @@ const FISH_SEEDS = [
   [140,745],[340,740],[565,740],[830,745],[1100,740],[1370,745],
   [145,925],[395,920],[620,925],[890,925],[1155,925],[1395,925],
 ];
+/* ---- Fish abilities: every species does something of its own when Fish Toss throws it ----
+   (indexes are FISH_NAMES / the fish_types sheet)                                                     */
+var FISH_ABILITY_INFO = {
+  split:  {ic:'🐟', name:'School',     desc:'Splits into two little fish on the first hit'},
+  fast:   {ic:'💨', name:'Speedy',     desc:'Flies 40% faster'},
+  heavy:  {ic:'🪨', name:'Heavy',      desc:'Knocks cats back much harder'},
+  pierce: {ic:'🗡️', name:'Piercing',   desc:'Goes through one more cat'},
+  lance:  {ic:'🗡️', name:'Lance',      desc:'Goes through two more cats'},
+  crit:   {ic:'💥', name:'Fierce',     desc:'25% chance of a double-damage hit'},
+  bounce: {ic:'↪️', name:'Bouncy',     desc:'Bounces on to another cat'},
+  gold:   {ic:'🪙', name:'Lucky gold', desc:'20% chance a hit drops a coin'},
+  slow:   {ic:'🐌', name:'Sticky',     desc:'Slows the cat it hits'},
+  heal:   {ic:'💚', name:'Soothing',   desc:'Each hit heals you a little'},
+  burst:  {ic:'💥', name:'Puff burst', desc:'Bursts on impact, hitting every cat around it (AoE)'},
+  poison: {ic:'☠️', name:'Stinger',    desc:'Leaves a stinging cloud that hurts cats inside it'},
+  zap:    {ic:'⚡', name:'Zap',        desc:'Zaps up to two more cats nearby'},
+  home:   {ic:'🎯', name:'Lure light', desc:'Steers itself towards the nearest cat'},
+};
+var FISH_AB = ['split','fast','heavy','pierce','fast','heavy',     // Sardines Mackerel Tuna Salmon Trout Catfish
+  'gold','slow','crit','crit','crit','bounce',                     // Goldfish BlackMoor Koi CalicoKoi RedBetta BlueBetta
+  'bounce','fast','heal','crit','poison','burst',                  // Clownfish BlueTang Butterflyfish MoorishIdol Lionfish Pufferfish
+  'burst','heal','home','zap','slow','heavy',                      // Boxfish Seahorse Anglerfish Eel MantaRay Sunfish
+  'slow','poison','lance','gold','bounce','bounce'];               // Flounder Stingray Marlin GoldenArowana Goby FancyGoby
+function fishAbility(ft){ return FISH_ABILITY_INFO[FISH_AB[ft]] ? FISH_AB[ft] : ''; }
+function abilityText(ft){ const a = FISH_ABILITY_INFO[fishAbility(ft)]; return a ? a.ic+' '+a.name+': '+a.desc : ''; }
+// what a fish's ability does when it hits cat c (returns true if the fish is used up)
+function fishAbilityHit(f, c, ang){
+  const ab = f.ab;
+  if(DEBUG){ const h = window._abHits = window._abHits || {}; h[ab] = (h[ab]||0) + 1; }
+  if(ab === 'slow'){ c.slowT = 1.6; c.slowMul = Math.min(c.slowMul||1, 0.45); }
+  else if(ab === 'gold'){ if(Math.random() < 0.2) dropCoin(c.x, c.y, 1); }
+  else if(ab === 'heal'){ player.hp = Math.min(player.maxHp, player.hp + 1.5); }
+  else if(ab === 'burst' && !f.popped){
+    f.popped = true;
+    const R = f.ft === 17 ? 95 : 70;                                    // the Pufferfish puffs widest
+    forNear(f.x, f.y, R + 40, o=>{ if(o !== c && !o.dying && areaDist(f.x, f.y, o.x, o.y) < R + o.r*0.5) damageCat(o, f.dmg*0.7, Math.atan2(o.y-f.y, o.x-f.x), f.w, 1.2); });
+    addP({x:f.x, y:f.y, life:0.4, max:0.4, type:'pring', r:R*0.35, sp:R*3, col:'#ffd23c', lw:6});
+    for(let k=0;k<8;k++){ const a = k/8*Math.PI*2; addP({x:f.x, y:f.y, vx:Math.cos(a)*200, vy:Math.sin(a)*200, life:0.35, type:'pstar', col:'#ffe27a', sz:4}); }
+    if(inView(f, 0)) addShake(2, 0.1);
+    return true;
+  }
+  else if(ab === 'poison' && !f.popped){ f.popped = true; zones.push({x:f.x, y:f.y, r:46, life:2.2, max:2.2, dmg:f.dmg*0.22, tick:0, w:f.w, nip:true, poison:true}); }
+  else if(ab === 'zap' && !f.popped){
+    f.popped = true;
+    const near = cats.filter(o=>o !== c && !o.dying && !o.prop && !f.hit.has(o) && (o.x-c.x)**2 + (o.y-c.y)**2 < 170*170)
+      .sort((a, b)=>((a.x-c.x)**2 + (a.y-c.y)**2) - ((b.x-c.x)**2 + (b.y-c.y)**2)).slice(0, 2);
+    let from = c;
+    for(const o of near){
+      damageCat(o, f.dmg*0.6, Math.atan2(o.y-from.y, o.x-from.x), f.w, 0.4);
+      for(let k=1;k<=4;k++) addP({x:from.x + (o.x-from.x)*k/5 + rand(-6,6), y:from.y + (o.y-from.y)*k/5 + rand(-6,6), life:0.22, type:'pstar', col:'#9fe8ff', sz:3.5});
+      from = o;
+    }
+  }
+  else if(ab === 'split' && !f.child && !f.popped){
+    f.popped = true;
+    for(const s of [-0.55, 0.55]){
+      const sp = Math.hypot(f.vx, f.vy), a = ang + s;
+      fish.push({x:f.x, y:f.y, vx:Math.cos(a)*sp*0.9, vy:Math.sin(a)*sp*0.9, r:f.r*0.7, sz:f.sz*0.65, dmg:f.dmg*0.45, pierce:1, range:170, travelled:0,
+        trail:[], w:f.w, hit:new Set(f.hit), big:false, filter:f.filter, ft:f.ft, ab:'', child:true});
+    }
+  }
+  return false;
+}
 // what each fish grade adds to the bucket
 const FISH_POOLS = [[0,1,4,5,28,29], [3,12,13,14], [2,15,17,18,24], [26,16,21,20,25], [6,7,8,9,10,11,19,22,23,27]];
 const FISH_GRADE_ICON = [0, 1, 2, 26, 6];
@@ -3602,9 +3686,12 @@ function fireToss(w, s){
     const slot = i===0 ? 0 : (i%2===1 ? 1 : -1)*Math.ceil(i/2);
     const a = aim + slot*spread + rand(-0.01,0.01);
     const fg = takeFish(), G = fishStats(fg);              // one fish out of your bucket
+    const ft = WEAPONS[w.key].evo ? 3 : fg < 0 ? fishTypeFor(0) : lastThrownSp, ab = fg < 0 || WEAPONS[w.key].evo ? '' : fishAbility(ft);
+    const spd = ab === 'fast' ? 1.4 : 1, crit = ab === 'crit' && Math.random() < 0.25;
     fish.push({x:player.x - Math.sin(aim)*slot*7, y:player.y + Math.cos(aim)*slot*7,
-      vx:Math.cos(a)*sp, vy:Math.sin(a)*sp, r:(s.big?13:7+grow*0.25)*G.size, sz:(s.big?46:28+grow)*G.size, dmg:s.dmg*(1 + G.dmg), pierce:s.pierce + G.pierce,
-      range:s.range, travelled:0, trail:[], w, hit:new Set(), big:!!s.big, filter:G.filter, ft:WEAPONS[w.key].evo ? 3 : fishTypeFor(fg)});
+      vx:Math.cos(a)*sp*spd, vy:Math.sin(a)*sp*spd, r:(s.big?13:7+grow*0.25)*G.size, sz:(s.big?46:28+grow)*G.size, dmg:s.dmg*(1 + G.dmg)*(crit ? 2 : 1), crit,
+      pierce:s.pierce + G.pierce + (ab === 'pierce' ? 1 : ab === 'lance' ? 2 : 0),
+      range:s.range*(ab === 'fast' ? 1.15 : 1), travelled:0, trail:[], w, hit:new Set(), big:!!s.big, filter:G.filter, ft, ab});
   }
   // Golden Catch: every 4th volley adds one huge golden fish
   w.volley = (w.volley||0) + 1;
@@ -4091,6 +4178,11 @@ function updateFish(dt){
   for(let i=fish.length-1;i>=0;i--){
     const f = fish[i];
     f.trail.push({x:f.x, y:f.y}); if(f.trail.length > 6) f.trail.shift();
+    if(f.ab === 'home'){                                   // Anglerfish: its lure light steers it to the nearest cat
+      let tgt = null, bd = 320*320;
+      for(const o of cats){ if(o.dying || o.prop || f.hit.has(o)) continue; const dd = (o.x-f.x)**2 + (o.y-f.y)**2; if(dd < bd){ bd = dd; tgt = o; } }
+      if(tgt){ const sp = Math.hypot(f.vx, f.vy), a0 = Math.atan2(f.vy, f.vx), a1 = Math.atan2(tgt.y-f.y, tgt.x-f.x); let da = a1 - a0; da = Math.atan2(Math.sin(da), Math.cos(da)); const a = a0 + clamp(da, -5*dt, 5*dt); f.vx = Math.cos(a)*sp; f.vy = Math.sin(a)*sp; }
+    }
     const sx = f.vx*dt, sy = f.vy*dt;
     f.x += sx; f.y += sy; f.travelled += Math.hypot(sx,sy);
     if(f.travelled >= f.range){ fish.splice(i,1); continue; }
@@ -4101,11 +4193,13 @@ function updateFish(dt){
       f.hit.add(c);
       const ang = Math.atan2(f.vy, f.vx);
       spawnHitSpark(f.x, f.y, ang);
-      damageCat(c, f.dmg, ang, f.w);
+      damageCat(c, f.dmg, ang, f.w, f.ab === 'heavy' ? 2.6 : 1);
+      if(f.crit && !c.prop){ spawnBigText(c.x, c.y - c.r - 10, 'CRIT!', '#ff6b4a'); f.crit = false; }
+      if(!c.prop && f.ab && fishAbilityHit(f, c, ang)) gone = true;
       if(!c.prop && --f.pierce <= 0) gone = true;
     });
     // Ricochet: once per fish, bounce on to the nearest cat it hasn't hit yet
-    if(gone && !f.bounced && !f.gold && hasTrick(f.w, 4)){
+    if(gone && !f.bounced && !f.gold && !f.popped && (hasTrick(f.w, 4) || f.ab === 'bounce')){
       let tgt = null, bd = 260*260;
       for(const o of cats){ if(o.dying || o.prop || f.hit.has(o)) continue; const dd = (o.x-f.x)**2 + (o.y-f.y)**2; if(dd < bd){ bd = dd; tgt = o; } }
       if(tgt){
@@ -7406,7 +7500,6 @@ function endRun(victory, quit){
   st.best[stage.key] = Math.max(st.best[stage.key]||0, Math.floor(runT));
   if(victory) st.cleared[stage.key] = true;
   if(comfort() > 0) save.homeGift = true;
-  save.casts = CASTS_PER_VISIT;
   const fresh = checkUnlocks();
   persist();
   $('res-title').textContent = 'Results';
@@ -8876,7 +8969,7 @@ function renderFishTab(){
     const price = Math.round(FISH_PRICE[i]*mul), pack = FISH_PACK[i];
     return `<div class="fish-row${b[i] ? ' cur' : ''}">
       ${fishImgHTML(i, 'fr-img')}
-      <div><b>${g.name}</b><span>${i ? `Fish Toss +${Math.round(g.dmg*100)}% damage, ${Math.round((g.size-1)*100)}% bigger${g.pierce ? ', +1 pierce' : ''}` : 'Plain and cheap. Where every fisher starts.'}</span></div>
+      <div><b>${fishName(FISH_GRADE_ICON[i])}</b><span class="fr-ab">${abilityText(FISH_GRADE_ICON[i])}</span><span>${i ? `Fish Toss +${Math.round(g.dmg*100)}% damage, ${Math.round((g.size-1)*100)}% bigger${g.pierce ? ', +1 pierce' : ''}` : 'Plain and cheap. Where every fisher starts.'}</span></div>
       <div class="fr-buy"><span class="fr-own">You have ${b[i]}</span>${FISH_PRICE[i] ? `<button data-g="${i}" data-n="1" ${save.gold < price ? 'disabled' : ''}>${pack} for ${price} 🪙</button><button class="alt" data-g="${i}" data-n="5" ${save.gold < price*5 ? 'disabled' : ''}>×5</button>` : '<em>Catch it yourself!</em>'}</div></div>`;
   }).join('');
   el.querySelectorAll('.fr-buy button').forEach(btn=>btn.onclick = ()=>gilBuy(+btn.dataset.g, +btn.dataset.n));
@@ -8887,8 +8980,8 @@ function gilBuy(g, n){
   const price = Math.round(FISH_PRICE[g]*(hb.haggle ? hb.haggle.mul : 1))*(n||1);
   if(save.gold < price) return;
   const got = FISH_PACK[g]*(n||1);
-  save.gold -= price; fishBag()[g] += got; persist();
-  showBanner(`🐟 +${got} ${FISH_GRADES[g].name} in your bucket`, 1300);
+  save.gold -= price; addFish(FISH_GRADE_ICON[g], got); persist();
+  showBanner(`🐟 +${got} ${fishName(FISH_GRADE_ICON[g])} in your bucket`, 1300);
   vibrate([20,30,40]);
   renderMenu(); renderHarborUi();
 }
@@ -8916,6 +9009,29 @@ var CASTS_PER_VISIT = 5;                             // casts refill after every
 var START_BUCKET = [300, 0, 0, 0, 0];
 var runFish = 0, runFishUp = 0, runCaught = [0,0,0,0,0], runThrown = [0,0,0,0,0], runScraps = 0, fishWarned = 0;
 function fishBag(){ if(!Array.isArray(save.fishBag)) save.fishBag = START_BUCKET.slice(); return save.fishBag; }
+// the bucket also remembers which species you have (save.fishSp: species index → count), so a pufferfish you
+// catch is a pufferfish in your bucket and a pufferfish when you throw it. fishBag() stays the per-grade total.
+function fishSp(){
+  if(!save.fishSp || typeof save.fishSp !== 'object'){ save.fishSp = {}; fishBag().forEach((n, g)=>{ if(n > 0) save.fishSp[FISH_GRADE_ICON[g]] = n; }); }
+  return save.fishSp;
+}
+function gradeOfSp(ft){ for(let g=0;g<FISH_POOLS.length;g++) if(FISH_POOLS[g].includes(+ft)) return g; return 0; }
+function addFish(ft, n){ const sp = fishSp(), g = gradeOfSp(ft); fishBag()[g] += n; sp[ft] = (sp[ft]||0) + n; return g; }
+// take one fish of grade g out of the bucket (a random species of that grade, weighted by how many you have)
+function takeFishOfGrade(g){
+  const sp = fishSp(), list = FISH_POOLS[g].filter(ft=>sp[ft] > 0);
+  fishBag()[g] = Math.max(0, fishBag()[g] - 1);
+  if(!list.length) return FISH_GRADE_ICON[g];
+  let r = Math.random()*list.reduce((a, ft)=>a + sp[ft], 0);
+  for(const ft of list){ if(r < sp[ft]){ if(!--sp[ft]) delete sp[ft]; return ft; } r -= sp[ft]; }
+  return list[0];
+}
+function removeFish(g, n){ for(let i=0;i<n;i++) takeFishOfGrade(g); }
+function spList(g){ const sp = fishSp(); const l = FISH_POOLS[g].filter(ft=>sp[ft] > 0).map(ft=>fishName(ft)+' ×'+sp[ft]+' ('+(FISH_ABILITY_INFO[fishAbility(ft)]||{name:'plain'}).name+')'); return FISH_TIER[g]+' fish'+(l.length ? ': '+l.join(', ') : ': none'); }
+function fishName(ft){ return FISH_NAMES[ft] || 'Fish'; }
+function spImgHTML(ft, cls){ const u = fishTypesReady ? fishIconURL(ft) : ''; return u ? `<img class="${cls||'fb-img'}" src="${u}" alt="">` : `<span class="${cls||'fb-img'}">🐟</span>`; }
+var FISH_TIER = ['Common', 'Nice', 'Great', 'Rare', 'Legendary'];
+var lastThrownSp = 0;
 function fishTotal(){ return fishBag().reduce((a, b)=>a + b, 0); }
 function bestFish(){ const b = fishBag(); for(let g = b.length-1; g >= 0; g--) if(b[g] > 0) return g; return -1; }
 // the HUD / fish-pickup "grade": the best fish in the bucket (plus this run's upgrades)
@@ -8936,16 +9052,16 @@ function takeFish(){
   if(n <= 0){ runScraps++; if(fishWarned < 2){ fishWarned = 2; showBanner('🪣 Bucket empty! Throwing fish scraps', 1800); } return -1; }
   let r = Math.random()*n, g = 0;
   for(; g < b.length; g++){ if(r < b[g]) break; r -= b[g]; }
-  g = Math.min(g, b.length-1); b[g]--; runThrown[g]++;
+  g = Math.min(g, b.length-1); lastThrownSp = takeFishOfGrade(g); runThrown[g]++;
   if(n - 1 === 50 && !fishWarned){ fishWarned = 1; showBanner('🪣 Only 50 fish left in your bucket', 1500); }
   return Math.min(FISH_GRADES.length-1, g + (runFishUp||0));
 }
 function fishStats(g){ return g < 0 ? FISH_SCRAPS : FISH_GRADES[g]; }
 // a catch found in the map goes in your bucket; a fish upgrade lifts every fish thrown this run
 function gainMapFish(){
-  const g = rollCatchGrade(player ? player.stats.luck : 1), n = rollHaul(g, 0.35);
-  fishBag()[g] += n; runCaught[g] += n;
-  showLootCard(FISH_GRADES[g].ic, 'Into your bucket', n+' '+FISH_GRADES[g].name, 'Fish Toss throws whatever is in your bucket.');
+  const g = rollCatchGrade(player ? player.stats.luck : 1), n = rollHaul(g, 0.35), ft = fishTypeFor(g);
+  addFish(ft, n); runCaught[g] += n;
+  showLootCard(spImgHTML(ft, 'lc-fish'), FISH_TIER[g]+' catch · into your bucket', n+' '+fishName(ft), abilityText(ft));
 }
 function gainFishUp(){
   if((runFishUp||0) >= FISH_GRADES.length-1){ runGold += 25; showBanner('🐟 Fish fully upgraded! +25 🪙', 1200); return; }
@@ -8956,7 +9072,7 @@ function gainFishUp(){
 function renderBucket(){
   const el = $('bucket-list'); if(!el) return;
   const b = fishBag(), n = fishTotal();
-  el.innerHTML = FISH_GRADES.map((g, i)=>`<div class="fb${b[i] ? '' : ' none'}">${fishImgHTML(i)}<b>${g.name}</b><i>×${b[i]}</i></div>`).join('') +
+  el.innerHTML = FISH_GRADES.map((g, i)=>`<div class="fb${b[i] ? '' : ' none'}" title="${spList(i)}">${fishImgHTML(i)}<b>${FISH_TIER[i]}</b><i>×${b[i]}</i></div>`).join('') +
     (n ? `<div class="fb-note">Fish Toss throws whatever is in your bucket, one fish per throw. Fish you don't throw stay for next time.</div>`
        : `<div class="fb-empty">Your bucket is empty, so you'll throw <b>fish scraps</b> (weaker). Buy fish from Old Gil or go fishing off your boat.</div>`);
   const st = $('btn-start'); if(st) st.textContent = `Let's go!`;
@@ -8968,17 +9084,19 @@ function renderBucket(){
    Fish that see the hook in front of them come and bite, unless they're too fancy for your bait:
    a fish whose grade is above the bait's strength tends to swim away. Sneak up from behind (they only
    see what's ahead of them) and touching one with the hook snags it anyway. A bite reels in on its own
-   and the whole haul goes in your bucket. Casts refill after every run.                              */
+   and the whole haul goes in your bucket. No gold, no cooldown: bait is paid for with fish from your
+   bucket (cheap fish catch better fish), and you can cast as often as you like.                        */
 var BAITS = [
-  {name:'Bread',  ic:'🍞', cost:0,  p:0},
-  {name:'Worm',   ic:'🪱', cost:10, p:1},
-  {name:'Shrimp', ic:'🦐', cost:30, p:2},
-  {name:'Squid',  ic:'🦑', cost:80, p:3},
+  {name:'Bread',  ic:'🍞', fish:-1, n:0, p:0},           // free
+  {name:'Worm',   ic:'🪱', fish:0,  n:5, p:1},           // costs 5 Sardines
+  {name:'Shrimp', ic:'🦐', fish:1,  n:3, p:2},           // costs 3 Mackerel
+  {name:'Squid',  ic:'🦑', fish:2,  n:2, p:3},           // costs 2 Bluefin Tuna
 ];
-var FW = 680, FH = 440, F_SURF = 96, F_BAND = 64, F_TOP = 112;        // fishing canvas: surface line, depth bands
+function baitCostText(b){ return b.n ? b.n+' '+FISH_TIER[b.fish].toLowerCase()+' fish' : 'Free'; }
+function canAffordBait(b){ return !b.n || fishBag()[b.fish] >= b.n; }
+var FW = 680, FH = 440, F_SURF = 96, F_BAND = 64, F_TOP = 112;        // fishing canvas (FW follows the screen's shape): surface line, depth bands
 var F_ROD = {x:392, y:58};
-var FISH_COUNT = [5, 4, 3, 2, 1];                                     // fish swimming in each depth band
-var FISH_LINE_TIME = 25;
+var FISH_COUNT = [5, 4, 3, 2, 1];                                     // fish swimming in each depth band (scaled up on wide screens)
 var fishing = null;
 function fBandY(g){ return F_TOP + g*F_BAND; }
 function fSpawn(g, anywhere){
@@ -8987,14 +9105,16 @@ function fSpawn(g, anywhere){
     sp:rand(34, 50) + g*14, size:28 + g*7, st:'swim', noticed:false, t:rand(0, 6), fleeT:0};
 }
 function openFishing(){
-  if(save.casts == null) save.casts = CASTS_PER_VISIT;
   hbPanel = 'fishing';
-  document.body.classList.add('panel-open');
-  const fishes = [];
-  FISH_COUNT.forEach((n, g)=>{ for(let i=0;i<n;i++){ const f = fSpawn(g, true); f.baseY = f.y; fishes.push(f); } });
-  fishing = {st:'ready', t:0, anim:0, hx:F_ROD.x, hy:F_SURF - 8, tx:null, ty:null, fishes, bubbles:[], hooked:null, n:0, grade:0, msg:'', bait:clamp(save.bait||0, 0, BAITS.length-1), id:(fishing ? fishing.id : 0) + 1};
+  document.body.classList.add('panel-open', 'fishing-mode');
   $('fishing').style.display = 'flex';
-  fishUi();
+  const fishes = [];
+  fishing = {st:'ready', t:0, anim:0, hx:F_ROD.x, hy:F_SURF - 8, tx:null, ty:null, fishes, bubbles:[], hooked:null, n:0, grade:0, msg:'', bait:clamp(save.bait||0, 0, BAITS.length-1), id:(fishing ? fishing.id : 0) + 1};
+  fishUi();                                    // fill the bait bar first: the sea is sized to end just above it
+  fishLayout();
+  fishing.hx = F_ROD.x;
+  const wide = FW/680;
+  FISH_COUNT.forEach((n, g)=>{ for(let i=0;i<Math.max(1, Math.round(n*wide));i++){ const f = fSpawn(g, true); f.baseY = f.y; fishes.push(f); } });
   const id = fishing.id; let last = performance.now();
   requestAnimationFrame(function frame(now){
     if(!fishing || fishing.id !== id || hbPanel !== 'fishing') return;
@@ -9005,39 +9125,37 @@ function openFishing(){
 }
 function closeFishing(){
   if(!fishing) return;
-  fishing = null; $('fishing').style.display = 'none';
+  fishing = null; $('fishing').style.display = 'none'; document.body.classList.remove('fishing-mode');
   if(hbPanel === 'fishing'){ hbPanel = null; document.body.classList.remove('panel-open'); renderHarborUi(); }
 }
 function fishUi(){
   const f = fishing; if(!f) return;
-  const casts = save.casts ?? CASTS_PER_VISIT, B = BAITS[f.bait];
-  $('fish-casts').textContent = casts + ' cast' + (casts === 1 ? '' : 's') + ' left';
-  $('fish-bucket').innerHTML = `<span class="v2coin"></span>Gold ${save.gold.toLocaleString()} · Fish ${fishTotal()}`;
-  $('fish-baits').innerHTML = BAITS.map((b, i)=>`<button class="fbait${i===f.bait ? ' sel' : ''}" data-i="${i}" ${f.st !== 'ready' && f.st !== 'caught' && f.st !== 'lost' ? 'disabled' : ''}><i>${b.ic}</i><b>${b.name}</b><span>${b.cost ? b.cost+' gold' : 'Free'}</span></button>`).join('');
+  const B = BAITS[f.bait], bag = fishBag();
+  $('fish-casts').textContent = '';
+  $('fish-bucket').innerHTML = FISH_GRADES.map((G, i)=>`<span class="fb-n" title="${spList(i)}">${fishImgHTML(i, 'fb-mini')}${bag[i]}</span>`).join('');
+  const idle = f.st === 'ready' || f.st === 'caught' || f.st === 'lost';
+  $('fish-baits').innerHTML = BAITS.map((b, i)=>`<button class="fbait${i===f.bait ? ' sel' : ''}${canAffordBait(b) ? '' : ' poor'}" data-i="${i}" ${idle ? '' : 'disabled'}><i>${b.ic}</i><b>${b.name}</b><span>${baitCostText(b)}</span></button>`).join('');
   $('fish-baits').querySelectorAll('.fbait').forEach(btn=>btn.onclick = ()=>{ if(!fishing) return; fishing.bait = +btn.dataset.i; save.bait = fishing.bait; persist(); fishUi(); });
-  const left = Math.max(0, Math.ceil(f.t));
   const txt = {
-    ready: casts > 0 ? `Pick a bait and cast. The deeper you go, the rarer the fish. Rare fish swim away from weak bait, but sneak up <b>from behind</b> and you can still hook them.`
-                     : 'The fish have gone quiet. Come back after your next trip out of town.',
-    fishing:`Steer the hook with the mouse, touch or arrow keys · <b>${left}s</b> left`,
-    hooked:`Hooked a <b>${f.hooked ? FISH_GRADES[f.hooked.g].name : ''}</b>! Reeling it in…`,
+    ready: `Pick a bait and cast. The deeper you go, the rarer the fish. Rare fish swim away from weak bait, but sneak up <b>from behind</b> and you can still hook them.`,
+    fishing:`Steer the hook with the mouse, touch or arrow keys · Space reels in`,
+    hooked:`Hooked a <b>${f.hooked ? fishName(f.hooked.ft) : ''}</b>! Reeling it in…`,
     caught:f.msg, lost:f.msg}[f.st];
   $('fish-say').innerHTML = txt;
   const btn = $('fish-act');
   btn.style.visibility = f.st === 'hooked' ? 'hidden' : '';
-  const canPay = save.gold >= B.cost;
-  btn.textContent = f.st === 'fishing' ? 'Reel in' : (casts > 0 ? (f.st === 'ready' ? 'Cast' : 'Cast again') + (B.cost ? ` (${B.cost} gold)` : '') : 'Done');
-  btn.disabled = (f.st === 'ready' && (casts <= 0 || !canPay)) || ((f.st === 'caught' || f.st === 'lost') && casts > 0 && !canPay);
-  $('fish-result').innerHTML = f.st === 'caught' ? `${fishImgHTML(f.grade, 'fr-big')}<div><div class="v2label">${['COMMON','NICE','GREAT','RARE','LEGENDARY'][f.grade]} CATCH</div><b>${f.n} ${FISH_GRADES[f.grade].name}</b><span>You have ${fishBag()[f.grade]} now</span></div>` : '';
+  const canPay = canAffordBait(B);
+  btn.textContent = f.st === 'fishing' ? 'Reel in' : canPay ? (f.st === 'ready' ? 'Cast' : 'Cast again') : `Need ${baitCostText(B)}`;
+  btn.disabled = idle && !canPay;
+  $('fish-result').innerHTML = f.st === 'caught' ? `${spImgHTML(f.ft, 'fr-big')}<div><div class="v2label">${FISH_TIER[f.grade].toUpperCase()} CATCH</div><b>${f.n} ${fishName(f.ft)}</b><span class="fr-ab">${abilityText(f.ft)}</span><span>You have ${fishSp()[f.ft]||0} now</span></div>` : '';
 }
 function fishAction(down){
   const f = fishing; if(!f || !down) return;
-  const casts = save.casts ?? CASTS_PER_VISIT, B = BAITS[f.bait];
+  const B = BAITS[f.bait];
   if(f.st === 'ready' || f.st === 'caught' || f.st === 'lost'){
-    if(casts <= 0){ if(f.st !== 'ready') closeFishing(); return; }
-    if(save.gold < B.cost) return;
-    save.gold -= B.cost; save.casts = casts - 1; persist();
-    f.st = 'fishing'; f.t = FISH_LINE_TIME; f.hx = F_ROD.x; f.hy = F_SURF + 10; f.tx = null; f.ty = null; f.hooked = null;
+    if(!canAffordBait(B)) return;
+    if(B.n){ removeFish(B.fish, B.n); persist(); }
+    f.st = 'fishing'; f.hx = F_ROD.x; f.hy = F_SURF + 10; f.tx = null; f.ty = null; f.hooked = null;
     for(const x of f.fishes){ x.noticed = false; if(x.st !== 'swim'){ x.st = 'swim'; } }
     fishUi();
   } else if(f.st === 'fishing'){
@@ -9048,7 +9166,8 @@ function fishAction(down){
 function fishPointer(e){
   const cv = $('fish-cv'), r = cv.getBoundingClientRect();
   if(!fishing || !r.width) return;
-  fishing.tx = (e.clientX - r.left)/r.width*FW; fishing.ty = (e.clientY - r.top)/r.height*FH;
+  const sc = Math.min(r.width/FW, r.height/FH), ox = r.left + (r.width - FW*sc)/2, oy = r.top + (r.height - FH*sc)/2;
+  fishing.tx = (e.clientX - ox)/sc; fishing.ty = (e.clientY - oy)/sc;
 }
 function fishUpdate(dt){
   const f = fishing; f.anim += dt;
@@ -9074,7 +9193,6 @@ function fishUpdate(dt){
   if(Math.random() < dt*3) f.bubbles.push({x:rand(10, FW-10), y:FH - 20, r:rand(2, 5), vy:rand(20, 40)});
   for(let i=f.bubbles.length-1;i>=0;i--){ const b = f.bubbles[i]; b.y -= b.vy*dt; b.x += Math.sin(f.anim*3 + i)*0.3; if(b.y < F_SURF) f.bubbles.splice(i, 1); }
   if(f.st === 'fishing'){
-    f.t -= dt;
     // steer: towards the pointer, or with the keys
     let kx = 0, ky = 0;
     if(keysDown.has('a') || keysDown.has('arrowleft')) kx -= 1;
@@ -9101,37 +9219,46 @@ function fishUpdate(dt){
         else x.st = 'approach';
       }
     }
-    if(f.st === 'fishing'){
-      if(f.t <= 0){ f.st = 'lost'; f.msg = 'Out of line time. Nothing bit. Try going deeper, or a tastier bait.'; fishUi(); }
-      else if(Math.floor(f.t) !== Math.floor(f.t + dt)) fishUi();
-    }
   } else if(f.st === 'hooked'){
     // reel it up to the boat, wriggling
     const x = f.hooked, dx = F_ROD.x - f.hx, dy = (F_SURF - 6) - f.hy, d = Math.hypot(dx, dy);
     const m = Math.min(d, 190*dt); if(d > 1){ f.hx += dx/d*m; f.hy += dy/d*m; }
     x.x = f.hx + Math.sin(f.anim*22)*4; x.y = f.hy + x.size*0.35;
     if(d < 4){
-      const g = x.g; f.grade = g; f.n = rollHaul(g, 1 + B.p*0.15);
-      fishBag()[g] += f.n; persist();
-      f.msg = g >= 3 ? `What a catch! <b>${f.n} ${FISH_GRADES[g].name}</b>!` : `Into the bucket!`;
+      const g = x.g; f.grade = g; f.ft = x.ft; f.n = rollHaul(g, 1 + B.p*0.15);
+      addFish(x.ft, f.n); persist();
+      f.msg = g >= 3 ? `What a catch! <b>${f.n} ${fishName(x.ft)}</b>!` : `Into the bucket!`;
       f.fishes.splice(f.fishes.indexOf(x), 1); const n = fSpawn(g, false); n.baseY = n.y; f.fishes.push(n);
       f.hooked = null; f.st = 'caught'; vibrate([25, 40, 25]); fishUi();
     }
   }
 }
+// full screen: the logical height stays 440, the width follows the screen's shape (the boat sits at 58% across)
+function fishLayout(){
+  const foot = $('fishing').querySelector('.fish-foot').getBoundingClientRect(), top = $('fishing').getBoundingClientRect().top;
+  if(foot.height) $('fish-cv').style.setProperty('height', Math.max(200, foot.top - top - 6)+'px', 'important');   // the sea ends just above the bait bar
+  const r = $('fish-cv').getBoundingClientRect(), asp = r.height ? r.width/r.height : 680/440;
+  FH = 440; FW = Math.round(Math.max(420, Math.min(1400, FH*asp)));
+  if(FH*asp < 420) FH = Math.round(420/asp);                         // portrait: a taller sea instead of empty sand
+  F_BAND = Math.round((FH - F_TOP - 40)/5);
+  F_ROD.x = Math.round(FW*0.58);
+  const cv = $('fish-cv'), dpr = Math.min(2, devicePixelRatio||1), k = Math.max(0.5, (r.height||FH)/FH)*dpr;
+  cv.width = Math.round(FW*k); cv.height = Math.round(FH*k); cv._k = k;
+}
+addEventListener('resize', ()=>{ if(fishing){ const old = FW; fishLayout(); for(const x of fishing.fishes) x.x *= FW/old; fishing.hx *= FW/old; } });
 function fishBite(x){
   const f = fishing;
   f.hooked = x; x.st = 'hooked'; f.st = 'hooked'; vibrate([20, 30, 20]); fishUi();
 }
 function fishDraw(){
   const f = fishing, cv = $('fish-cv'), g = cv.getContext('2d'), t = f.anim;
-  if(cv.width !== FW || cv.height !== FH){ cv.width = FW; cv.height = FH; }
+  const k = cv._k || 1; g.setTransform(k, 0, 0, k, 0, 0);
   g.clearRect(0, 0, FW, FH);
   // sky, sun, far islands
   const sky = g.createLinearGradient(0, 0, 0, F_SURF); sky.addColorStop(0, '#4fb3ee'); sky.addColorStop(1, '#bfe7fb');
   g.fillStyle = sky; g.fillRect(0, 0, FW, F_SURF);
   g.fillStyle = 'rgba(255,255,255,0.9)';
-  for(const [cx, cy, s] of [[90, 26, 1], [560, 18, 0.8]]){ const x = (cx + t*6) % (FW + 120) - 60; g.beginPath(); g.ellipse(x, cy, 34*s, 11*s, 0, 0, Math.PI*2); g.ellipse(x + 22*s, cy - 7*s, 22*s, 11*s, 0, 0, Math.PI*2); g.fill(); }
+  for(const [cx, cy, s] of [[90, 26, 1], [FW*0.45, 34, 0.7], [FW - 120, 18, 0.8]]){ const x = (cx + t*6) % (FW + 120) - 60; g.beginPath(); g.ellipse(x, cy, 34*s, 11*s, 0, 0, Math.PI*2); g.ellipse(x + 22*s, cy - 7*s, 22*s, 11*s, 0, 0, Math.PI*2); g.fill(); }
   g.fillStyle = '#6fbf63'; g.beginPath(); g.ellipse(40, F_SURF + 2, 90, 20, 0, Math.PI, 0); g.fill();
   g.beginPath(); g.ellipse(FW - 30, F_SURF + 2, 110, 24, 0, Math.PI, 0); g.fill();
   g.fillStyle = '#f2dfa0'; g.fillRect(FW - 140, F_SURF - 4, 140, 6);
@@ -9139,19 +9266,19 @@ function fishDraw(){
   const sea = g.createLinearGradient(0, F_SURF, 0, FH); sea.addColorStop(0, '#36a9e6'); sea.addColorStop(0.5, '#1f78c4'); sea.addColorStop(1, '#123f86');
   g.fillStyle = sea; g.fillRect(0, F_SURF, FW, FH - F_SURF);
   g.save(); g.globalAlpha = 0.08; g.fillStyle = '#ffffff';
-  for(let i=0;i<5;i++){ const x = 80 + i*130 + Math.sin(t*0.4 + i)*20; g.beginPath(); g.moveTo(x, F_SURF); g.lineTo(x + 40, F_SURF); g.lineTo(x - 30, FH); g.lineTo(x - 90, FH); g.closePath(); g.fill(); }
+  for(let i=0;i<Math.ceil(FW/130);i++){ const x = 80 + i*130 + Math.sin(t*0.4 + i)*20; g.beginPath(); g.moveTo(x, F_SURF); g.lineTo(x + 40, F_SURF); g.lineTo(x - 30, FH); g.lineTo(x - 90, FH); g.closePath(); g.fill(); }
   g.restore();
   g.font = '800 11px Nunito, sans-serif'; g.textAlign = 'left'; g.textBaseline = 'middle';
   FISH_GRADES.forEach((G, i)=>{
     const y = fBandY(i);
     if(i){ g.strokeStyle = 'rgba(255,255,255,0.10)'; g.setLineDash([6, 8]); g.beginPath(); g.moveTo(0, y); g.lineTo(FW, y); g.stroke(); g.setLineDash([]); }
-    g.fillStyle = 'rgba(255,255,255,0.45)'; g.fillText(G.name.toUpperCase(), 8, y + 12);
+    g.fillStyle = 'rgba(255,255,255,0.45)'; g.fillText(['SHALLOWS','REEF','OPEN SEA','DEEP','ABYSS'][i]+' · '+FISH_TIER[i].toUpperCase(), 8, y + 12);
   });
   // sea floor
   g.fillStyle = '#e9c97a'; g.beginPath(); g.moveTo(0, FH);
   for(let x = 0; x <= FW; x += 40) g.lineTo(x, FH - 14 - Math.sin(x*0.05)*5);
   g.lineTo(FW, FH); g.closePath(); g.fill();
-  for(const [x, c, h] of [[60, '#ff7aa8', 30], [120, '#44d0c0', 22], [560, '#ffb347', 26], [620, '#ff7aa8', 34]]){
+  for(const [x, c, h] of [[60, '#ff7aa8', 30], [120, '#44d0c0', 22], [FW*0.4, '#44d0c0', 18], [FW - 120, '#ffb347', 26], [FW - 60, '#ff7aa8', 34]]){
     g.strokeStyle = c; g.lineWidth = 6; g.lineCap = 'round'; g.beginPath(); g.moveTo(x, FH - 12); g.quadraticCurveTo(x + Math.sin(t + x)*6, FH - 12 - h/2, x + 4, FH - 12 - h); g.stroke();
   }
   // surface waves
@@ -9175,13 +9302,15 @@ function fishDraw(){
   }
   // the boat and the fisher
   const by = F_SURF - 4 + Math.sin(t*1.8)*2;
+  g.save(); g.translate(F_ROD.x - 392, 0);
   g.fillStyle = '#ffffff'; g.beginPath(); g.moveTo(268, by - 16); g.lineTo(398, by - 16); g.quadraticCurveTo(392, by + 6, 360, by + 8); g.lineTo(290, by + 8); g.quadraticCurveTo(274, by + 2, 268, by - 16); g.closePath(); g.fill();
   g.fillStyle = '#4A90D9'; g.fillRect(272, by - 10, 122, 5);
   g.fillStyle = '#3B2E2A'; g.beginPath(); g.arc(330, by - 34, 12, 0, Math.PI*2); g.fill();
   g.fillStyle = '#F6C9A0'; g.beginPath(); g.arc(330, by - 32, 10, 0, Math.PI*2); g.fill();
   g.fillStyle = '#E2582C'; g.beginPath(); g.arc(330, by - 38, 10, Math.PI, 0); g.fill(); g.fillRect(318, by - 39, 24, 3);
   g.fillStyle = '#F8C630'; g.fillRect(320, by - 22, 20, 8);
-  g.strokeStyle = '#6b4424'; g.lineWidth = 4; g.lineCap = 'round'; g.beginPath(); g.moveTo(336, by - 22); g.lineTo(F_ROD.x, F_ROD.y); g.stroke();
+  g.strokeStyle = '#6b4424'; g.lineWidth = 4; g.lineCap = 'round'; g.beginPath(); g.moveTo(336, by - 22); g.lineTo(392, F_ROD.y); g.stroke();
+  g.restore();
   // reel wheel at the rod tip
   g.fillStyle = '#ffffff'; g.beginPath(); g.arc(F_ROD.x, F_ROD.y, 9, 0, Math.PI*2); g.fill();
   g.strokeStyle = '#3B2E2A'; g.lineWidth = 2; g.stroke();
@@ -10275,7 +10404,8 @@ if(DEBUG) window.CS = {
   closeTalk:()=>closeTalk(),
   home:()=>{ if(state==='harbor') exitHarbor(); enterHome(); },
   run:()=>startRun(),
-  fish:()=>{ if(state==='harbor'){ save.casts = Math.max(save.casts||0, 1); openFishing(); } },
+  fish:()=>{ if(state==='harbor'){ openFishing(); } },
+  onlyFish:(ft, n)=>{ const sp = fishSp(); for(const k in sp) delete sp[k]; save.fishBag = [0,0,0,0,0]; addFish(ft, n || 200); },   // testing: a bucket of one species (not saved until something persists)
   fishing:()=>fishing, bag:()=>fishBag().slice(), runFish:()=>runFishIdx(), fishStep:(dt)=>{ if(fishing){ fishUpdate(dt); fishDraw(); } },
   intro:t=>{ playIntro(true); if(t) introJump(t); },
   levelUp:()=>{ levelQueue++; showLevelUp(); },
