@@ -1362,6 +1362,10 @@
     background:#FFFFFF;border-radius:26px;padding:12px 14px;box-shadow:0 5px 0 rgba(59,46,42,0.18), 0 10px 22px rgba(59,46,42,0.15);}
   #fishing .fish-hint{position:absolute;left:0;right:0;bottom:calc(8px + var(--sab));z-index:2;color:#FFFFFF;opacity:.8;margin:0;}
   .fbait.poor span{color:#E5404B;}
+  .quality-btns{display:flex;flex-wrap:wrap;align-items:center;gap:8px;}
+  .quality-btns button{min-height:36px;padding:0 16px;border:0;border-radius:999px;background:#F6EFE4;color:#3B2E2A;box-shadow:inset 0 0 0 2px #EADFCF;font-family:'Fredoka','Nunito',sans-serif;font-size:15px;font-weight:600;cursor:pointer;}
+  .quality-btns button.on{background:#F8C630;box-shadow:0 3px 0 #C99A12;}
+  .quality-btns span{font-size:12px;font-weight:700;color:#7A6A5E;}
   @media (max-width: 640px){ #fish-bucket{gap:6px !important;padding:0 8px !important;} #fish-bucket .fb-n{font-size:11px;} #fish-bucket .fb-mini{width:20px;height:14px;} #fishing .fish-head h2{font-size:18px;} #fishing .fish-hint{display:none;} }
 
   #loot-card .lc-fish{width:110px;height:80px;object-fit:contain;}
@@ -1529,6 +1533,7 @@
       <div class="sh-h">Your build</div>
       <div class="sh-sub">Projectiles</div><div class="sh-icons" id="pause-build"></div>
       <div class="sh-sub">Upgrades</div><div class="sh-icons" id="pause-pass"></div>
+      <div class="sh-sub">Graphics</div><div class="quality-btns" id="quality-btns"></div>
       <div class="sh-btns"><button class="bigbtn alt" id="btn-quit">End Run</button><button class="bigbtn" id="btn-resume">Resume</button></div>
     </div>
   </div>
@@ -7231,20 +7236,35 @@ function applyQuality(){
   if(L >= 3){ const g = $('glc'); if(g) g.style.visibility = 'hidden'; }
   tiltOverKey = '';
 }
+// the player's choice in the pause screen: 'auto' (step down when slow), 'fancy' (always full), 'fast' (always lowest)
+function qualityMode(){ try{ return localStorage.getItem('chumstorm_quality_mode') || 'auto'; }catch(e){ return 'auto'; } }
+function setQualityMode(m){
+  try{ localStorage.setItem('chumstorm_quality_mode', m); }catch(e){}
+  QUALITY.forced = m !== 'auto';
+  QUALITY.level = m === 'fancy' ? 0 : m === 'fast' ? 3 : (()=>{ try{ return clamp(+(localStorage.getItem('chumstorm_quality')||0), 0, 3); }catch(e){ return 0; } })();
+  QUALITY.slowT = 0; QUALITY.warm = 0; QUALITY.ema = 16.7;
+  applyQuality(); renderQualityBtns();
+}
+function renderQualityBtns(){
+  const el = $('quality-btns'); if(!el) return;
+  const m = qualityMode();
+  el.innerHTML = [['auto','Auto'], ['fancy','Fancy'], ['fast','Fast']].map(([k, t])=>`<button data-q="${k}" class="${k===m ? 'on' : ''}">${t}</button>`).join('') +
+    `<span>${m === 'auto' ? 'Steps down by itself if the game runs slowly' + (QUALITY.level ? ` (now level ${QUALITY.level} of 3)` : '') : m === 'fast' ? 'Flat camera, no blur, fewer particles' : '3D camera with every effect'}</span>`;
+  el.querySelectorAll('button').forEach(b=>b.onclick = ()=>setQualityMode(b.dataset.q));
+}
 (function initQuality(){
   const q = /[?&]quality=(\w+)/.exec(location.search);
-  if(q && q[1] === 'auto'){ try{ localStorage.removeItem('chumstorm_quality'); }catch(e){} }
-  else if(q){ QUALITY.level = clamp(+q[1]||0, 0, 3); QUALITY.forced = true; }
-  else { try{ QUALITY.level = clamp(+(localStorage.getItem('chumstorm_quality')||0), 0, 3); }catch(e){} }
-  applyQuality();
+  if(q && q[1] === 'auto'){ try{ localStorage.removeItem('chumstorm_quality'); localStorage.removeItem('chumstorm_quality_mode'); }catch(e){} }
+  else if(q){ QUALITY.level = clamp(+q[1]||0, 0, 3); QUALITY.forced = true; applyQuality(); return; }
+  setQualityMode(qualityMode());
 })();
 function watchQuality(frameMs){
   if(QUALITY.forced || QUALITY.level >= 3) return;
   QUALITY.warm += frameMs;
-  if(QUALITY.warm < 3000) return;                      // ignore the first seconds (loading, the intro, a new run)
-  QUALITY.ema += (Math.min(frameMs, 100) - QUALITY.ema)*0.05;
-  QUALITY.slowT = QUALITY.ema > 25 ? QUALITY.slowT + frameMs : 0;
-  if(QUALITY.slowT > 2000){
+  if(QUALITY.warm < 1500) return;                      // ignore the first moment (loading, a new run)
+  QUALITY.ema += (Math.min(frameMs, 100) - QUALITY.ema)*0.08;
+  QUALITY.slowT = QUALITY.ema > 22 ? QUALITY.slowT + frameMs : 0;
+  if(QUALITY.slowT > 1000){
     QUALITY.level++; QUALITY.slowT = 0; QUALITY.warm = 0; QUALITY.ema = 16.7;
     applyQuality();
     try{ localStorage.setItem('chumstorm_quality', QUALITY.level); }catch(e){}
@@ -7588,6 +7608,7 @@ function pauseGame(){
   const box = (ic, lv, t)=>`<div title="${t||''}"><i>${ic}</i>${lv ? `<b>${lv}</b>` : ''}</div>`, pad = (a, n)=>a.concat(Array(Math.max(0, n - a.length)).fill('<div class="empty"><i></i></div>')).join('');
   $('pause-build').innerHTML = pad(player.weapons.map(w=>box(WEAPONS[w.key].ic, WEAPONS[w.key].evo ? '★' : w.level, WEAPONS[w.key].name)), 6);
   $('pause-pass').innerHTML = pad(player.passiveOrder.map(k=>box(PASSIVES[k].ic, player.passives[k], PASSIVES[k].name)).concat(player.artifacts.map(k=>box(ARTIFACTS[k].ic, '', ARTIFACTS[k].name))), 6);
+  renderQualityBtns();
   $('pauseOverlay').style.display = 'flex';
 }
 function resumeFromPause(){ $('pauseOverlay').style.display = 'none'; resumePlay(); }
