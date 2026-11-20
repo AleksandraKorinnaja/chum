@@ -1371,7 +1371,33 @@
   #loot-card .lc-fish{width:110px;height:80px;object-fit:contain;}
 
   #fish-result .fr-ab, .fish-row .fr-ab{display:block;color:#E2582C !important;font-weight:800 !important;}
-</style>
+
+  /* ---- tutorial coach card ---- */
+  #coach{position:absolute;left:50%;bottom:calc(132px + var(--sab));transform:translate(-50%, 20px);z-index:15;width:min(520px, calc(100vw - 32px));box-sizing:border-box;
+    background:#FFFFFF;border-radius:22px;padding:12px 16px 14px;color:#3B2E2A;font-family:'Nunito',sans-serif;
+    box-shadow:0 5px 0 rgba(59,46,42,0.18), 0 10px 22px rgba(59,46,42,0.16), 0 0 0 3px #F8C630;opacity:0;pointer-events:none;transition:opacity .25s, transform .25s;}
+  #coach.show{opacity:1;transform:translate(-50%, 0);pointer-events:auto;}
+  #coach.pop{animation:coachPop .45s cubic-bezier(.3,1.6,.5,1);}
+  @keyframes coachPop{0%{transform:translate(-50%, 16px) scale(.92)}100%{transform:translate(-50%, 0) scale(1)}}
+  body.harbor-mode #coach{bottom:calc(206px + var(--sab));}
+  body.home-mode #coach, body.fishing-mode #coach, body.panel-open #coach, body.intro-mode #coach{display:none;}
+  .coach-top{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+  .coach-top .sp{flex:1;}
+  .coach-lab{font-size:11px;font-weight:800;color:#7A6A5E;letter-spacing:.1em;text-transform:uppercase;}
+  .coach-skip{border:0;background:none;color:#7A6A5E;font:inherit;font-size:12px;font-weight:800;text-decoration:underline;cursor:pointer;padding:2px 4px;}
+  .coach-row{display:flex;gap:12px;align-items:flex-start;}
+  .coach-num{flex-shrink:0;width:36px;height:36px;border-radius:50%;background:#2BB5A5;color:#fff;font-family:'Fredoka','Nunito',sans-serif;font-size:18px;font-weight:700;
+    display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px #FFFFFF, 0 3px 0 3px rgba(59,46,42,0.12);}
+  .coach-num.done{background:#5ad76e;animation:slotPop .4s ease-out;}
+  .coach-txt{flex:1;min-width:0;}
+  .coach-txt > b{display:block;font-family:'Fredoka','Nunito',sans-serif;font-size:18px;font-weight:700;}
+  .coach-txt p b{font-weight:900;color:#E2582C;}
+  .coach-txt p{margin:2px 0 0;font-size:14px;font-weight:700;line-height:1.35;color:#3B2E2A;}
+  .coach-txt kbd{display:inline-block;min-width:18px;padding:0 5px;border-radius:5px;background:#F6EFE4;box-shadow:inset 0 -2px 0 #D9C3A5;font:inherit;font-size:12px;font-weight:900;text-align:center;}
+  .coach-goal{display:inline-block;margin-top:6px;font-size:12px;font-weight:900;color:#E2582C;letter-spacing:.02em;}
+  .coach-bar{height:6px;border-radius:3px;background:#E8DCCB;margin-top:10px;overflow:hidden;}
+  .coach-bar i{display:block;height:100%;background:#F8C630;border-radius:3px;transition:width .15s;}
+  @media (max-width: 640px){ #coach{bottom:calc(120px + var(--sab));} body.harbor-mode #coach{bottom:calc(180px + var(--sab));} .coach-txt p{font-size:13px;} }</style>
 </head>
 <body>
 <div id="wrap">
@@ -1478,7 +1504,7 @@
   </div>
 
   <div id="harbor-ui">
-    <div class="hb-top"><span class="hb-gold v2pill"><span class="v2coin"></span><span id="hb-coin" hidden></span>Gold <span id="hb-gold">0</span></span><span class="hb-fish v2pill" id="hb-fish" title="Fish in your bucket"></span><span class="hb-disc v2pill" id="hb-disc"></span><span class="sp"></span><button id="hb-story" class="v2round" title="Watch the opening story again" aria-label="Replay story">▶</button></div>
+    <div class="hb-top"><span class="hb-gold v2pill"><span class="v2coin"></span><span id="hb-coin" hidden></span>Gold <span id="hb-gold">0</span></span><span class="hb-fish v2pill" id="hb-fish" title="Fish in your bucket"></span><span class="hb-disc v2pill" id="hb-disc"></span><span class="sp"></span><button id="hb-tut" class="v2round" title="Play the tutorial again" aria-label="Replay tutorial">?</button><button id="hb-story" class="v2round" title="Watch the opening story again" aria-label="Replay story">▶</button></div>
     <div id="hb-requests"></div>
     <button id="hb-prompt"></button>
     <div id="hb-nav"></div>
@@ -1494,6 +1520,7 @@
       <div class="fish-hint">Mouse, touch or arrow keys steer the hook · Space casts and reels in · Esc to leave</div>
     </div>
   </div>
+  <div id="coach" aria-live="polite"></div>
   <div id="new-cat-banner"></div>
   <div id="callout" class="callout"></div>
   <div id="loot-card"></div>
@@ -4035,6 +4062,7 @@ function drawCrown(x, y, s){
 /* ============== UPDATE ============== */
 function update(dt){
   runT += dt;
+  tutTick(dt);
   updateLighting();
   if(runT >= RUN_LENGTH){ dinnerBell(); return; }
   runEvents();
@@ -4094,6 +4122,7 @@ function startRoll(){
   const v = rollInput();
   const mx = v ? v[0] : Math.cos(player.facing), my = v ? v[1] : Math.sin(player.facing), n = Math.hypot(mx, my) || 1;
   player.rollX = mx/n; player.rollY = my/n; player.rollQ = 0;
+  tutEvent('dodge');
   if(Math.abs(player.rollX) > 0.15) player.faceX = player.rollX > 0 ? 1 : -1;
   player.rollN = (player.rollN||0) + 1;
   player.rollT = ROLL.time; player.rollCd = ROLL.cd + ROLL.time; player.dodged = false; player.rollTrail = []; player.landT = 0;
@@ -7541,15 +7570,128 @@ function startRun(opts){
   renderBuildIcons(); renderItemBar(); startMissions(); runRequestsDirty = true; renderRunRequests(); updateHud();
   // how many cats this area still hides: silhouettes under the chip, and a callout after the mission intro
   renderDiscStrip();
-  { const here = undiscoveredIn(stage), all = stageCatKeys(stage).length; if(here.length) pending.push({t:4.6, fn:()=>callout(`<div class="co-head"><b>Cats to discover</b><button class="v2round v2x co-x" aria-label="Close">X</button></div><div class="co-sub">${stage.name} · ${all - here.length} of ${all} found</div><div class="co-grid">${here.slice(0, 10).map(k=>`<div class="co-cell"><i><img src="${catIconURL(ENEMIES[k], 56, true)}" alt=""></i><span>???</span></div>`).join('')}</div>`, 'dim w600', 3400)}); }
+  { const here = undiscoveredIn(stage), all = stageCatKeys(stage).length; if(here.length && !save.introRun) pending.push({t:4.6, fn:()=>callout(`<div class="co-head"><b>Cats to discover</b><button class="v2round v2x co-x" aria-label="Close">X</button></div><div class="co-sub">${stage.name} · ${all - here.length} of ${all} found</div><div class="co-grid">${here.slice(0, 10).map(k=>`<div class="co-cell"><i><img src="${catIconURL(ENEMIES[k], 56, true)}" alt=""></i><span>???</span></div>`).join('')}</div>`, 'dim w600', 3400)}); }
   royalRunStart();
   if(opts && opts.prep === true) return;          // the opening story sets the map up, then calls beginRun()
   beginRun();
+}
+/* ---- Tutorial: a coach card that teaches the game one step at a time ----
+   Part 1 plays in your first run (straight after the story), part 2 on your first visit to the harbor.
+   Each step finishes when you actually do the thing (move, feed cats, level up, dodge, open a building…)
+   or, for tips that only need reading, after a few seconds. Progress is saved in save.tut
+   ({run: next step, harbor: next step, skip: true}); "?" in the harbor top bar replays it.            */
+const TUT_RUN = [
+  {id:'move',   title:'Move around',          line:'Walk with <kbd>WASD</kbd> or the arrow keys. On a phone, hold and drag anywhere.', goal:'Walk a little way', need:260},
+  {id:'feed',   title:'Feed the cats',        line:'You throw fish by yourself at the nearest cat. Stay close to the hungry ones and keep out of their claws!', goal:'Feed 5 cats', need:5},
+  {id:'xp',     title:'Grab the sparkles',    line:'Fed cats drop sparkly XP. Walk over it to fill the <b>blue bar</b> at the top. A full bar means a level up.', goal:'Reach level 2', need:2},
+  {id:'dodge',  title:'Dodge!',               line:'Press <kbd>Space</kbd> (or the round <b>Space</b> button) to dash out of trouble. You can\'t be scratched mid-dodge.', goal:'Dodge once'},
+  {id:'bucket', title:'Your fish bucket',     line:'Every fish you throw comes out of your bucket (the <b>Fish</b> pill, top right). Each kind of fish has its own trick: pufferfish burst, eels zap!', goal:'', wait:7},
+  {id:'goals',  title:'Missions and requests', line:'The panels on the left are bonus goals for gold. The round <b>?</b> faces on the right are cats you haven\'t met yet.', goal:'', wait:7},
+  {id:'items',  title:'Items and treasure',   line:'Glowing pickups give power-ups, and treasure boxes give new skills. One-time items go in the slots bottom right: press <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd>.', goal:'', wait:7},
+  {id:'last',   title:'Feed them all!',       line:'Survive until dinner is over. If the cats overrun you, you keep the gold you earned and go home to get stronger.', goal:'', wait:6},
+];
+const TUT_HARBOR = [
+  {id:'walk',   title:'Welcome to the harbor', line:'This is your street. Walk with <kbd>A</kbd> <kbd>D</kbd> or the arrow keys, or tap where to go.', goal:'Take a stroll', need:200},
+  {id:'shop',   title:'The Big Fish Shop',     line:'Your shop: spend gold on <b>skills</b> that last forever, and visit your <b>Cat Home</b> upstairs. Walk to the door and press <kbd>E</kbd>, or tap it.', goal:'Go into the shop', target:'shop'},
+  {id:'gil',    title:'Old Gil\'s fish',       line:'Fish are your ammo. Old Gil on the pier sells crates of fish for your bucket.', goal:'Visit Old Gil', target:'gil'},
+  {id:'boat',   title:'Go fishing',            line:'Fishing is free! Steer the hook deeper for rarer fish, and sneak up on fancy fish from behind.', goal:'Board your boat', target:'boat'},
+  {id:'locals', title:'Locals with requests',  line:'Townsfolk with a <b>!</b> over their head have a job for you. Talk to them for bonus gold.', goal:'', wait:7},
+  {id:'gate',   title:'Back to the cats',      line:'When you\'re ready, walk off the <b>left end</b> of the street past the <b>Areas</b> sign (or tap <b>Areas</b> below) to pick where to go.', goal:'Choose an area', target:'gate'},
+];
+let tut = null;           // {part:'run'|'harbor', i, steps, prog, base, t, doneT}
+function tutSave(){ if(!save.tut || typeof save.tut !== 'object') save.tut = {run:0, harbor:0}; return save.tut; }
+function tutStart(part){
+  const S = tutSave(); if(S.skip) return;
+  const steps = part === 'run' ? TUT_RUN : TUT_HARBOR, i = S[part]||0;
+  if(i >= steps.length){ tut = null; tutRender(); return; }
+  tut = {part, i, steps, prog:0, t:0, doneT:0, base:null};
+  tutRender(true);
+}
+function tutStep(){ return tut && tut.steps[tut.i]; }
+function tutAdvance(){
+  if(!tut || tut.doneT) return;
+  tut.doneT = 1.1;                                  // show the tick for a moment, then the next step
+  vibrate(15); tutRender();
+}
+function tutEvent(ev){
+  const st = tutStep(); if(!st || tut.doneT) return;
+  if(ev === 'dodge' && st.id === 'dodge') tutAdvance();
+  else if(ev.startsWith('open:') && st.target){
+    const k = ev.slice(5);
+    if(k === st.target || (st.target === 'shop' && (k === 'tackle' || k === 'home' || k === 'shop'))) tutAdvance();
+  }
+}
+function tutTick(dt){
+  if(!tut) return;
+  if(tut.doneT){
+    tut.doneT -= dt;
+    if(tut.doneT <= 0){
+      const S = tutSave(); S[tut.part] = tut.i + 1; persist();
+      tut.i++; tut.prog = 0; tut.t = 0; tut.doneT = 0; tut.base = null;
+      if(tut.i >= tut.steps.length){
+        const part = tut.part; tut = null; tutRender();
+        if(part === 'harbor') showBanner('🎓 Tutorial complete! Good luck out there', 2200);
+        return;
+      }
+      tutRender(true);
+    }
+    return;
+  }
+  const st = tutStep(); if(!st) return;
+  tut.t += dt;
+  let p = tut.prog;
+  if(st.id === 'move' && player){
+    if(!tut.base) tut.base = {x:player.x, y:player.y, d:0};
+    tut.base.d += Math.hypot(player.x - tut.base.x, player.y - tut.base.y); tut.base.x = player.x; tut.base.y = player.y;
+    p = tut.base.d/st.need;
+  } else if(st.id === 'walk' && hb){
+    if(!tut.base) tut.base = {x:hb.x, d:0};
+    tut.base.d += Math.abs(hb.x - tut.base.x); tut.base.x = hb.x;
+    p = tut.base.d/st.need;
+  } else if(st.id === 'feed'){
+    if(tut.base === null) tut.base = fedCount;
+    p = (fedCount - tut.base)/st.need;
+  } else if(st.id === 'xp' && player){
+    p = player.level >= st.need ? 1 : player.xp/player.xpToNext*0.95;
+  } else if(st.wait){
+    p = tut.t/st.wait;
+  }
+  if(Math.abs(p - tut.prog) > 0.01 || p >= 1){ tut.prog = Math.min(1, p); tutRenderBar(); }
+  if(p >= 1) tutAdvance();
+}
+function tutRenderBar(){ const b = $('coach') && $('coach').querySelector('.coach-bar i'); if(b) b.style.width = Math.round(tut.prog*100)+'%'; }
+function tutRender(fresh){
+  const el = $('coach'); if(!el) return;
+  const st = tutStep();
+  if(!st){ el.classList.remove('show'); return; }
+  const n = tut.steps.length;
+  el.innerHTML = `<div class="coach-top"><span class="coach-lab">${tut.part === 'run' ? 'How to play' : 'Your harbor'} · ${tut.i + 1}/${n}</span><span class="sp"></span><button class="coach-skip" type="button">Skip tutorial</button></div>
+    <div class="coach-row"><div class="coach-num${tut.doneT ? ' done' : ''}">${tut.doneT ? '✓' : tut.i + 1}</div>
+    <div class="coach-txt"><b>${st.title}</b><p>${st.line}</p>${st.goal ? `<div class="coach-goal">${tut.doneT ? 'Done!' : st.goal}</div>` : ''}</div></div>
+    <div class="coach-bar"><i style="width:${Math.round((tut.doneT ? 1 : tut.prog)*100)}%"></i></div>`;
+  el.querySelector('.coach-skip').onclick = e=>{ e.stopPropagation(); tutSave().skip = true; persist(); tut = null; tutRender(); showBanner('Tutorial skipped. Tap ? in the harbor to see it again', 2000); };
+  el.classList.add('show');
+  if(fresh){ el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
+}
+function tutReplay(){
+  save.tut = {run:0, harbor:0}; persist();
+  tutStart('harbor');
+  showBanner('🎓 Tutorial on: the run part plays in your next run', 2000);
+}
+// harbor: a bouncing arrow over the building the current step wants you to visit
+function tutHarborArrow(gy){
+  const st = tutStep(); if(!st || !st.target || tut.part !== 'harbor' || tut.doneT) return;
+  const b = HB_BUILDINGS.find(x=>x.key===st.target); if(!b) return;
+  const y = (b.gate ? gy - 330 : b.boat ? gy - 370 : b.stall ? gy - 340 : gy - 48 - b.h - 180) - Math.abs(Math.sin(hb.t*4))*14;
+  ctx.save(); ctx.fillStyle = '#E2582C'; ctx.strokeStyle = '#FFFFFF'; ctx.lineWidth = 5; ctx.lineJoin = 'round';
+  ctx.beginPath(); ctx.moveTo(b.x - 26, y); ctx.lineTo(b.x - 12, y); ctx.lineTo(b.x - 12, y - 30); ctx.lineTo(b.x + 12, y - 30); ctx.lineTo(b.x + 12, y); ctx.lineTo(b.x + 26, y); ctx.lineTo(b.x, y + 28); ctx.closePath();
+  ctx.stroke(); ctx.fill(); ctx.restore();
 }
 function beginRun(){
   showSpeech(character.key==='brine' ? 'By the gods! The chums are coming!' : 'Dinner time, you lot!', 2400);
   showBanner(stage.name, 1800, 'STAGE '+(STAGES.indexOf(stage) + 1));
   state = 'playing';
+  if(save.introRun || save.tut) tutStart('run'); else { tut = null; tutRender(); }
   startLoop();
 }
 function dinnerBell(){
@@ -7620,7 +7762,8 @@ $('btn-gohome').addEventListener('click', ()=>{
   const first = save.introRun;
   if(first){ delete save.introRun; persist(); }
   showMenu();
-  if(first) setTimeout(()=>callout(`<div class="co-head"><b>Your fish shop</b></div><div class="co-pic wide">${hbParts.shop ? `<img src="${hbParts.shop._url || (hbParts.shop._url = hbParts.shop.toDataURL())}" alt="">` : '🐟'}</div><div class="co-line" style="text-align:left">This is the harbor. Spend your gold on skills and fish, take requests from the locals, go fishing off your boat, then walk out of town (far left) to try again!</div><button class="bigbtn co-btn">Got it</button>`, 'dim w540', 6000), 500);
+  if(first){ tutSave(); persist(); }
+  if(false) setTimeout(()=>callout(`<div class="co-head"><b>Your fish shop</b></div><div class="co-pic wide">${hbParts.shop ? `<img src="${hbParts.shop._url || (hbParts.shop._url = hbParts.shop.toDataURL())}" alt="">` : '🐟'}</div><div class="co-line" style="text-align:left">This is the harbor. Spend your gold on skills and fish, take requests from the locals, go fishing off your boat, then walk out of town (far left) to try again!</div><button class="bigbtn co-btn">Got it</button>`, 'dim w540', 6000), 500);
 });
 $('btn-start').addEventListener('click', startRun);
 $('btn-shop-cathome').addEventListener('click', ()=>{ if(state!=='harbor') return; closeHarborPanel(true); exitHarbor(); enterHome(); });
@@ -7628,6 +7771,7 @@ $('intro-skip').addEventListener('click', e=>{ e.stopPropagation(); finishIntro(
 $('intro-go').addEventListener('click', e=>{ e.stopPropagation(); finishIntro(); });
 $('intro-ui').addEventListener('pointerdown', e=>{ if(e.target.closest('button')) return; introNext(); });
 $('hb-story').addEventListener('click', e=>{ e.stopPropagation(); playIntro(true); });
+$('hb-tut').addEventListener('click', e=>{ e.stopPropagation(); tutReplay(); });
 $('caviar-btn').addEventListener('pointerdown', e=>{ e.preventDefault(); e.stopPropagation(); placePlate(); });
 $('roll-btn').addEventListener('pointerdown', e=>{ e.preventDefault(); e.stopPropagation(); startRoll(); });
 document.addEventListener('visibilitychange', ()=>{ if(document.hidden && state==='playing') pauseGame(); });
@@ -8773,6 +8917,7 @@ function enterHarbor(fromHome){
     hb.locals.push({b, look:b.look, name:b.giver, princess:b.type==='royal', x:1000 + i*120, tx:1000 + i*120, state:'wait', pay:true, face:-1, walkT:0, idleT:0});
   });
   renderHarborUi();
+  if(save.tut && !save.tut.skip && (save.tut.harbor||0) < TUT_HARBOR.length && !save.introRun) tutStart('harbor'); else if(tut && tut.part !== 'harbor'){ tut = null; tutRender(); }
   if(hb.locals.length) setTimeout(()=>showBanner('📮 Someone is waiting to thank you!', 1800), 400);
   const id = hbLoop;
   let last = performance.now();
@@ -8863,6 +9008,7 @@ function renderRunRequests(){
 function hbWalkTo(x, onArrive){ hb.target = clamp(x, HB_MIN, HB_LEN-60); hb.onArrive = onArrive||null; }
 function harborUpdate(dt){
   hb.t += dt;
+  tutTick(dt);
   const blocked = hbPanel || hbTalk;
   let dir = 0;
   if(!blocked){
@@ -8944,6 +9090,7 @@ function harborInteract(){
   else openBuilding(hb.near.b.key);
 }
 function openBuilding(key){
+  tutEvent('open:'+key);
   if(key==='home'){ exitHarbor(); enterHome(); return; }
   if(key==='boat'){ openFishing(); return; }
   if(key==='gil') hb.haggleShown = true;
@@ -9177,6 +9324,7 @@ function fSpawn(g, anywhere){
     sp:rand(34, 50) + g*14, size:28 + g*7, st:'swim', noticed:false, t:rand(0, 6), fleeT:0};
 }
 function openFishing(){
+  tutEvent('open:boat');
   hbPanel = 'fishing';
   document.body.classList.add('panel-open', 'fishing-mode');
   $('fishing').style.display = 'flex';
@@ -9678,6 +9826,7 @@ function harborRender(){
     ctx.save(); ctx.fillStyle = '#ffd23c'; ctx.strokeStyle = '#1c1420'; ctx.lineWidth = 3;
     ctx.beginPath(); ctx.moveTo(x-14, by); ctx.lineTo(x+14, by); ctx.lineTo(x, by+16); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.restore();
   }
+  tutHarborArrow(gy);
   for(const p of hb.parts){
     ctx.save(); ctx.globalAlpha = Math.min(1, p.life*2);
     if(p.type==='coin'){ drawCoin(p.x, gy + p.y, 7); }
@@ -10478,6 +10627,7 @@ if(DEBUG) window.CS = {
   run:()=>startRun(),
   fish:()=>{ if(state==='harbor'){ openFishing(); } },
   onlyFish:(ft, n)=>{ const sp = fishSp(); for(const k in sp) delete sp[k]; save.fishBag = [0,0,0,0,0]; addFish(ft, n || 200); },   // testing: a bucket of one species (not saved until something persists)
+  tut:()=>tut && {part:tut.part, i:tut.i, id:tut.steps[tut.i] && tut.steps[tut.i].id, prog:tut.prog}, tutStart:p=>{ save.tut = {run:0, harbor:0}; tutStart(p); },
   fishing:()=>fishing, bag:()=>fishBag().slice(), runFish:()=>runFishIdx(), fishStep:(dt)=>{ if(fishing){ fishUpdate(dt); fishDraw(); } },
   intro:t=>{ playIntro(true); if(t) introJump(t); },
   levelUp:()=>{ levelQueue++; showLevelUp(); },

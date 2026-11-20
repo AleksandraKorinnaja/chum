@@ -69,6 +69,28 @@ There are three areas, each with its own ground:
 
 The environment sheet is otherwise only used for the breakable props: a pink pot in town, a flower crate in the park and a teal pot on the beach. The bones panel and the skull sign are not used.
 
+## Tutorial
+A white **coach card** with a yellow ring teaches the game one step at a time. Each step finishes when you actually do it, or after a few seconds for tips that only need reading. A progress bar fills as you go, and a green tick shows before the next step.
+- **Part 1, in your first run** (straight after the story), at the bottom of the screen:
+  1. Move around.
+  2. Feed 5 cats.
+  3. Grab XP to reach level 2.
+  4. Dodge once.
+  5. Your fish bucket and fish abilities.
+  6. Missions, requests and undiscovered cats.
+  7. Items and treasure.
+  8. Feed them all!
+- **Part 2, on your first visit to the harbor**, above the walk prompt. A bouncing orange arrow points at the building for each step:
+  1. Take a stroll.
+  2. Go into the Big Fish Shop.
+  3. Visit Old Gil.
+  4. Board your boat.
+  5. Locals with requests.
+  6. Choose an area (the Areas sign at the far left).
+- **Skip and replay:** **Skip tutorial** turns it off. The round **?** button in the harbor's top bar plays it again: the harbor part right away, the run part in your next run.
+- **Saved progress:** in `save.tut` (`{run, harbor, skip}`). Players who started before the tutorial existed only see it if they press **?**.
+- **Code:** `TUT_RUN` / `TUT_HARBOR` in `index.html` list the steps; `tutEvent()` and `tutTick()` decide when each one is done. With `?debug`, `CS.tut()` shows the current step and `CS.tutStart('run' | 'harbor')` restarts a part.
+
 ## The opening story
 The first time the game starts, an animated opening plays **in Cat Town itself**, in the piazza where every run begins. The run is set up but frozen while the story plays on top of the real map, in sunset light under string lights:
 1. A little seaside town somewhere in Italy.
