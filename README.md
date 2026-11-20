@@ -152,6 +152,7 @@ Cat Town is a low-poly town square, styled after the Ooblets square reference: s
 - **New cats arrive faster, the crowd doesn't grow faster:** the kinds of cats in each area move ahead every **45 seconds** (`WAVE_MIN`), so new types join about 25% sooner. How many cats are around, and how quickly more come, still follows the original minute-by-minute pace. Timed events (swarms, elites, bosses) keep their own schedule.
 - **Newer cats are worth more XP:** each cat type gives ×1 XP plus 0.25 for every wave later it first appears in that area, up to ×3.5. In Cat Town, orange tabbies give ×1, black cats ×1.5, and the last arrivals up to ×3.5. Elites still give 5× on top.
 - **More treasure and drops:** a treasure spot turns up about every 20 seconds (the first at 0:10), breakable crates about twice as often, and ordinary cats now drop things: about 1 in 80 a treasure box, 1 in 17 a power-up, and sometimes a coin. Every fish find (🐟 pickups and treasure boxes) is always better fish (nice and up), about 50 at a time.
+- **Speed boosts you can feel:** Fast Feet gives +20% move speed per level (was 10%) and Comfy Boots +10% per rank (was 5%). While you're boosted, dust kicks up behind you as you run, more of it the faster you are.
 **The 3D look:** the run maps look like a tilted, gently curved 3D diorama.
 - **The ground** (floor, decorations, zones, plates, shots):
   - It's drawn flat, then a small WebGL pass tilts it so it falls away toward the top.
@@ -260,7 +261,14 @@ Each card also shows:
 - **Treasure boxes come in three tiers:** gold (1 reward), purple **Rare** (3 rewards, may contain an artifact) and rainbow **Legendary** (5 rewards, always an artifact if one is left, triple gold). Bosses always drop Rare or better. Each tier has its own look in the world and on the opening screen.
 
 ## Between runs
-- **The Harbor.** The game opens, and every run ends, on the street outside your fish shop. Walk left and right (**A / D** or the arrow keys, or tap where to go). Walk up to a building and press **E** / **Space** / **↑** (or tap it) to go in:
+- **The Harbor Island.** The harbor is a little floating island seen through the same 3D camera as the runs: flat ground (paving, lawns, sand, the pier) tilted in 3D, with everything that stands up (you, the townsfolk, your cats, Old Gil's stall, the boat, signposts, trees) drawn upright on top as 2D figures. The camera is an isometric 3/4 view, looking at the island from a corner (45° around, `ISO` in `index.html`): the paving runs in diamonds, the island shows its cliffs on two sides, and buildings are blocks showing two faces (the village art on the front, a plain wall on the side), while people, cats and props stay upright 2D figures facing you. WASD moves along the screen (W walks up the screen). `HB_ISO = false` switches back to the straight-on tilted camera.
+  - **Walking:** in every direction with **WASD** or the arrow keys, or tap where to go. Tapping a building, stall or signpost walks you there around obstacles and opens it. Press **E** / **Space** / **Enter** at a door.
+  - **The starting island:** your **Big Fish Shop** (Skills & Cat Sanctuary), the **Pet Store**, two more Italian houses as 3D blocks wearing the village art, a lawn where your cats laze, lamps, bushes and benches. On the south side, **Old Gil's stall** sits on the quay and the **pier** leads down to **your boat** (fishing). A **Cat Town** signpost stands at the end of the road on the west.
+  - **The island grows:** every area has its own piece of land, holding that area's signpost. Willow Park is a park to the north, with low-poly trees, a pond and a path; Sunny Beach is a beach to the east, with palms and umbrellas. Land you haven't unlocked shows as a faint dashed sandbank with a 🔒 and what unlocks it. The first time you come home after unlocking an area, its land rises out of the sea while the camera pans to it, with a "New land!" banner (remembered in `save.hbLand`).
+  - **Signposts:** walking up to one and pressing E opens the "Where to?" panel with that area already picked.
+  - **Code:** `HB3_LAND`, `HB3_HOUSES`, `HB3_SPOTS` and `HB3_PROPS` in `index.html`. Setting `HB3D = false` brings back the old side-view street described below.
+- **Big windows slide in from the right:** Tackle & Skills, the Pet Store, Old Gil's fish and "Where to?" open as a full-height side panel with a scalloped edge and a green header, with the island still visible on the left. Click the island or X to close.
+- **The old side-view street** (`HB3D = false`): the game opens, and every run ends, on the street outside your fish shop. Walk left and right (**A / D** or the arrow keys, or tap where to go). Walk up to a building and press **E** / **Space** / **↑** (or tap it) to go in:
   The street is built from the harbor kit at **`assets/env/harbor_sheet.webp`**:
   - **Buildings:** the Big Fish Shop (your shop, with its own sign) and three houses for the Cat Home, Tackle & Skills and the Pet Store.
   - **Street dressing:** lamp posts, a bench, flower boxes, plant pots, an A-board, a signpost and a banner pole.
@@ -361,6 +369,8 @@ The character sheet is **`assets/player/characters.png`** (`.webp` / `.jpg` also
 - **Without the PSD:** the game falls back to the sheets and the built-in placement.
 
 ## UI size
+- **Speech bubble:** sits just above the player's head (following the 3D camera), so it never covers the face.
+- **Cats to discover** (top right in a run) shows the silhouettes of the cats you haven't met yet.
 - **Bigger HUD and harbor UI:** everything is scaled up by `--ui` (1.25 on big screens, 1.15 on medium, about 1 on phones). Each piece grows from the corner it's anchored to, so nothing moves.
 - **Full-size pop-ups:** the panels (Tackle & Skills, Pet Store, Old Gil, Where to?, dialogue, pause, results) use `--pz`, which is full size on big screens and smaller on small ones.
 - **Text:** nothing in the panels is smaller than 13.5px.

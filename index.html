@@ -138,7 +138,7 @@
 
   #speech-bubble{
     position:absolute;top:calc(50% - 88px);left:50%;
-    transform:translate(-50%,6px) scale(0.85);
+    transform:translate(-50%,calc(-100% + 6px)) scale(0.85);transform-origin:50% 100%;
     background:var(--cream);border:3px solid var(--ink);border-radius:14px;
     padding:8px 13px;max-width:220px;width:max-content;
     font-family:'Fredoka',sans-serif;font-weight:600;font-size:13px;color:var(--ink);
@@ -146,7 +146,7 @@
     opacity:0;transition:opacity .18s ease, transform .18s cubic-bezier(.3,1.4,.4,1);
     box-shadow:0 4px 0 rgba(43,35,32,0.2);
   }
-  #speech-bubble.show{ opacity:1; transform:translate(-50%,0) scale(1); }
+  #speech-bubble.show{ opacity:1; transform:translate(-50%,-100%) scale(1); }
   #speech-bubble::before{
     content:'';position:absolute;left:50%;bottom:-9px;transform:translateX(-50%);
     width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;
@@ -943,7 +943,7 @@
   body.ui-v2 .disc-sil:empty{display:none;}
   body.ui-v2 .disc-sil i{width:32px;height:32px;border-radius:50%;border:2px solid var(--v2-line);background:var(--v2-soft);box-sizing:border-box;display:flex;align-items:center;justify-content:center;
     font-style:normal;font-size:12px;font-weight:800;color:var(--v2-muted);overflow:hidden;}
-  body.ui-v2 .disc-sil i img{width:28px;height:28px;filter:none;animation:none;}
+  body.ui-v2 .disc-sil i img{width:30px;height:30px;filter:none;animation:none;object-fit:contain;opacity:.85;}
   body.ui-v2 .disc-sil span{font-size:12px;font-weight:800;color:var(--v2-muted);align-self:center;}
   body.ui-v2 #hud-right .chip{align-self:flex-end;font-size:13px;padding:4px 12px;}
   /* item slots: teal rounds with a white ring, a dark count badge, and a yellow key pill under each */
@@ -1555,6 +1555,25 @@
   body.ui-v2 .talk-req .v2pill{height:46px;font-size:19px;}
   body.ui-v2 .talk-btns .bigbtn{min-height:56px !important;font-size:22px !important;padding:0 32px !important;}
   .reward .ic .rw-fish{width:80%;height:80%;object-fit:contain;}
+  /* the harbor island uses the 3D camera too */
+  body.harbor-mode #glc{display:block !important;}
+  body.ui-v2 #hb-hint{display:none !important;}
+  /* ---- big windows: a side panel that slides in from the right (the island stays visible on the left) ---- */
+  body.ui-v2.panel-open #menu{background:linear-gradient(90deg, rgba(46,58,63,0) 0%, rgba(46,58,63,0.25) 100%) !important;justify-content:flex-end !important;align-items:stretch !important;padding:0 !important;}
+  body.ui-v2.panel-open #menu .home-card, body.ui-v2.panel-open.panel-gil #menu .home-card{zoom:1 !important;width:min(720px, 60vw) !important;max-width:none !important;height:100dvh;max-height:none !important;
+    margin:0 !important;border-radius:0 !important;padding:30px 30px 30px 54px !important;overflow-y:auto;
+    background:linear-gradient(#dff0cf 0, #dff0cf 96px, #fbf6ea 96px) !important;box-shadow:-12px 0 30px rgba(59,46,42,0.18) !important;
+    -webkit-mask:radial-gradient(circle 15px at 0 22px, transparent 96%, #000 100%) 0 0 / 100% 44px repeat-y;mask:radial-gradient(circle 15px at 0 22px, transparent 96%, #000 100%) 0 0 / 100% 44px repeat-y;
+    animation:panelIn .38s cubic-bezier(.2,.9,.25,1);}
+  @keyframes panelIn{from{transform:translateX(105%)}to{transform:none}}
+  body.ui-v2.panel-open #menu .panel-head{min-height:44px;}
+  body.ui-v2.panel-open #menu .panel-head h1{font-size:30px !important;color:#2f6b4f !important;}
+  body.ui-v2.panel-open .ps-cols{flex-direction:column;}
+  body.ui-v2.panel-open .pick-grid{grid-template-columns:repeat(2, minmax(0, 1fr)) !important;}
+  body.ui-v2.panel-open .stage-list{grid-template-columns:repeat(2, minmax(0, 1fr)) !important;}
+  body.ui-v2.panel-open #shop-list.tree{gap:10px;}
+  body.ui-v2.panel-open #hb-nav, body.ui-v2.panel-open #hb-requests, body.ui-v2.panel-open #hb-prompt, body.ui-v2.panel-open #coach{visibility:hidden;}
+  @media (max-width: 760px){ body.ui-v2.panel-open #menu .home-card{width:100vw !important;-webkit-mask:none;mask:none;padding:24px 18px !important;} }
   @media (max-width: 560px){ .run-row{flex-wrap:wrap;} .run-go{flex:1;} .runs-head h1{font-size:26px;} }</style>
 </head>
 <body>
@@ -2047,7 +2066,7 @@ const PASSIVES = {
   riptide: { ic:'🌊', name:'Riptide',        desc:'+10% projectile speed',  max:5, apply:(s,l)=>s.speed+=0.10*l },
   serving: { ic:'🍽️', name:'Second Serving', desc:'+1 projectile / bobber / puddle', max:2, apply:(s,l)=>s.amount+=l },
   boots:   { ic:'🥾', name:'Sturdy Boots',   desc:'+20% max HP',            max:5, apply:(s,l)=>s.maxHpMul+=0.20*l },
-  feet:    { ic:'👟', name:'Fast Feet',      desc:'+10% move speed',        max:5, apply:(s,l)=>s.moveSpeed+=0.10*l },
+  feet:    { ic:'👟', name:'Fast Feet',      desc:'+20% move speed',        max:5, apply:(s,l)=>s.moveSpeed+=0.20*l },
   magnet:  { ic:'🧲', name:'Chum Magnet',    desc:'+30% pickup range',      max:5, apply:(s,l)=>s.magnet+=0.30*l },
   snack:   { ic:'💚', name:'Fresh Catch',    desc:'+0.3 HP per second',     max:5, apply:(s,l)=>s.regen+=0.3*l },
   lure:    { ic:'🍀', name:'Lucky Lure',     desc:'+10% luck',              max:5, apply:(s,l)=>s.luck+=0.10*l },
@@ -2105,7 +2124,7 @@ const SHOP = [
   { key:'amount2',  br:'angler',  ic:'🪣', name:'Bottomless Bucket',desc:'+1 more projectile',  max:1, base:10000,apply:(s,r)=>s.amount+=r, proj:1 },
   { key:'maxhp',    br:'sailor',  ic:'❤️', name:'Hearty Breakfast', desc:'+10% max HP',         max:3, base:150,  apply:(s,r)=>s.maxHpMul+=0.10*r },
   { key:'regen',    br:'sailor',  ic:'💚', name:'Packed Lunch',     desc:'+0.15 HP per second', max:5, base:180,  apply:(s,r)=>s.regen+=0.15*r },
-  { key:'move',     br:'sailor',  ic:'👟', name:'Comfy Boots',      desc:'+5% move speed',      max:3, base:200,  apply:(s,r)=>s.moveSpeed+=0.05*r },
+  { key:'move',     br:'sailor',  ic:'👟', name:'Comfy Boots',      desc:'+10% move speed',     max:3, base:200,  apply:(s,r)=>s.moveSpeed+=0.10*r },
   { key:'armor',    br:'sailor',  ic:'🧥', name:'Oilskin Coat',     desc:'+1 armor',            max:3, base:400,  apply:(s,r)=>s.armor+=r },
   { key:'revival',  br:'sailor',  ic:'🛟', name:'Life Ring',        desc:'Revive once per run', max:1, base:6000, apply:()=>{} },
   { key:'greed',    br:'fortune', ic:'🪙', name:'Haggler',          desc:'+10% gold',           max:5, base:150,  apply:(s,r)=>s.greed+=0.10*r },
@@ -2217,8 +2236,10 @@ function fmtTime(t){ t = Math.floor(t); return String(Math.floor(t/60)).padStart
 const camera = { x:0, y:0 };
 let band = null;
 function getViewBounds(pad=0){
-  const o = viewOver();                            // the 3D camera shows more than one screen's worth of ground
-  return {left:camera.x-W/2*o-pad, right:camera.x+W/2*o+pad, top:camera.y-H/2*o-pad, bottom:camera.y+H/2*o+pad};
+  if(isoOn()) return isoBounds(pad);
+  const o = viewOver()/viewZoom();                 // the 3D camera shows more than one screen's worth of ground (and the harbor is zoomed out)
+  const oy = o/viewSquash();
+  return {left:camera.x-W/2*o-pad, right:camera.x+W/2*o+pad, top:camera.y-H/2*oy-pad, bottom:camera.y+H/2*oy+pad};
 }
 function updateCamera(){
   camera.x = player.x;
@@ -2282,7 +2303,7 @@ addEventListener('keydown', e=>{
   if(key==='escape' && placing){ cancelPlacing(); return; }
   if(state==='harbor' && !(e.target && e.target.tagName==='INPUT')){
     if(key==='escape'){ if(hbTalk) closeTalk(); else if(hbPanel) closeHarborPanel(); return; }
-    if(['e',' ','enter','w','arrowup'].includes(key) && !hbPanel){
+    if((HB3D ? ['e',' ','enter'] : ['e',' ','enter','w','arrowup']).includes(key) && !hbPanel){
       e.preventDefault();
       if(hbTalk){ const yes = $('talk-yes'); if(yes && key!=='w' && key!=='arrowup') yes.click(); }
       else harborInteract();
@@ -2925,6 +2946,12 @@ function applyUiIcons(){
     if(state !== 'harbor' || hbPanel || hbTalk) return;
     const key = btn.dataset.b;
     if(key==='requests'){ const el = $('hb-requests'); el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); return; }
+    if(HB3D){                                    // walk to it on the island
+      const want = key === 'home' || key === 'tackle' ? 'shop' : key;
+      const tk = want === 'gate' ? (hb3Targets().find(t=>t.key==='gate' && t.stage===save.stage) || hb3Targets().find(t=>t.key==='gate')) : hb3Targets().find(t=>t.key===want);
+      if(tk) hbGoTo(tk, ()=>{ if(tk.stage){ save.stage = tk.stage; persist(); } openBuilding(key); });
+      return;
+    }
     const b = HB_BUILDINGS.find(x=>x.key===key), at = b && b.decor ? HB_BUILDINGS.find(x=>x.key==='shop') : b;   // home & tackle live in the Big Fish Shop
     if(b) hbWalkTo(at.x, ()=>openBuilding(b.key));
   });
@@ -4401,6 +4428,9 @@ function movePlayer(dt){
     if(Math.abs(mx) > 0.15) player.faceX = mx > 0 ? 1 : -1;
     player.moving = true;
     player.walkT += dt;
+    // boosted speed shows: dust kicks up behind you, more of it the faster you are
+    const boost = player.stats.moveSpeed - 1;
+    if(boost > 0.08){ player.dustT = (player.dustT||0) - dt; if(player.dustT <= 0){ player.dustT = 0.16/Math.min(3, 1 + boost*2); const a = Math.atan2(my, mx) + Math.PI + rand(-0.4, 0.4); addP({x:player.x - mx*14, y:player.y + 6, vx:Math.cos(a)*rand(40, 90), vy:Math.sin(a)*rand(20, 50) - 20, life:0.4, type:'poof', color:'#f3e2c8'}); } }
   }
   player.knock.x -= player.knock.x*8.5*dt; player.knock.y -= player.knock.y*8.5*dt;
   player.x += player.knock.x*dt; player.y += player.knock.y*dt;
@@ -6713,7 +6743,7 @@ function undiscoveredTotal(){ return ALL_CAT_DEFS.filter(d=>!collected.has(d.key
 function renderDiscStrip(){
   const el = $('disc-sil'); if(!el) return;
   const keys = undiscoveredIn(stage);
-  el.innerHTML = keys.slice(0, keys.length > 5 ? 4 : 5).map(k=>`<i title="??? Cat">?</i>`).join('') + (keys.length > 5 ? `<i>+${keys.length - 4}</i>` : '');
+  el.innerHTML = keys.slice(0, keys.length > 5 ? 4 : 5).map(k=>`<i title="??? Cat"><img src="${catIconURL(ENEMIES[k], 56, true)}" alt=""></i>`).join('') + (keys.length > 5 ? `<i>+${keys.length - 4}</i>` : '');
 }
 function announceDiscovery(def){
   const here = undiscoveredIn(stage).length, left = undiscoveredTotal();
@@ -7060,7 +7090,8 @@ function render(){
   ctx.restore();
   const s = playerScreenPos();
   const bubble = $('speech-bubble');
-  bubble.style.left = s.x+'px'; bubble.style.top = Math.max(18, s.y-92)+'px';
+  { const f = tiltOn() ? tiltFwd(player.x - camera.x + W/2, player.y - camera.y + H/2) : {x:s.x, y:s.y, s:1};        // the bubble's tail sits just above the head
+    bubble.style.left = f.x+'px'; bubble.style.top = Math.max(60, f.y - (PLAYER_H + 34)*f.s)+'px'; }
   if(!tilted) drawLighting();
   // Power-ups draw above the night overlay so they always glow.
   ctx.save();
@@ -7090,7 +7121,7 @@ const TILT = {on:true, k:0.3, focus:0.55, fish:0.1, strip:4};
 const TILT_HAZE = {town:['#f7e2d2','#efd3c0'], park:['#e2f0d8','#cfe5c4'], sea:['#dcf0f6','#c4e4ef']};
 let tiltBuf = null, tiltGL = null;
 function tiltOn(){ return TILT.on && TILT.k > 0; }
-function tiltActive(){ return tiltOn() && ['playing','paused','levelup','chest','results','intro'].includes(state); }
+function tiltActive(){ return tiltOn() && (['playing','paused','levelup','chest','results','intro'].includes(state) || (state === 'harbor' && HB3D && !HB_ISO)); }
 function tiltM(u){ return 1 + TILT.k*(u - TILT.focus); }
 // which row of the flat frame ends up at (tilted) row u, as fractions of the height; and back again
 function tiltSrcU(u){ const k = TILT.k; if(!k) return u; return 0.5 + Math.log((1 + k*(u - TILT.focus))/(1 + k*(0.5 - TILT.focus)))/k; }
@@ -7117,10 +7148,17 @@ function tiltFwd(sx, sy){
   return {x:dx*W, y:dy*H, s};
 }
 // set the transform so world point (wx, wy) lands on the tilted ground, drawn upright at its distance's size
+// the harbor island is seen from further away than the runs (a diorama); everything else is 1:1
+function viewZoom(){ return state === 'harbor' && typeof HB3D !== 'undefined' && HB3D ? 0.8 : 1; }
+// the harbor's camera sits lower (a 3/4 view): the ground is foreshortened by this much; things standing up are not
+function viewSquash(){ return state === 'harbor' && typeof HB3D !== 'undefined' && HB3D && !HB_ISO ? 0.6 : 1; }
+let bbAnchorY = 0;                                   // the ground y of whatever billboard() last set up (boxPt squashes ground depth around it)
 function billboard(wx, wy, ox=0, oy=0){
+  if(isoOn()){ const [sx, sy] = isoP(wx, wy, 0), Z = viewZoom(); isoAnchor = {x:wx, y:wy, sx, sy}; ctx.setTransform(Z, 0, 0, Z, sx - wx*Z + ox, sy - wy*Z + oy); return; }
   if(!tiltOn()){ ctx.setTransform(1, 0, 0, 1, Math.round(W/2 - camera.x) + ox, Math.round(H/2 - camera.y) + oy); return; }
-  const f = tiltFwd(wx - camera.x + W/2, wy - camera.y + H/2);
-  ctx.setTransform(f.s, 0, 0, f.s, f.x - wx*f.s + ox, f.y - wy*f.s + oy);
+  const Z = viewZoom(), FY = viewSquash(), f = tiltFwd((wx - camera.x)*Z + W/2, (wy - camera.y)*Z*FY + H/2), k = f.s*Z;
+  bbAnchorY = wy;
+  ctx.setTransform(k, 0, 0, k, f.x - wx*k + ox, f.y - wy*k + oy);
 }
 // How much wider than the screen the flat ground has to be so the tilt and lens never show past its edge.
 let tiltOverKey = '', tiltOverVal = 1;
@@ -8020,8 +8058,8 @@ function tutTick(dt){
     tut.base.d += Math.hypot(player.x - tut.base.x, player.y - tut.base.y); tut.base.x = player.x; tut.base.y = player.y;
     p = tut.base.d/st.need;
   } else if(st.id === 'walk' && hb){
-    if(!tut.base) tut.base = {x:hb.x, d:0};
-    tut.base.d += Math.abs(hb.x - tut.base.x); tut.base.x = hb.x;
+    if(!tut.base) tut.base = {x:hb.x, y:hb.y||0, d:0};
+    tut.base.d += Math.hypot(hb.x - tut.base.x, (hb.y||0) - tut.base.y); tut.base.x = hb.x; tut.base.y = hb.y||0;
     p = tut.base.d/st.need;
   } else if(st.id === 'feed'){
     if(tut.base === null) tut.base = fedCount;
@@ -9295,7 +9333,7 @@ function enterHarbor(fromHome){
   stage = STAGES.find(s=>s.key===save.stage) || STAGES[0];
   character = CHARACTERS.find(c=>c.key===save.char) || CHARACTERS[0];
   const keep = fromHome ? hb : null;           // after a run you're back outside your fish shop
-  hb = {x: keep ? keep.x : 1140, face:1, walkT:0, moving:false, target:null, onArrive:null, camX: keep ? keep.camX : 1140, t:0,
+  hb = {x: keep ? keep.x : 1140, y: keep && keep.y != null ? keep.y : null, face:1, walkT:0, moving:false, target:null, onArrive:null, camX: keep ? keep.camX : 1140, t:0,
         cats:[], locals:[], parts:[], offerT:rand(5,9), haggle:null, near:null};
   // your cats, lazing about in front of the shop
   hb.cats = CAT_ORDER.filter(k=>collected.has(k)).map((k, i, arr)=>{
@@ -9306,6 +9344,7 @@ function enterHarbor(fromHome){
   (save.bounties||[]).filter(b=>b.done).forEach((b, i)=>{
     hb.locals.push({b, look:b.look, name:b.giver, princess:b.type==='royal', x:1000 + i*120, tx:1000 + i*120, state:'wait', pay:true, face:-1, walkT:0, idleT:0});
   });
+  if(HB3D) hb3Init(fromHome);
   renderHarborUi();
   if(save.tut && !save.tut.skip && (save.tut.harbor||0) < TUT_HARBOR.length && !save.introRun) tutStart('harbor'); else if(tut && tut.part !== 'harbor'){ tut = null; tutRender(); }
   if(hb.locals.length) setTimeout(()=>showBanner('📮 Someone is waiting to thank you!', 1800), 400);
@@ -9397,6 +9436,7 @@ function renderRunRequests(){
 /* ---- update ---- */
 function hbWalkTo(x, onArrive){ hb.target = clamp(x, HB_MIN, HB_LEN-60); hb.onArrive = onArrive||null; }
 function harborUpdate(dt){
+  if(HB3D) return harborUpdate3(dt);
   hb.t += dt;
   tutTick(dt);
   const blocked = hbPanel || hbTalk;
@@ -9477,7 +9517,7 @@ function harborUpdate(dt){
 function harborInteract(){
   if(!hb || hbPanel || hbTalk || !hb.near) return;
   if(hb.near.local) openTalk(hb.near.local);
-  else openBuilding(hb.near.b.key);
+  else { if(hb.near.b.stage){ save.stage = hb.near.b.stage; persist(); } openBuilding(hb.near.b.key); }
 }
 function openBuilding(key){
   tutEvent('open:'+key);
@@ -9600,7 +9640,7 @@ function renderFishTab(){
   else if(avReady){ const av = composeAvatar(GIL_LOOK, 8), k = 104/av.bodyH; gg.drawImage(av.cv, gc.width/2 - av.cx*k, gc.height - 4 - av.footY*k, av.cv.width*k, av.cv.height*k); }
   if(!hb.haggle) hb.haggle = {mul:1, tried:false};
   const mul = hb.haggle.mul, b = fishBag();
-  $('gil-line').textContent = hb.haggle.tried ? hb.haggle.say : '“Fresh off the boat! You throw ’em, you buy ’em again. Fish Toss throws whatever’s in your bucket, so stock up. Want to haggle?”';
+  $('gil-line').textContent = hb.haggle.tried ? hb.haggle.say : '“Fresh off the boat! You throw ’em, you buy ’em again. Plain fish are free, but the fancy ones hit harder, and those you buy from me. Want to haggle?”';
   el.innerHTML = FISH_GRADES.map((g, i)=>{
     const price = Math.round(FISH_PRICE[i]*mul), pack = FISH_PACK[i];
     return `<div class="fish-row${b[i] ? ' cur' : ''}">
@@ -10154,6 +10194,512 @@ function drawBoat(b, gy, hi){
   ctx.restore();
   drawSign(x - 40, y - 290, b.name, b.ic);
 }
+/* ---- the harbor's isometric 3/4 camera ----
+   The island is seen from a corner, 45° around and looking down at an angle: ground is rotated and foreshortened
+   (tiles become diamonds), buildings are boxes showing two faces, and people, cats and props stand upright as 2D
+   figures facing you. isoP() projects a world point (x, y, height z) to the screen; isoInv() goes back.        */
+const HB_ISO = true;
+const ISO = {c:Math.cos(Math.PI/4), s:Math.sin(Math.PI/4), FY:0.56, cliff:130};
+function isoOn(){ return state === 'harbor' && typeof HB3D !== 'undefined' && HB3D && HB_ISO; }
+function isoP(x, y, z){ const dx = x - camera.x, dy = y - camera.y, Z = viewZoom(); return [W/2 + (ISO.c*dx - ISO.s*dy)*Z, H/2 + (ISO.s*dx + ISO.c*dy)*Z*ISO.FY - (z||0)*Z]; }
+function isoInv(px, py){ const Z = viewZoom(), u = (px - W/2)/Z, v = (py - H/2)/(Z*ISO.FY); return {x:camera.x + ISO.c*u + ISO.s*v, y:camera.y - ISO.s*u + ISO.c*v}; }
+function isoDepth(x, y){ return ISO.s*x + ISO.c*y; }
+let isoAnchor = {x:0, y:0, sx:0, sy:0};
+function isoBounds(pad){
+  const pts = [isoInv(0, 0), isoInv(W, 0), isoInv(0, H), isoInv(W, H)];
+  return {left:Math.min(...pts.map(p=>p.x)) - pad, right:Math.max(...pts.map(p=>p.x)) + pad, top:Math.min(...pts.map(p=>p.y)) - pad, bottom:Math.max(...pts.map(p=>p.y)) + pad};
+}
+// a building block seen from the corner: the art on the south face, a plain wall on the east face, a tiled roof
+function drawIsoHouse(h){
+  const F = kitFacade(h.kit); if(!F) return;
+  const H0 = h.w*Math.hypot(ISO.c, ISO.s*ISO.FY)*F.fh/F.fw, x0 = h.x - h.w/2;       // as tall as the art is for the face's on-screen width
+  const x1 = h.x + h.w/2, y0 = h.y - h.d, y1 = h.y;
+  const P = isoP, [wr, wg, wb] = F.wall, shade = k => `rgb(${wr*k|0},${wg*k|0},${wb*k|0})`;
+  const poly = (pts, fill) => { ctx.beginPath(); pts.forEach(([px, py], i)=>i ? ctx.lineTo(px, py) : ctx.moveTo(px, py)); ctx.closePath(); ctx.fillStyle = fill; ctx.fill(); };
+  ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0);
+  poly([P(x0 + 10, y1 + 10, 0), P(x1 + 30, y1 + 10, 0), P(x1 + 30, y0 + 20, 0), P(x0 + 10, y0, 0)], 'rgba(60,40,30,0.18)');            // shadow
+  poly([P(x1, y1, 0), P(x1, y0, 0), P(x1, y0, H0), P(x1, y1, H0)], shade(0.74));                                                       // east wall
+  poly([P(x0, y1, 0), P(x1, y1, 0), P(x1, y1, H0), P(x0, y1, H0)], shade(0.95));                                                       // south wall
+  // the house art, mapped onto the south face
+  const [ax, ay] = P(x0, y1, H0), [bx, by] = P(x1, y1, H0), [cx, cy] = P(x0, y1, 0);
+  ctx.save(); ctx.transform((bx - ax)/F.fw, (by - ay)/F.fw, (cx - ax)/F.fh, (cy - ay)/F.fh, ax, ay);
+  ctx.imageSmoothingEnabled = true; ctx.drawImage(F.img, 0, F.top, F.fw, F.fh, 0, 0, F.fw, F.fh); ctx.restore();
+  // roof: four tiles of terracotta with rows, a darker band where it meets the walls
+  const R = [P(x0, y0, H0), P(x1, y0, H0), P(x1, y1, H0), P(x0, y1, H0)];
+  poly(R, BOX3D.roof);
+  ctx.strokeStyle = BOX3D.roofDark; ctx.lineWidth = 2;
+  for(let j=1;j<5;j++){ const yy = y0 + (y1 - y0)*j/5, a = P(x0, yy, H0), b = P(x1, yy, H0); ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke(); }
+  ctx.strokeStyle = 'rgba(80,40,30,0.35)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(...P(x0, y1, H0)); ctx.lineTo(...P(x1, y1, H0)); ctx.lineTo(...P(x1, y0, H0)); ctx.stroke();
+  ctx.restore();
+}
+// each piece of land's cliffs: its south and east sides, in layers (drawn in screen space, under the tops)
+function isoCliffs(){
+  ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0);
+  const P = isoP, Hc = ISO.cliff;
+  const quad = (a, b, z0, z1, fill) => { const p = [P(a[0], a[1], -z0), P(b[0], b[1], -z0), P(b[0], b[1], -z1), P(a[0], a[1], -z1)]; ctx.beginPath(); p.forEach(([px, py], i)=>i ? ctx.lineTo(px, py) : ctx.moveTo(px, py)); ctx.closePath(); ctx.fillStyle = fill; ctx.fill(); };
+  const face = (a, b, G, k, alpha) => { ctx.globalAlpha = alpha; quad(a, b, 0, 22, lpShade(G.side[0], k)); quad(a, b, 22, 74, lpShade(G.side[1], k)); quad(a, b, 74, Hc, lpShade(G.side[2], k)); quad(a, b, Hc - 6, Hc, 'rgba(255,255,255,0.4)'); };
+  for(const L of HB3_LAND){
+    const a = hb3Alpha(L.key); if(a <= 0) continue;
+    const G = HB3_GROUND[L.ground], off = (1 - a)*90;
+    for(const r of L.rects){
+      face([r.x0, r.y1 + off], [r.x1, r.y1 + off], G, 1, a);        // south side (lit)
+      face([r.x1, r.y1 + off], [r.x1, r.y0 + off], G, 0.82, a);     // east side (in shade)
+    }
+  }
+  // the pier's posts and edge
+  const Pr = HB3_PIER; ctx.globalAlpha = 1;
+  quad([Pr.x0, Pr.y1], [Pr.x1, Pr.y1], 0, 16, '#8a5a34'); quad([Pr.x1, Pr.y1], [Pr.x1, Pr.y0], 0, 16, '#6e4426');
+  for(let y = Pr.y0 + 120; y < Pr.y1; y += 140) for(const x of [Pr.x0 + 6, Pr.x1 - 6]){ const [px, py] = P(x, y, 0); ctx.fillStyle = '#6e4426'; ctx.fillRect(px - 5, py, 10, 60*viewZoom()); }
+  ctx.restore();
+}
+// the locked land's label, upright (not rotated with the ground)
+function isoLockLabels(){
+  ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0);
+  for(const L of HB3_LAND){
+    if(!L.stage || hb3LandOn(L)) continue;
+    const r = L.rects[0], [px, py] = isoP((r.x0 + r.x1)/2, (r.y0 + r.y1)/2, 0), st = STAGES.find(s=>s.key===L.stage);
+    ctx.fillStyle = 'rgba(59,46,42,0.6)'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.font = "700 26px Fredoka, Nunito, sans-serif"; ctx.fillText('🔒 '+L.name, px, py - 14);
+    ctx.font = "800 16px Nunito, sans-serif"; ctx.fillText(st && st.unlock ? st.unlock.text : 'Unlocks later', px, py + 14);
+  }
+  ctx.restore();
+}
+/* ============== THE HARBOR ISLAND (3/4 top-down) ==============
+   The harbor is a little floating island seen through the same 3D camera as the runs: the flat ground (paving,
+   lawns, sand, the pier) is tilted and curved by the WebGL pass, and everything that stands up (you, the
+   townsfolk, your cats, Old Gil's stall, the boat, signposts, trees) is drawn upright on top as 2D billboards.
+   Buildings are 3D boxes wearing the Italian village art (drawHouseBox). Walk anywhere with WASD / arrows / tap.
+   The island grows: each area you unlock adds its own piece of land (with a signpost to that area), which rises
+   out of the sea the first time you come home after unlocking it. HB3D = false brings back the side-view street. */
+const HB3D = true;
+const HB3_PERSON_H = 112;
+// pieces of land: the harbor (always there) plus one per area; each piece is a few rectangles of ground
+const HB3_LAND = [
+  {key:'harbor', stage:null, name:'The Harbor', ground:'pave', rects:[{x0:-900, x1:900, y0:-560, y1:430}], edge:'quay'},
+  {key:'meadow', stage:'meadow', name:'Cat Town Road', ground:'pave', rects:[{x0:-1500, x1:-900, y0:-180, y1:300}], edge:'quay'},
+  {key:'market', stage:'market', name:'Willow Park', ground:'grass', rects:[{x0:-1500, x1:200, y0:-1360, y1:-560}], edge:'earth'},
+  {key:'pier', stage:'pier', name:'Sunny Beach', ground:'sand', rects:[{x0:900, x1:1800, y0:-560, y1:430}], edge:'sand'},
+];
+const HB3_PIER = {x0:420, x1:580, y0:380, y1:1080};        // overlaps the quay a little so you can step onto it
+// buildings (front edge at y, w wide, d deep, the kit art on the front); key = the building to open
+const HB3_HOUSES = [
+  {kit:'houses', x:-650, y:-300, w:230, d:170},
+  {kit:'fishShop', x:-200, y:-300, w:320, d:190, key:'shop'},
+  {kit:'gelato', x:250, y:-300, w:230, d:170, key:'pet'},
+  {kit:'trattoria', x:660, y:-300, w:240, d:170},
+];
+// everything else you can walk up to: Old Gil's stall, the boat, and one signpost per area
+const HB3_SPOTS = [
+  {key:'gil', x:250, y:330, name:"Old Gil's Fish", ic:'🐠', verb:'Barter for fish', stall:true, w:230},
+  {key:'boat', x:720, y:990, name:'Your Boat', ic:'⛵', verb:'Go fishing', boat:true, w:300, door:{x:530, y:1000}},
+  {key:'gate', land:'meadow', stage:'meadow', x:-1380, y:40, name:'Cat Town', ic:'🏘️', verb:'Go to Cat Town', gate:true},
+  {key:'gate', land:'market', stage:'market', x:-600, y:-1240, name:'Willow Park', ic:'🌳', verb:'Go to Willow Park', gate:true},
+  {key:'gate', land:'pier', stage:'pier', x:1660, y:-100, name:'Sunny Beach', ic:'🏖️', verb:'Go to Sunny Beach', gate:true},
+];
+// little things standing on each piece of land (low-poly pieces from the town square, plus a few kit sprites)
+const HB3_PROPS = [
+  ['lamp', -880, -120, 'harbor'], ['lamp', 880, -120, 'harbor'], ['lamp', -420, 380, 'harbor'], ['lamp', 380, 380, 'harbor'],
+  ['bush', -430, -220, 'harbor', '#f2d45a', 0.8], ['bush', 30, -225, 'harbor', '#7cc35c', 0.7], ['bush', 470, -220, 'harbor', '#9fd36a', 0.75],
+  ['bench', -560, 300, 'harbor'], ['bench', -60, 300, 'harbor'],
+  ['kit', -820, 380, 'harbor', 'pinkPot', 50], ['kit', 820, 380, 'harbor', 'flowerPot', 54], ['kit', -40, -250, 'harbor', 'blueFlowers', 44],
+  ['kit', -1420, -120, 'meadow', 'lemonTree', 110], ['kit', -1000, 260, 'meadow', 'flowerPot', 50], ['lamp', -1000, -150, 'meadow'],
+  ['tree', -1350, -1240, 'market', '#73b24f', 1.1], ['tree', -1100, -900, 'market', '#5f9a42', 1.25], ['tree', -300, -1250, 'market', '#73b24f', 1],
+  ['tree', 60, -900, 'market', '#8cc65a', 1.15], ['tree', -800, -700, 'market', '#5f9a42', 0.9], ['bush', -500, -800, 'market', '#f2d45a', 0.9],
+  ['bush', -1300, -680, 'market', '#9fd36a', 0.8], ['bench', -330, -770, 'market'], ['mush', -200, -700, 'market', '', 1], ['mush', -180, -686, 'market', '', 0.8],
+  ['palm', 1050, -460, 'pier'], ['palm', 1700, -460, 'pier'], ['palm', 1450, 330, 'pier'], ['umbrella', 1200, 0, 'pier', '#E5404B'], ['umbrella', 1450, -250, 'pier', '#2BB5A5'],
+];
+const HB3_POND = {x:-650, y:-1020, rx:200, ry:110, land:'market'};
+const HB3_EXIT = {x:-1450, y:60};                   // where townsfolk walk in from (the Cat Town road)
+function hb3LandOn(L){ return !L.stage || isUnlocked(L.stage); }
+function hb3Revealed(L){ return !L.stage || L.stage === 'meadow' || (save.hbLand||[]).includes(L.key); }
+function hb3Alpha(key){ if(!key || key === 'harbor') return 1; const L = HB3_LAND.find(l=>l.key===key); if(!L || !hb3LandOn(L)) return 0; if(hb.reveal && hb.reveal.key === key) return clamp(hb.reveal.t/1.4, 0, 1); return hb3Revealed(L) ? 1 : 0; }
+function hb3Rects(){ const out = []; for(const L of HB3_LAND) if(hb3Alpha(L.key) >= 1) for(const r of L.rects) out.push(r); out.push(HB3_PIER); return out; }
+function hb3Walkable(x, y){
+  const m = 22, R = hb3Rects(), inAny = (px, py) => R.some(r=>px > r.x0 && px < r.x1 && py > r.y0 && py < r.y1);
+  if(!(inAny(x - m, y) && inAny(x + m, y) && inAny(x, y - m) && inAny(x, y + 6))) return false;     // pieces of land join seamlessly
+  for(const h of HB3_HOUSES) if(x > h.x - h.w/2 - 16 && x < h.x + h.w/2 + 16 && y > h.y - h.d - 10 && y < h.y + 14) return false;
+  { const g = HB3_SPOTS[0]; if(Math.hypot((x - g.x)/130, (y - g.y + 10)/40) < 1) return false; }   // Gil's counter
+  if(hb3Alpha('market') >= 1 && Math.hypot((x - HB3_POND.x)/(HB3_POND.rx + 10), (y - HB3_POND.y)/(HB3_POND.ry + 10)) < 1) return false;
+  return true;
+}
+function hb3Move(dx, dy){
+  const free = !hb3Walkable(hb.x, hb.y);              // wedged somewhere you can't stand: any move gets you out
+  if(free || hb3Walkable(hb.x + dx, hb.y)) hb.x += dx;
+  if(free || hb3Walkable(hb.x, hb.y + dy)) hb.y += dy;
+}
+// the spot you walk to for a building / stall / gate
+function hb3Door(t){
+  if(t.door && typeof t.door === 'object') return t.door;     // (the old street's buildings use 'door' for a paint colour)
+  if(t.kit) return {x:t.x, y:t.y + 60};
+  if(t.stall) return {x:t.x, y:t.y + 70};
+  if(t.gate) return {x:t.x + (t.x < 0 ? 110 : -110), y:t.y + 40};
+  return {x:t.x, y:t.y + 60};
+}
+function hb3Targets(){
+  const out = [];
+  for(const h of HB3_HOUSES) if(h.key){ const B = HB_BUILDINGS.find(b=>b.key===h.key); out.push(Object.assign({}, B, {x:h.x, y:h.y, kit:h.kit, w:h.w})); }
+  for(const s of HB3_SPOTS) if(!s.land || hb3Alpha(s.land) >= 1) out.push(s);
+  return out;
+}
+// a walking route around buildings and counters: a breadth-first search over a 30px grid of the land you can stand on
+function hb3Path(fx, fy, tx, ty){
+  const C = 30, R = hb3Rects();
+  let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+  for(const r of R){ x0 = Math.min(x0, r.x0); x1 = Math.max(x1, r.x1); y0 = Math.min(y0, r.y0); y1 = Math.max(y1, r.y1); }
+  const cols = Math.ceil((x1 - x0)/C), rows = Math.ceil((y1 - y0)/C), N = cols*rows;
+  const cx = x => Math.floor((x - x0)/C), cy = y => Math.floor((y - y0)/C), wx = i => x0 + (i + 0.5)*C, wy = j => y0 + (j + 0.5)*C;
+  const ok = new Uint8Array(N); for(let j=0;j<rows;j++) for(let i=0;i<cols;i++) ok[j*cols + i] = hb3Walkable(wx(i), wy(j)) ? 1 : 0;
+  const near = (i, j)=>{ if(i >= 0 && j >= 0 && i < cols && j < rows && ok[j*cols + i]) return j*cols + i;
+    let best = -1, bd = 1e9; for(let dj=-4;dj<=4;dj++) for(let di=-4;di<=4;di++){ const a = i + di, b = j + dj; if(a < 0 || b < 0 || a >= cols || b >= rows || !ok[b*cols + a]) continue; const d = di*di + dj*dj; if(d < bd){ bd = d; best = b*cols + a; } } return best; };
+  const s = near(cx(fx), cy(fy)), g = near(cx(tx), cy(ty)); if(s < 0 || g < 0) return null;
+  const prev = new Int32Array(N).fill(-1); prev[s] = s; const q = [s];
+  for(let h=0; h<q.length && prev[g] < 0; h++){
+    const c = q[h], i = c % cols, j = (c/cols)|0;
+    for(const [di, dj] of [[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]){
+      const a = i + di, b = j + dj; if(a < 0 || b < 0 || a >= cols || b >= rows) continue;
+      const n = b*cols + a; if(!ok[n] || prev[n] >= 0) continue;
+      if(di && dj && (!ok[j*cols + a] || !ok[b*cols + i])) continue;            // no cutting corners
+      prev[n] = c; q.push(n);
+    }
+  }
+  if(prev[g] < 0) return null;
+  const pts = []; for(let c = g; c !== s; c = prev[c]) pts.push({x:wx(c % cols), y:wy((c/cols)|0)}); pts.reverse(); pts.push({x:tx, y:ty});
+  // straighten: skip points you can walk to in a straight line
+  const clear = (a, b)=>{ const d = Math.hypot(b.x - a.x, b.y - a.y), n = Math.ceil(d/12); for(let k=1;k<n;k++){ if(!hb3Walkable(a.x + (b.x - a.x)*k/n, a.y + (b.y - a.y)*k/n)) return false; } return true; };
+  const out = []; let cur = {x:fx, y:fy}, k = 0;
+  while(k < pts.length){ let far = k; for(let m = pts.length - 1; m > k; m--) if(clear(cur, pts[m])){ far = m; break; } out.push(pts[far]); cur = pts[far]; k = far + 1; }
+  return out;
+}
+function hbGoTo(t, cb){ const d = hb3Door(t); hb3WalkTo(d.x, d.y, cb); }
+function hb3WalkTo(x, y, cb){ hb.path = hb3Path(hb.x, hb.y, x, y) || [{x, y}]; hb.target = hb.path.shift(); hb.onArrive = cb || null; hb.stuckT = 0; }
+// -- entering the harbor: place you, your cats and the waiting townsfolk; then reveal any new land --
+function hb3Init(fromHome){
+  if(!fromHome || hb.y == null){ hb.x = -200; hb.y = -160; }
+  hb.camX = hb.x; hb.camY = hb.y; camera.x = hb.x; camera.y = hb.y;
+  hb.cats.forEach((c, i)=>{ const a = i/Math.max(1, hb.cats.length)*Math.PI*2; c.x = -100 + Math.cos(a)*260; c.y = 80 + Math.sin(a)*120; c.tx = c.x; c.ty = c.y; });
+  hb.locals.forEach((l, i)=>{ l.x = -60 + i*90; l.y = -150; l.tx = l.x; l.ty = l.y; });
+  // newly unlocked land rises out of the sea, one piece at a time
+  const fresh = HB3_LAND.filter(L=>L.stage && hb3LandOn(L) && !hb3Revealed(L));
+  hb.revealQ = fresh.map(L=>L.key); hb.reveal = null;
+  if(hb.revealQ.length) setTimeout(()=>hb3NextReveal(), 600);
+}
+function hb3NextReveal(){
+  if(!hb || state !== 'harbor') return;
+  const key = hb.revealQ.shift(); if(!key){ hb.reveal = null; return; }
+  const L = HB3_LAND.find(l=>l.key===key), r = L.rects[0];
+  hb.reveal = {key, t:0, cx:(r.x0 + r.x1)/2, cy:(r.y0 + r.y1)/2};
+  showBanner('🏝️ New land: '+L.name+'!', 2600);
+  vibrate([20, 40, 20]);
+}
+function hb3RevealTick(dt){
+  const R = hb.reveal; if(!R) return;
+  R.t += dt;
+  if(R.t > 1.4 && !R.saved){ R.saved = true; save.hbLand = [...new Set([...(save.hbLand||[]), R.key])]; persist(); }
+  if(R.t > 3.2){ hb.reveal = null; if(hb.revealQ.length) setTimeout(()=>hb3NextReveal(), 300); }
+}
+function harborUpdate3(dt){
+  hb.t += dt;
+  tutTick(dt);
+  hb3RevealTick(dt);
+  const blocked = hbPanel || hbTalk || (hb.reveal && hb.reveal.t < 2.2);
+  let mx = 0, my = 0;
+  if(!blocked){
+    if(keysDown.has('a') || keysDown.has('arrowleft')) mx -= 1;
+    if(keysDown.has('d') || keysDown.has('arrowright')) mx += 1;
+    if(keysDown.has('w') || keysDown.has('arrowup')) my -= 1;
+    if(keysDown.has('s') || keysDown.has('arrowdown')) my += 1;
+  }
+  const speed = 330, smx = mx;
+  if(isoOn() && (mx || my)){ const u = mx, v = my; mx = ISO.c*u + ISO.s*v; my = -ISO.s*u + ISO.c*v; }   // W walks up the screen
+  hb.moving = false;
+  if(mx || my){
+    hb.target = null; hb.onArrive = null; hb.path = null;
+    const k = Math.hypot(mx, my); hb3Move(mx/k*speed*dt, my/k*speed*dt);
+    if(smx) hb.face = smx > 0 ? 1 : -1; hb.moving = true;
+  } else if(hb.target && !blocked){
+    const dx = hb.target.x - hb.x, dy = hb.target.y - hb.y, d = Math.hypot(dx, dy);
+    if(d < 10){ if(hb.path && hb.path.length){ hb.target = hb.path.shift(); } else { hb.target = null; const f = hb.onArrive; hb.onArrive = null; if(f) f(); } }
+    else {
+      const st = Math.min(d, speed*dt), ox = hb.x, oy = hb.y;
+      hb3Move(dx/d*st, dy/d*st);
+      { const sdx = isoOn() ? ISO.c*dx - ISO.s*dy : dx; if(Math.abs(sdx) > 4) hb.face = Math.sign(sdx); }
+      hb.moving = true;
+      if(Math.hypot(hb.x - ox, hb.y - oy) < st*0.2){                 // blocked: sidestep around it (try both sides), give up after a while
+        hb.stuckT = (hb.stuckT||0) + dt;
+        for(const sgn of [1, -1]){ const a = Math.atan2(dy, dx) + sgn*Math.PI*0.5, bx = hb.x, by = hb.y; hb3Move(Math.cos(a)*st, Math.sin(a)*st); if(hb.x !== bx || hb.y !== by) break; }
+        if(hb.stuckT > 1.6){ const f = hb.onArrive; hb.target = null; hb.onArrive = null; if(f && d < 220) f(); }
+      }
+      else hb.stuckT = 0;
+    }
+  }
+  if(hb.moving) hb.walkT += dt;
+  // camera: follows you (or the land that's rising)
+  const fx = hb.reveal && hb.reveal.t < 2.6 ? hb.reveal.cx : hb.x, fy = hb.reveal && hb.reveal.t < 2.6 ? hb.reveal.cy : hb.y;
+  hb.camX += (fx - hb.camX)*Math.min(1, dt*(hb.reveal ? 2.5 : 6)); hb.camY += (fy - hb.camY)*Math.min(1, dt*(hb.reveal ? 2.5 : 6));
+  if(isoOn()){ camera.x = hb.camX - 50; camera.y = hb.camY - 50; } else { camera.x = hb.camX; camera.y = hb.camY - 60; }          // look a little north, so the buildings fit
+  // your cats: laze about, wander, and come say hi if you're close
+  for(const c of hb.cats){
+    c.t -= dt;
+    if(c.t <= 0){
+      c.t = rand(2, 5); const r = Math.random();
+      if(r < 0.45){ c.mode = 'walk'; c.tx = clamp(c.x + rand(-170, 170), -820, 820); c.ty = clamp(c.y + rand(-100, 100), -230, 400); }
+      else if(r < 0.6 && Math.hypot(hb.x - c.x, hb.y - c.y) < 300){ c.mode = 'walk'; c.tx = hb.x + rand(-70, 70); c.ty = hb.y + rand(-20, 40); }
+      else c.mode = 'idle';
+    }
+    if(c.mode === 'walk'){ const dx = c.tx - c.x, dy = (c.ty ?? c.y) - c.y, d = Math.hypot(dx, dy); if(d < 4) c.mode = 'idle'; else { c.x += dx/d*Math.min(d, 60*dt); c.y += dy/d*Math.min(d, 60*dt); if(Math.abs(dx) > 1) c.face = Math.sign(dx); } }
+    c.sqv += (-c.sq*140 - c.sqv*9)*dt; c.sq += c.sqv*dt;
+    if(c.z > 0 || c.vz){ c.vz -= 900*dt; c.z += c.vz*dt; if(c.z <= 0){ c.z = 0; c.vz = 0; c.sqv -= 4; } }
+  }
+  // townsfolk: someone walks up with a request now and then (in from the Cat Town road)
+  hb.offerT -= dt;
+  const offering = hb.locals.some(l=>!l.pay && l.state!=='leave');
+  if(!offering && !blocked && princessDue() && !hb.princessCame && hb.t > 2.5){
+    hb.princessCame = true;
+    hb.locals.push({offer:makeRoyalBounty(), look:npcReady ? {npc:NPC_ROLE.signora} : randomLook(true), name:PRINCESS, princess:true, x:HB3_EXIT.x, y:HB3_EXIT.y, state:'arrive', face:1, walkT:0, idleT:0, waitT:60});
+    setTimeout(()=>showBanner('👑 The town Princess is looking for you!', 2000), 300);
+  }
+  if(hb.offerT <= 0 && !offering && !blocked){
+    hb.offerT = rand(18, 30);
+    if(activeBounties().length < 3){
+      const name = LOCAL_NAMES.filter(n=>!activeBounties().some(b=>b.giver===n))[Math.floor(Math.random()*8)] || 'Pip';
+      hb.locals.push({offer:makeBounty(), look:randomLook(), name, x:HB3_EXIT.x, y:HB3_EXIT.y + rand(-60, 60), state:'arrive', face:1, walkT:0, idleT:0, waitT:28});
+    }
+  }
+  for(let i=hb.locals.length-1;i>=0;i--){
+    const l = hb.locals[i];
+    if(l.y == null) l.y = hb.y + 10;
+    if(l.state==='arrive' || l.state==='leave'){
+      const tx = l.state==='leave' ? HB3_EXIT.x - 120 : hb.x + (l.x < hb.x ? -90 : 90), ty = l.state==='leave' ? HB3_EXIT.y : hb.y + 6;
+      const dx = tx - l.x, dy = ty - l.y, d = Math.hypot(dx, dy);
+      if(d < 6){ if(l.state==='leave'){ hb.locals.splice(i, 1); continue; } l.state = 'wait'; }
+      else { const st = Math.min(d, 160*dt); l.x += dx/d*st; l.y += dy/d*st; if(Math.abs(dx) > 1) l.face = Math.sign(dx); l.walkT += dt; }
+    } else {
+      l.face = hb.x > l.x ? 1 : -1;
+      if(!l.pay && !hbTalk){ l.waitT -= dt; if(l.waitT <= 0) l.state = 'leave'; }
+    }
+  }
+  for(let i=hb.parts.length-1;i>=0;i--){ const p = hb.parts[i]; p.life -= dt; p.x += p.vx*dt; p.y += p.vy*dt; p.vy += (p.g||0)*dt; if(p.life <= 0) hb.parts.splice(i,1); }
+  // what's in reach: a townsperson first, then a building / stall / gate
+  let near = null;
+  for(const l of hb.locals) if(l.state==='wait' && Math.hypot(l.x - hb.x, l.y - hb.y) < 120){ near = {local:l}; break; }
+  if(!near && !blocked) for(const t of hb3Targets()){ const d = hb3Door(t); if(Math.hypot(d.x - hb.x, d.y - hb.y) < 120){ near = {b:t}; break; } }
+  const key = near ? (near.local ? 'l'+near.local.name : near.b.key + (near.b.stage||'')) : '';
+  if(key !== (hb.nearKey||'')){ hb.near = near; hb.nearKey = key; renderPrompt(); }
+}
+// tap / click: talk to a townsperson, squish a cat, walk into a building, or just walk there
+function hb3Pointer(e){
+  const r = canvas.getBoundingClientRect(), p = unwarp(e.clientX - r.left, e.clientY - r.top);
+  const Z = viewZoom(), iw = isoOn() ? isoInv(e.clientX - r.left, e.clientY - r.top) : null;
+  const wx = iw ? iw.x : camera.x + (p.x - W/2)/Z, wy = iw ? iw.y : camera.y + (p.y - H/2)/(Z*viewSquash());
+  for(const l of hb.locals) if(l.state==='wait' && Math.abs(wx - l.x) < 45 && wy > l.y - 150 && wy < l.y + 25){ hb3WalkTo(l.x + (hb.x < l.x ? -80 : 80), l.y + 4, ()=>openTalk(l)); return; }
+  for(const c of hb.cats) if(Math.abs(wx - c.x) < 40 && wy > c.y - 70 && wy < c.y + 20){
+    c.sqv += 7; c.vz = 260; vibrate(10);
+    for(let i=0;i<4;i++) hb.parts.push({x:c.x + rand(-10,10), y:c.y - 60, vx:rand(-40,40), vy:rand(-120,-70), life:0.9, type:'heart', abs:true});
+    return;
+  }
+  for(const t of hb3Targets()){
+    const hit = t.kit ? (Math.abs(wx - t.x) < t.w/2 && wy > t.y - 320 && wy < t.y + 30) : (Math.abs(wx - t.x) < (t.w||140)/2 && wy > t.y - 260 && wy < t.y + 40);
+    if(hit){ hbGoTo(t, ()=>{ if(t.stage){ save.stage = t.stage; persist(); } openBuilding(t.key); }); return; }
+  }
+  hb3WalkTo(wx, wy, null);
+}
+/* ---- drawing ---- */
+function hb3Ground(part){
+  const v = getViewBounds(60);
+  if(part !== 'top'){
+  // the sea all around, with soft waves
+  const sea = ctx.createLinearGradient(0, v.top, 0, v.bottom); sea.addColorStop(0, '#8fd3e8'); sea.addColorStop(1, '#5fb6d8');
+  ctx.fillStyle = sea; ctx.fillRect(v.left, v.top, v.right - v.left, v.bottom - v.top);
+  ctx.strokeStyle = 'rgba(255,255,255,0.45)'; ctx.lineWidth = 3; ctx.lineCap = 'round';
+  for(let y = Math.floor(v.top/70)*70; y < v.bottom; y += 70) for(let x = Math.floor(v.left/180)*180; x < v.right; x += 180){
+    const ox = ((y*37) % 180) + Math.sin(hb.t*1.2 + y*0.03)*14; ctx.beginPath(); ctx.moveTo(x + ox, y); ctx.quadraticCurveTo(x + ox + 14, y - 7, x + ox + 28, y); ctx.stroke();
+  }
+  if(part === 'sea') return;
+  }
+  // land that isn't yours yet: a faint sandbank with a lock
+  for(const L of HB3_LAND){
+    if(!L.stage || hb3LandOn(L)) continue;
+    const r = L.rects[0];
+    ctx.fillStyle = 'rgba(255,255,255,0.18)'; roundRect(r.x0 + 30, r.y0 + 30, r.x1 - r.x0 - 60, r.y1 - r.y0 - 60, 60); ctx.fill();
+    ctx.setLineDash([18, 14]); ctx.strokeStyle = 'rgba(255,255,255,0.6)'; ctx.lineWidth = 4; ctx.stroke(); ctx.setLineDash([]);
+    if(isoOn()) continue;                         // (upright labels come later)
+    const st = STAGES.find(s=>s.key===L.stage);
+    ctx.fillStyle = 'rgba(59,46,42,0.55)'; ctx.font = "700 34px Fredoka, Nunito, sans-serif"; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('🔒 '+L.name, (r.x0 + r.x1)/2, (r.y0 + r.y1)/2 - 20);
+    ctx.font = "800 22px Nunito, sans-serif"; ctx.fillText(st && st.unlock ? st.unlock.text : 'Unlocks later', (r.x0 + r.x1)/2, (r.y0 + r.y1)/2 + 22);
+  }
+  // the pier
+  const P = HB3_PIER;
+  if(!isoOn()){ ctx.fillStyle = '#7a5230'; for(let y = P.y0 + 60; y < P.y1; y += 140){ ctx.fillRect(P.x0 - 8, y, 14, 60); ctx.fillRect(P.x1 - 6, y, 14, 60); } }
+  ctx.fillStyle = '#c69463'; ctx.fillRect(P.x0, P.y0 - 10, P.x1 - P.x0, P.y1 - P.y0 + 10);
+  ctx.strokeStyle = 'rgba(110,70,40,0.35)'; ctx.lineWidth = 3; for(let y = P.y0; y < P.y1; y += 26){ ctx.beginPath(); ctx.moveTo(P.x0, y); ctx.lineTo(P.x1, y); ctx.stroke(); }
+  ctx.fillStyle = '#8a5a34'; ctx.fillRect(P.x0, P.y1, P.x1 - P.x0, 18);
+  // each piece of land: its cliff (the side you can see), then its top
+  for(const L of HB3_LAND){
+    const a = hb3Alpha(L.key); if(a <= 0) continue;
+    ctx.save(); ctx.globalAlpha = a; ctx.translate(0, (1 - a)*90);
+    for(const r of L.rects) hb3Slab(r, L);
+    ctx.restore();
+  }
+}
+const HB3_GROUND = {pave:{top:null, side:['#e2c3a0','#c59a72','#a77a55']}, grass:{top:'#8fcd6b', side:['#79bb58','#b07a52','#8a5a3a']}, sand:{top:'#f3dcaa', side:['#e6c78e','#c9a46c','#a98456']}};
+function hb3Slab(r, L){
+  const G = HB3_GROUND[L.ground], w = r.x1 - r.x0, h = r.y1 - r.y0;
+  // the cliff below the south edge: three bands (top lip, earth, deep earth) (the isometric camera draws its cliffs separately)
+  if(!isoOn()){
+  ctx.fillStyle = G.side[2]; ctx.fillRect(r.x0, r.y1, w, 150);
+  ctx.fillStyle = G.side[1]; ctx.fillRect(r.x0, r.y1, w, 96);
+  ctx.fillStyle = G.side[0]; ctx.fillRect(r.x0, r.y1, w, 26);
+  ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.fillRect(r.x0, r.y1 + 150, w, 8);
+  }                  // foam at the waterline
+  // the top
+  if(L.ground === 'pave'){
+    const S = SQ.tile, i0 = Math.floor(r.x0/S), i1 = Math.ceil(r.x1/S) - 1, j0 = Math.floor(r.y0/S), j1 = Math.ceil(r.y1/S) - 1;
+    ctx.save(); ctx.beginPath(); ctx.rect(r.x0, r.y0, w, h); ctx.clip();
+    for(let j=j0;j<=j1;j++) for(let i=i0;i<=i1;i++){ ctx.fillStyle = SQ.tiles[Math.floor(sqHash(i, j)*SQ.tiles.length)]; ctx.fillRect(i*S, j*S, S, S); }
+    ctx.strokeStyle = SQ.grout; ctx.lineWidth = 3; ctx.beginPath();
+    for(let i=i0;i<=i1 + 1;i++){ ctx.moveTo(i*S, r.y0); ctx.lineTo(i*S, r.y1); } for(let j=j0;j<=j1 + 1;j++){ ctx.moveTo(r.x0, j*S); ctx.lineTo(r.x1, j*S); } ctx.stroke();
+    ctx.restore();
+    if(L.key === 'harbor'){                                                                             // a lawn in front of the shops
+      ctx.fillStyle = SQ.curb; roundRect(-560, -40, 720, 240, 110); ctx.fill();
+      ctx.fillStyle = SQ.grass; roundRect(-544, -26, 688, 212, 96); ctx.fill();
+      hb3Speckle(-540, -20, 680, 200, 'grass', 7);
+    }
+  } else if(L.ground === 'grass'){
+    ctx.fillStyle = G.top; ctx.fillRect(r.x0, r.y0, w, h); hb3Speckle(r.x0, r.y0, w, h, 'grass', 11);
+    // a winding sandy path through the park to its signpost
+    ctx.strokeStyle = '#ead2a8'; ctx.lineWidth = 80; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.beginPath(); ctx.moveTo(-200, r.y1 + 10); ctx.quadraticCurveTo(-200, -820, -450, -960); ctx.quadraticCurveTo(-650, -1080, -600, -1200); ctx.stroke();
+    if(hb3Alpha('market') > 0){ const P2 = HB3_POND; ctx.fillStyle = '#6fb9d6'; ctx.beginPath(); ctx.ellipse(P2.x, P2.y, P2.rx + 12, P2.ry + 10, 0, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#9ad7e3'; ctx.beginPath(); ctx.ellipse(P2.x, P2.y, P2.rx, P2.ry, 0, 0, Math.PI*2); ctx.fill(); }
+  } else {
+    ctx.fillStyle = G.top; ctx.fillRect(r.x0, r.y0, w, h); hb3Speckle(r.x0, r.y0, w, h, 'sand', 13);
+  }
+}
+function hb3Speckle(x0, y0, w, h, kind, seed){
+  const N = Math.round(w*h/(kind === 'sand' ? 9000 : 6500));
+  for(let k=0;k<N;k++){
+    const fx = x0 + 10 + sqHash(k*7 + seed, seed)*(w - 20), fy = y0 + 10 + sqHash(seed + 3, k*11 + 2)*(h - 20), r = sqHash(k, k + seed);
+    if(kind === 'sand'){ ctx.fillStyle = r < 0.5 ? 'rgba(200,160,100,0.35)' : 'rgba(255,255,255,0.5)'; ctx.fillRect(fx, fy, 4, 3); continue; }
+    if(r < 0.6){ ctx.strokeStyle = SQ.grassDark; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(fx - 4, fy); ctx.lineTo(fx - 6, fy - 7); ctx.moveTo(fx, fy); ctx.lineTo(fx, fy - 9); ctx.moveTo(fx + 4, fy); ctx.lineTo(fx + 6, fy - 7); ctx.stroke(); }
+    else { ctx.fillStyle = r < 0.78 ? '#ffffff' : r < 0.9 ? '#9cc7f2' : '#ffd96a'; for(let p=0;p<5;p++){ const a = p/5*Math.PI*2; ctx.beginPath(); ctx.arc(fx + Math.cos(a)*3, fy + Math.sin(a)*2.3, 2.3, 0, Math.PI*2); ctx.fill(); } }
+  }
+}
+function hb3Tree(o){ const s = o.s || 1; sqShadow(o.x, o.y, 54*s, 18*s, 0.22); lpCyl(o.x, o.y, 10*s, 70*s, 0, '#8a5a32', {n:6, r2:8*s}); const [cx, cy] = boxPt(o.x, o.y, 112*s); lpBlob(cx, cy, 58*s, o.c || '#73b24f'); }
+function hb3Palm(o){
+  sqShadow(o.x, o.y, 44, 14, 0.2);
+  for(let i=0;i<6;i++) lpCyl(o.x + i*3, o.y, 9 - i*0.6, 26, i*26, i%2 ? '#b98a56' : '#a6784a', {n:6, r2:8.5 - i*0.6});
+  const [cx, cy] = boxPt(o.x + 18, o.y, 160);
+  for(let i=0;i<6;i++){ const a = i/6*Math.PI*2 + 0.3; ctx.fillStyle = lpShade('#5fae4a', 0.85 + 0.15*Math.cos(a + 2.3)); ctx.beginPath(); ctx.moveTo(cx, cy);
+    ctx.quadraticCurveTo(cx + Math.cos(a)*50, cy + Math.sin(a)*24 - 26, cx + Math.cos(a)*86, cy + Math.sin(a)*40 + 10); ctx.quadraticCurveTo(cx + Math.cos(a)*44, cy + Math.sin(a)*20, cx, cy); ctx.fill(); }
+}
+function hb3Umbrella(o){
+  sqShadow(o.x + 20, o.y, 70, 24, 0.16);
+  lpCyl(o.x, o.y, 3, 110, 0, '#f6efe4', {n:4});
+  const [cx, cy] = boxPt(o.x, o.y, 120), R = 74;
+  for(let i=0;i<8;i++){ const a0 = i/8*Math.PI*2, a1 = (i + 1)/8*Math.PI*2; ctx.fillStyle = i%2 ? '#ffffff' : (o.c || '#E5404B');
+    ctx.beginPath(); ctx.moveTo(cx, cy - 24); ctx.lineTo(cx + Math.cos(a0)*R, cy + Math.sin(a0)*R*0.42); ctx.lineTo(cx + Math.cos(a1)*R, cy + Math.sin(a1)*R*0.42); ctx.closePath(); ctx.fill(); }
+}
+function hb3Gate(s, hi){
+  const P = boxPt;
+  sqShadow(s.x, s.y, 30, 10, 0.2);
+  lpCyl(s.x, s.y, 7, 150, 0, '#8a5a32', {n:6});
+  const [bx, by] = P(s.x, s.y, 150);
+  const dir = s.x < 0 ? -1 : 1, w = 190, hgt = 54, bob = hi ? Math.sin(hb.t*6)*3 : 0;
+  ctx.save(); ctx.translate(bx + dir*20 + bob*dir, by);
+  ctx.fillStyle = hi ? '#ffd23c' : '#F8C630';
+  ctx.beginPath(); ctx.moveTo(dir*(w*0.5 + 30), 0); ctx.lineTo(dir*w*0.5, -hgt/2); ctx.lineTo(-dir*w*0.5, -hgt/2); ctx.lineTo(-dir*w*0.5, hgt/2); ctx.lineTo(dir*w*0.5, hgt/2); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = 'rgba(0,0,0,0.08)'; ctx.fillRect(-w*0.5, hgt/2 - 8, w, 8);
+  ctx.fillStyle = '#3B2E2A'; ctx.font = "700 24px Fredoka, Nunito, sans-serif"; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(s.ic+' '+s.name, 0, 2);
+  ctx.restore();
+}
+function hb3Marker(x, z, y){
+  const [mx, my] = boxPt(x, y, z), by = my - Math.abs(Math.sin(hb.t*5))*10;
+  ctx.fillStyle = '#ffd23c'; ctx.strokeStyle = '#3B2E2A'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(mx - 14, by); ctx.lineTo(mx + 14, by); ctx.lineTo(mx, by + 16); ctx.closePath(); ctx.fill(); ctx.stroke();
+}
+function harborRender3(){
+  ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0, 0, W, H);
+  const over = tiltOverscan();
+  ctx.save();
+  if(isoOn()){
+    ctx.restore(); $('glc').style.visibility = 'hidden';
+    const isoWorld = ()=>{ ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.translate(W/2, H/2); ctx.scale(viewZoom(), viewZoom()*ISO.FY); ctx.rotate(Math.PI/4); ctx.translate(-camera.x, -camera.y); };
+    isoWorld(); hb3Ground('sea'); isoCliffs(); isoWorld(); hb3Ground('top'); ctx.setTransform(1, 0, 0, 1, 0, 0); isoLockLabels();
+  } else {
+  const Z = viewZoom();
+  const FY = viewSquash();
+  ctx.translate(W/2, H/2); ctx.scale(Z/over, Z*FY/over); ctx.translate(-camera.x, -camera.y);
+  hb3Ground();
+  ctx.restore();
+  applyTilt();
+  }
+  // everything standing up, back to front
+  const items = [], near = hb.near && hb.near.b ? hb.near.b : null, nearKey = near ? near.key + (near.stage||'') : '';
+  for(const h of HB3_HOUSES) items.push([h.y - 12, h.x, h.y, ()=>{ if(isoOn()) drawIsoHouse(h); else drawHouseBox(h.kit, h.x, h.y, h.w, h.d); if(h.key && nearKey === h.key) hb3Marker(h.x, h.w*0.9, h.y); }, isoDepth(h.x - h.w/2, h.y) - 1]);     // (a block is behind anything south or east of its front-left corner)
+  for(const s of HB3_SPOTS){
+    const a = s.land ? hb3Alpha(s.land) : 1; if(a <= 0) continue;
+    const hi = nearKey === s.key + (s.stage||'');
+    items.push([s.y, s.x, s.y, ()=>{
+      ctx.globalAlpha = a;
+      if(s.stall) drawGilStall({x:s.x, w:s.w, name:s.name, ic:s.ic}, s.y + 40, hi);
+      else if(s.boat){ ctx.save(); ctx.scale(0.8, 0.8); ctx.translate(s.x*0.25, s.y*0.25); drawBoat({x:s.x, name:s.name, ic:s.ic}, s.y - 28 + Math.sin(hb.t*1.6)*3, hi); ctx.restore(); }
+      else if(s.gate) hb3Gate(s, hi);
+    }]);
+  }
+  for(const p of HB3_PROPS){
+    const [t, x, y, land, a1, a2] = p, a = hb3Alpha(land); if(a <= 0) continue;
+    items.push([y, x, y, ()=>{
+      ctx.globalAlpha = a; const o = {x, y, c:a1, s:a2};
+      if(t === 'lamp') drawSquareLamp(o, hb.t); else if(t === 'bush') drawSquareBush(o); else if(t === 'bench') drawSquareBench(o); else if(t === 'mush') drawSquareMush(o);
+      else if(t === 'tree') hb3Tree(o); else if(t === 'palm') hb3Palm(o); else if(t === 'umbrella') hb3Umbrella(o);
+      else if(t === 'kit'){ sqShadow(x, y, a2*0.4, a2*0.1, 0.18); kitSprite(a1, x, y, a2); }
+    }]);
+  }
+  for(const c of hb.cats) items.push([c.y, c.x, c.y, ()=>{
+    ctx.fillStyle = 'rgba(80,50,30,0.2)'; ctx.beginPath(); ctx.ellipse(c.x, c.y + 3, 24, 7, 0, 0, Math.PI*2); ctx.fill();
+    ctx.translate(c.x, c.y - c.z);
+    const walk = c.mode==='walk' ? Math.sin(hb.t*12 + c.x)*0.06 : Math.sin(hb.t*2 + c.x)*0.03, s = c.def.ai==='boss' ? 0.75 : 1.2, sq = clamp(c.sq, -0.5, 0.5) + walk;
+    ctx.scale(s*c.face*(1 + sq*0.8), s*(1 - sq)); ctx.translate(0, -21); drawCatShape(ctx, c.def);
+  }]);
+  for(const l of hb.locals) items.push([l.y, l.x, l.y, ()=>{
+    ctx.fillStyle = 'rgba(80,50,30,0.2)'; ctx.beginPath(); ctx.ellipse(l.x, l.y + 4, 22, 7, 0, 0, Math.PI*2); ctx.fill();
+    hbAvatar(l.look, l.pay ? 1 : 9, l.x, l.y + 6, HB3_PERSON_H, l.face, l.walkT, l.state!=='wait');
+    if(l.princess) drawCrown(l.x, l.y + 6 - HB3_PERSON_H + 4, 1);
+    if(l.state==='wait') hbBubble(l.x, l.y - HB3_PERSON_H - 28, l.pay ? '🪙' : '!', l.pay ? '#c9922c' : '#e8402a');
+    ctx.font = '900 14px Nunito, sans-serif'; ctx.textAlign = 'center'; ctx.lineWidth = 4; ctx.strokeStyle = '#3B2E2A'; ctx.strokeText(l.name, l.x, l.y + 26); ctx.fillStyle = '#fff'; ctx.fillText(l.name, l.x, l.y + 26);
+    if(hb.near && hb.near.local === l) hb3Marker(l.x, HB3_PERSON_H + 70, l.y);
+  }]);
+  items.push([hb.y, hb.x, hb.y, ()=>{
+    ctx.fillStyle = 'rgba(80,50,30,0.24)'; ctx.beginPath(); ctx.ellipse(hb.x, hb.y + 4, 22, 7, 0, 0, Math.PI*2); ctx.fill();
+    hbPlayer(hb.x, hb.y + 6, HB3_PERSON_H, hb.face, hb.walkT, hb.moving);
+  }]);
+  if(near && !near.kit) items.push([near.y + 1, near.x, near.y, ()=>hb3Marker(near.x, near.boat ? 260 : near.stall ? 290 : 230, near.y)]);
+  if(typeof tutHarborArrow3 === 'function') tutHarborArrow3(items);
+  if(isoOn()) for(const it of items) it[0] = it[4] != null ? it[4] : isoDepth(it[1], it[2]) + (it[0] - it[2]);
+  items.sort((a, b)=>a[0] - b[0]);
+  for(const [, x, y, fn] of items){ billboard(x, y, 0, 0); ctx.save(); fn(); ctx.restore(); }
+  // hearts and coins
+  for(const p of hb.parts){
+    billboard(p.x, hb.y, 0, 0); ctx.save(); ctx.globalAlpha = Math.min(1, p.life*2);
+    const py = hb.y + p.y;
+    if(p.type==='coin') drawCoin(p.x, py, 7); else { ctx.font = '18px sans-serif'; ctx.textAlign = 'center'; ctx.fillStyle = '#ff6b8a'; ctx.fillText('❤', p.x, py); }
+    ctx.restore();
+  }
+  ctx.setTransform(1,0,0,1,0,0);
+}
+// tutorial: a bouncing orange arrow over the place the current harbor step wants you to visit
+function tutHarborArrow3(items){
+  const st = tutStep(); if(!st || !st.target || !tut || tut.part !== 'harbor' || tut.doneT) return;
+  const t = hb3Targets().find(x=>x.key === st.target); if(!t) return;
+  const z = t.kit ? t.w*0.9 + 70 : t.boat ? 330 : t.stall ? 350 : 290;
+  items.push([t.y + 2, t.x, t.y, ()=>{
+    const [mx, my] = boxPt(t.x, t.y, z), y = my - Math.abs(Math.sin(hb.t*4))*14;
+    ctx.fillStyle = '#E2582C'; ctx.strokeStyle = '#FFFFFF'; ctx.lineWidth = 5; ctx.lineJoin = 'round';
+    ctx.beginPath(); ctx.moveTo(mx - 26, y); ctx.lineTo(mx - 12, y); ctx.lineTo(mx - 12, y - 30); ctx.lineTo(mx + 12, y - 30); ctx.lineTo(mx + 12, y); ctx.lineTo(mx + 26, y); ctx.lineTo(mx, y + 28); ctx.closePath();
+    ctx.stroke(); ctx.fill();
+  }]);
+}
 function drawHarborBackdrop(){
   const S = hbScale(), gy = hbGround(), horizon = (gy - 330)*S;
   const sky = ctx.createLinearGradient(0, 0, 0, horizon);
@@ -10189,6 +10735,7 @@ function drawHarborBackdrop(){
   }
 }
 function harborRender(){
+  if(HB3D) return harborRender3();
   const S = hbScale(), gy = hbGround();
   ctx.setTransform(1,0,0,1,0,0);
   drawHarborBackdrop();
@@ -10276,6 +10823,7 @@ function harborRender(){
 canvas.addEventListener('pointerdown', e=>{
   if(state !== 'harbor' || hbPanel || hbTalk) return;
   e.preventDefault();
+  if(HB3D){ hb3Pointer(e); return; }
   const S = hbScale(), gy = hbGround();
   const wx = hb.camX + (e.clientX - W/2)/S, wy = e.clientY/S;
   for(const l of hb.locals){
@@ -10715,7 +11263,7 @@ function kitFacade(k){
   const wall = n ? [r/n, gg/n, b/n] : [230, 200, 170];
   return facadeCache[k] = {img, top, fh:H - top, fw:W, wall};
 }
-function boxPt(x, y, z){ return [x + (x - camera.x)*z/BOX3D.Z, y - z + (y - camera.y)*z/BOX3D.Z*BOX3D.lean]; }
+function boxPt(x, y, z){ if(isoOn()){ const [px, py] = isoP(x, y, z), Z = viewZoom(), A = isoAnchor; return [A.x + (px - A.sx)/Z, A.y + (py - A.sy)/Z]; } const FY = viewSquash(), gy = FY === 1 ? y : bbAnchorY + (y - bbAnchorY)*FY; return [x + (x - camera.x)*z/BOX3D.Z, gy - z + (y - camera.y)*z/BOX3D.Z*BOX3D.lean]; }
 // a house block: front face centred on x at y (the ground line), w wide, depth d going away from you
 function drawHouseBox(k, x, y, w, d){
   const F = kitFacade(k); if(!F) return false;
@@ -11067,6 +11615,7 @@ if(DEBUG) window.CS = {
   fish:()=>{ if(state==='harbor'){ openFishing(); } },
   onlyFish:(ft, n)=>{ const sp = fishSp(); for(const k in sp) delete sp[k]; save.fishBag = [0,0,0,0,0]; addFish(ft, n || 200); },   // testing: a bucket of one species (not saved until something persists)
   giveItem:k=>gainItem(k || 'yarnball'),
+  hbGo:(k, stage)=>{ const t = hb3Targets().find(x=>x.key===k && (!stage || x.stage===stage)); if(t) hbGoTo(t, ()=>{ window._arrived = k; }); return !!t; }, hbPos:()=>hb && [Math.round(hb.x), Math.round(hb.y)], hbDbg:()=>({t:hb.target, st:hb.stuckT, here:hb3Walkable(hb.x, hb.y), r:hb3Walkable(hb.x+5, hb.y), l:hb3Walkable(hb.x-5, hb.y), u:hb3Walkable(hb.x, hb.y-5), dn:hb3Walkable(hb.x, hb.y+5), blocked:!!(hbPanel || hbTalk || hb.reveal), panel:hbPanel, talk:!!hbTalk, rev:hb.reveal}),
   pickupKinds:()=>{ const o = {}; for(const p of pickups) o[p.kind] = (o[p.kind]||0) + 1; return o; },
   catKeys:()=>{ const o = {}; for(const c of cats) if(c.def && !c.dying) o[c.def.key] = (o[c.def.key]||0) + 1; return o; },
   tut:()=>tut && {part:tut.part, i:tut.i, id:tut.steps[tut.i] && tut.steps[tut.i].id, prog:tut.prog}, tutStart:p=>{ save.tut = {run:0, harbor:0}; tutStart(p); },
