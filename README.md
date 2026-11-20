@@ -11,14 +11,25 @@ Serve the folder over HTTP (opening the file directly can block the art from loa
 ## Cat art
 **Town cats (area 1)** come from **`assets/cats/town_cats.webp`**: Orange Tabby, Brown Tabby, Grey Tabby, Black, White, Cream, Calico, Tortoiseshell, Tuxedo, Siamese, Ragdoll, and Black & White Cats, on the same 4 × 3 layout with a label under each cat. The Cream Cat is the town's boss, the **Big Cream Cat**. If the sheet is missing, plain round cats in each fur colour stand in.
 
-**Sebastian, the Royal Ragdoll Cat** (the last cat of Cat Town) is **`assets/cats/royal_ragdoll.webp`**, a single picture cut out the same way. You can't find him in the normal waves:
-1. **The quest:** once every other Cat Town cat lives in your Cat Home, **Princess Rosalind** (with a crown) walks up to you at the harbor. Sebastian has run off, and he only eats caviar.
-2. **The chase:** accept her request and sail to Cat Town. Sebastian turns up after about 20 seconds, with a crown arrow at the screen edge while he's off screen.
-   - He runs from you in a zig-zag.
-   - Every few seconds he gets **tired** and stops: that's your chance.
-   - When he thinks he's safe, he sits and grooms.
-   - Weapons don't hurt him, and he never hurts you.
-3. **The rescue:** touch him to serve the caviar on its silver plate. He eats, moves into your Cat Home, and **Cat Town is complete**. The Princess pays **300 🪙** at the harbor.
+**Sebastian, the Royal Ragdoll Cat** (the last cat of Cat Town) is **`assets/cats/royal_ragdoll.webp`**, a single picture cut out the same way. Catching him is the mission of your **second Cat Town run**:
+1. **The request:** when you come back from your first run, **Princess Rosalind** (the signora, with a crown) is waiting at the harbor. Sebastian has run off; he won't touch fish and hisses at anyone who comes near. She gives you her caviar plates.
+2. **Finding him:** a "MISSION: CATCH SEBASTIAN" card opens the run, and he turns up a little way off. A blue 👑 arrow with the distance points the way.
+3. **You can't chase him down:**
+   - Get close and he **hisses** ("HSSSSS!") and bolts, a bit faster than you.
+   - Linger near him and his 👁 suspicion meter fills up until he runs off.
+4. **Caviar traps:**
+   - Press **F** (or the 🍽️ CAVIAR button) to put a plate down where you stand. You can have 3 out at once; putting down another picks up the oldest.
+   - When nobody's near, he sneaks up to a plate. If you hang around the plate he's after, he smells you and gives up on it for a while (😾).
+5. **The bite:** when he starts eating:
+   - You get an alert banner and a flash.
+   - The plate pulses gold, and a **GO!** marker over him shows how much meal is left.
+   - Off screen, the arrow turns gold and says **EATING!**
+6. **The swoop:** reach him while he eats (the dodge helps). Dawdle close by for more than about a second and he spots you and runs; if he finishes the plate, he slips away and you need another.
+7. **The rescue:** touch him while he's eating and he's yours. **Cat Town is complete**, **Willow Park opens**, and the Princess pays **300 🪙** at the harbor.
+
+**Rules:** weapons don't hurt him and he never hurts you. Tune it with `ROYAL` in `index.html`.
+
+**Area 2 unlock:** Willow Park opens once you've found **every cat in Cat Town**, Sebastian included.
 
 **Sea cats** (areas 2 and 3):
 The sea-cat sheet lives at **`assets/cats/sea_cats.webp`** (4 columns × 3 rows on white, with a name label under each cat; a `sea_cats.png` works too). The game slices it when it loads: it removes the white background from the edges inward (so white fur and eyes stay) and keeps only the biggest shape in each cell, which drops the labels. In reading order the cells are:
@@ -58,6 +69,36 @@ There are three areas, each with its own ground:
 
 The environment sheet is otherwise only used for the breakable props: a pink pot in town, a flower crate in the park and a teal pot on the beach. The bones panel and the skull sign are not used.
 
+## The opening story
+The first time the game starts, an animated opening plays **in Cat Town itself**, in the piazza where every run begins. The run is set up but frozen while the story plays on top of the real map, in sunset light under string lights:
+1. A little seaside town somewhere in Italy.
+2. Townspeople enjoy their evening in the piazza: the lemon seller, a musician serenading a waitress, a gelato kid, the florist, granny, the gondolier and the chef.
+3. **But this town has one big problem…** The lights flicker, everyone panics and runs home (SLAM!), and dusk falls.
+4. **The town is run by cats.** A few peek in from the edges, then they pour into the square, and the Big Cream Cat shows up too.
+5. It's **DINNER TIME!** The cats all jump and meow.
+6. **Then you step out of your fish shop:** the fish shop owner, the only one up for the challenge. The cats make room and you hold the fish up high: "Save the town. Feed every single cat!"
+
+**Straight into the first map:** when the story ends (or you skip it), the run simply starts right there. The cats that came for dinner are the first ones to feed. When that first run is over, the results screen only offers **⚓ Back to the fish shop**, which opens the harbor for the first time with a short "Your fish shop" welcome. From then on you sail out from the harbor as usual.
+
+**Controls:** tap, Space or Enter goes to the next line. **Skip** (or Esc) and **Let's feed them!** both start the Cat Town run. A replay from the 🎬 button goes back to the harbor instead.
+
+**Seeing it again:** it only plays once (`save.seenIntro`). Replay it with the 🎬 button next to "The Harbor", or add `?intro` to the URL.
+
+## The fisher, the townsfolk and the Italian town kit
+- **You: the fisher.** `assets/player/fisher_turnaround.webp` (front, three-quarter, side and back views) is you in runs, the harbor and the story.
+  - **Look:** the view follows the way you're heading, with a thick white outline (`OUTLINE_PX`) and squash & stretch when walking. You're drawn bigger than before (`PLAYER_H`).
+  - **Fixed outfit:** the Wardrobe just shows your fisher walking (beanie, striped shirt, overalls and boots).
+  - **The chibi rig is off:** the head + hair from `chibi_parts.psd` on the `chibi_body.webp` body, with the hair picker, is still in the code. Set `CHIBI_ENABLED = true` to bring it back; `?debug#chibi` shows it.- **Townspeople:** `assets/npc/townsfolk.webp` (4 × 4) has the chef, waitress, old fisherman, fishmonger, gelato seller, gondolier, nun, granny, painter, musician, lemon seller, florist, sailor, gelato kid, signora and newsboy. They are the story's locals and the harbor's request-givers; locals saved before the sheet get one picked from their outfit.
+- **Town kit:** `assets/env/italian_town.webp`.
+  - **The harbor's buildings** come from the kit, bigger than before. Only the Big Fish Shop keeps its own art.
+    - The **Big Fish Shop** is where your **Tackle & Skills** are, with your **Cat Home** upstairs (the 🏠 button in its panel). The bottom bar's Home, Tackle and Skills buttons lead there too.
+    - The Italian houses and the trattoria are scenery.
+    - The **Pet Store** is the gelato shop.
+  - **The harbor street** has bunting strung between the houses, flower pots along the quay, a lemon tree by the fish shop and the Italian flag by your boat. These are the `kit:` entries in `HB_DECOR` and `HB_BUILDINGS`.
+  - **Everyone the same height:** you, the locals and Old Gil are the same height in the harbor (`HB_PERSON_H`). In the story, the townsfolk are as tall as you (`PLAYER_H`).  - **Cat Town:** keeps its own clean cobbled look. The only kit pieces there are the row of shops where every run (and the story) starts: the trattoria, your fish shop and the gelato shop.
+  - **Old Gil:** he is the old fisherman with the pipe from the townsfolk sheet.
+  - **Checking the cuts:** `?debug#kit` shows every cut piece.
+
 ## Controls
 - Move: WASD / arrow keys, or touch anywhere and drag (floating joystick)
 - Weapons fire automatically; desktop mouse-drag aims Fish Toss and Catnip Spray
@@ -65,7 +106,53 @@ The environment sheet is otherwise only used for the breakable props: a pink pot
 - Pause: ⏸ button, Esc or P
 - One-time items: **1 / 2 / 3** (or **Q** for the first), or tap the item slots at the bottom right. Party Treats fire instantly. Yarn Balls and Cucumbers are **placed by hand**: pick one, then click / tap where it should land (an aiming circle shows its area, time slows while you aim, and you can reach up to 480 px away). Pressing the same number again places it at the circle; Esc, right-click or tapping the slot again cancels.
 
+## Cat Town's layout
+Cat Town is blocked out as a little Italian town, built from simple 3D shapes (boxes, cylinders and ball-shaped treetops) that stand up on the tilted ground. The layout repeats every `TOWN_TILE` pixels, so it never ends.
+- **The piazza** (where you start):
+  - A big round stone square with a large tiered **fountain**, with water arcs, ripples and sparkles.
+  - Benches and lamp posts around it.
+  - The trattoria, your fish shop and the gelato shop along its north side.
+- **Streets and houses:**
+  - A paved east–west main street, a north street, and a north–south avenue.
+  - Rows of houses face the streets: pastel walls, windows with green shutters and flower boxes, an arched door and a terracotta roof. Some wear the Italian village art.
+  - Gaps between the houses leave lanes to walk through, and trees line the main street.
+- **The park** (south-east): grass, trees, a pond with ripples, flower beds, benches and a lamp along a winding path.
+- **The garden** (south-west): rows of raised flower beds and lemon trees on grass, with crossing paths.
+
+**It never gets in the way:**
+- Nothing blocks you or the cats.
+- Any house, tree, shop or the fountain fades to see-through while you or a cat is behind it.
+- Manholes and weeds stay off the grass, the garden and the piazza.
+
+**Editing it:** the layout is the `TOWN` list in `index.html` (`ground` for streets and grass, `things` for what stands up). `BOX3D.Z` sets how much tall things lean with the camera.
 ## How a run works
+**The 3D look:** the run maps look like a tilted, gently curved 3D diorama.
+- **The ground** (floor, decorations, zones, plates, shots):
+  - It's drawn flat, then a small WebGL pass tilts it so it falls away toward the top.
+  - The same pass adds a subtle fish-eye curve and a soft haze in the distance, in the area's own tint.
+  - The result shows on `#glc`, the canvas underneath.
+- **Things that stand up** (cats, you, the house blocks, lamps, flower pots, the story's actors) are drawn on top.
+  - They stay upright and aren't squashed.
+  - Each stands at its spot on the curved ground and is sized by its distance (`billboard()`).
+  - They're depth-sorted, so a cat behind a house is hidden by it.
+- **House blocks:** the piazza's trattoria, fish shop and gelato shop are real boxes.
+  - The front face shows the Italian village art.
+  - The side walls are in the facade's colour, with a terracotta roof on top.
+  - You see a building's side as you walk past it.
+- **No cut-off ground:** the ground is drawn zoomed out by just enough (`tiltOverscan()`) that the tilt and curve always have ground to show, so it fills the screen edge to edge. The view bounds grow with it, so cats spawn beyond what you can see.
+- **Tilt-shift blur:** a light blur at the top and bottom of the screen (`#tiltshift`).
+- **Aiming:** mouse aim and placing items are mapped back through the curve and tilt, so they land where you point.
+- **Without WebGL:** the ground is tilted by redrawing it in thin rows, with no curve.
+- **Tuning:** `TILT` in `index.html`. `k` is the lean, `focus` the row that keeps its size, and `fish` the lens curve (0 = none). `BOX3D` controls the house blocks.
+| Type | Colour | What it is |
+|---|---|---|
+| 🎯 **New projectile** | Blue | A weapon you don't have yet |
+| ⬆️ **Projectile upgrade** | Orange | The next level of a weapon you have; a new trick (Lv 4 / 7) glows gold |
+| 📈 **Stat upgrade** | Green | A passive bonus |
+
+Each card also shows:
+- **Level pips:** where you are and the level you'd get, like "Lv 1 → 2 / 8".
+- **A pink "+1 PROJECTILE" tag:** when the pick adds a projectile.
 - **15-minute runs.** Each area has a minute-by-minute wave table plus scripted events: crowds and schools sweeping across the screen, encirclements, elite cats, and a boss at 3:30, 8:30 and 13:30 (the Big Cream Cat in town, the Narwhal Cat on the beach, and the two take turns in the park). Every 5 minutes is a day/night cycle.
 - **Three areas, 24 cats (+2 bosses), each type with its own behaviour.** Each wave slot is a role. The area decides which cat fills it, and the town cat plays the same role as a sea cat:
   - **Tougher as you go:** every new cat type has more HP than the one before it, in the order they first show up: Octopus 10 → Sea Bass 18 → Urchin 26 → Squid 38 → Axolotl 55 → Shark 75 → Nudibranch 105 → Sea Angel 120 → Orca 190 → bosses 3,000. Crowds and schools stay light. XP rises to match, and town cats copy the sea cat whose role they play.
@@ -88,7 +175,7 @@ The environment sheet is otherwise only used for the breakable props: a pink pot
     - **Pigeon Cat:** blows a feather gust lane that shoves you along it.
     - **Working Cat:** builds a worksite of cones, a barrier and crates that block your way for 12 s.
     - **Looooong Stray Cat:** very long, bites along its whole body, and leaves fur piles you can't walk through.
-  - The specials join the park from minutes 1, 3, 5 and 7. Until those sheets are added, plain round cats in each fur colour stand in.
+  - The specials join the park from minutes 1, 3, 5 and 7. Both park sheets are in; `?debug#cats` shows every cat as the game cuts it.
   - **Area 3 · Sunny Beach:** the 12 sea cats.
   - Every attack is telegraphed on the ground with an outline + gradient that fills up before it lands. The sea cats:
   - Octopus Cat wiggles toward you; Sea Bass Cat rests, then darts.
@@ -109,7 +196,7 @@ The environment sheet is otherwise only used for the breakable props: a pink pot
 - **Cats left to discover:** the HUD chip shows the total and how many are in this area (e.g. ❓ 33 to discover · 5 here), with silhouettes of this area's undiscovered cats underneath.
   - **Run start:** a *CATS TO DISCOVER* card lists them.
   - **New cat:** feeding one gives a *NEW CAT DISCOVERED!* card with how many are left.
-  - **Elsewhere:** the harbor top bar and the boat's stage list show the counts too.
+  - **Elsewhere:** the harbor top bar and the area pop-up's stage list show the counts too.
 - **HUD:** level badge, HP (with numbers) and XP bars, timer, gold and cats fed across the top; weapons, passives and missions on the left; projectile count, active Frenzy / Party Treats timers and how many cat types are still left to discover on the right; one-time item slots bottom right.
 - **Weapon tricks:** every weapon learns a new trick at **Lv 4** and **Lv 7** (cards that unlock one get a gold **★ NEW TRICK** ribbon, other cards show the next trick coming). Evolved weapons keep both. Stars on the HUD weapon icons count tricks learned.
 
@@ -159,8 +246,9 @@ The environment sheet is otherwise only used for the breakable props: a pink pot
   - 🎣 **Tackle & Skills**: the skill tree
   - 🐟 **Chum Storm Fish Co.** (your shop): the wardrobe for your fisher's look
   - 🐾 **Pet Store**: furniture for the Cat Home
-  - 🐠 **Old Gil's Fish** on the pier: barter for better fish
-  - ⛵ **Your boat** at the end of the pier: pick a fisher and a stage, then set sail.
+  - 🐠 **Old Gil's Fish** on the pier: buy fish for your bucket
+  - ⛵ **Your boat** at the end of the pier: go fishing (see below).
+  - 🗺️ **Out of town** at the far left of the street: a yellow **Areas** sign with arrows on the cobbles. Walk past it (or press **E** by it, or tap **Areas** in the bottom bar) and a pop-up shows every area, your fishers and what is in your fish bucket. Pick and press **Let's go!** to start a run.
   - Your collected cats laze around in front of the shop (tap one to squish it).
 - **Locals with requests.** Now and then a local walks up with a ❗ and asks for something. Requests carry across runs (up to 3 at once) and show in the Requests panel, both in the harbor and during runs:
   - find and feed a specific cat, often one you've never met
@@ -169,7 +257,23 @@ The environment sheet is otherwise only used for the breakable props: a pink pot
   - dig up some treasure spots
   - survive to a set time on a stage
   When one is done, the local waits in the harbor with a 🪙 bubble. Talk to them to collect the gold.
-- **Old Gil's fish.** Trade gold for better fish: Sardines → Mackerel (350) → Bluefin Tuna (1,100) → Swordfish (2,800, +1 pierce) → Golden Koi (6,500). Each grade makes Fish Toss and Salmon Run hit harder and throw bigger, recoloured fish, and gives every weapon a small damage bonus. You can **haggle** once per visit: 55% for 20% off, otherwise the price goes up 10%.
+- **Your fish bucket is your ammo.** It holds fish of five grades: Sardines, Mackerel, Bluefin Tuna, Swordfish (+1 pierce) and Golden Koi.
+  - **Every fish Fish Toss throws comes out of the bucket**, picked at random from what's in it. Each fish hits as hard as its own grade: better fish do more damage and are bigger.
+  - **Fish you don't throw stay** for the next run. The HUD's **Fish** pill shows how many are left; it turns red under 50.
+  - **Empty bucket:** you throw **fish scraps**, which do 25% less damage.
+  - **New saves** start with 300 Sardines. **Older saves** are scaled up to the new crate sizes once.
+  - **Three ways to get fish:**
+    - **Old Gil** sells crates: 100 Sardines for 40, 50 Mackerel for 90, 25 Bluefin Tuna for 180, 10 Swordfish for 320 (or ×5). The Golden Koi isn't for sale. You can **haggle** once per visit: a 55% chance of 20% off, otherwise prices go up 10%.
+    - **Fishing off your boat:** a side view under the boat.
+      - **Pick a bait:** Bread (free), Worm (10 gold), Shrimp (30) or Squid (80).
+      - **Cast**, then **steer the hook** with the mouse, touch or arrow keys. Each cast lasts 25 seconds; Space reels in early.
+      - **The deeper you go, the rarer the fish:** Sardines near the surface, then Mackerel, Tuna and Swordfish, and Golden Koi by the sea floor.
+      - **Fish that see the hook come and bite.** Fish see only what's in front of them.
+      - **Rare fish swim away from weak bait.** Each bait is good up to a grade: Bread for Sardines, Worm for Mackerel, Shrimp for Tuna, Squid for Swordfish. Each grade above that makes a fish more likely to flee.
+      - **Sneak up from behind:** touching any fish with the hook from behind snags it, whatever the bait.
+      - **A bite is reeled in on its own.** The whole catch goes in your bucket, for example 60–100 Sardines or 3–5 Golden Koi; better bait lands a bit more.
+      - **Casts:** you get 5, refilled after every run.
+    - **In the maps:** 🐟 **+FISH** pickups put a small catch in your bucket. ⬆️ **FISH UPGRADE** pickups (from 1:30) make every fish you throw for the rest of the run count as one grade better. The results screen shows how many fish you threw and found.
 - **Fish types:** everything you throw is a real fish from **`assets/fx/fish_types.webp`** (30 species, from sardines to a golden arowana). Each fish grade adds more and fancier fish to the bucket Fish Toss picks from: 6 at first, 30 with the Golden Koi. Salmon Run throws salmon, Golden Catch throws a glowing golden arowana, and Tuxedo Cats' Fish Missiles are random fish.
 - **Gold** collected in a run is kept, even if you're overrun. You spend it on two things:
 - **Skill Tree:** three branches. Each node needs the one above it before you can buy it, and existing purchases carry over.
@@ -217,6 +321,7 @@ The character sheet is **`assets/player/characters.png`** (`.webp` / `.jpg` also
 
 ## Testing shortcuts
 Add `?debug` to the URL: **L** level up · **T** skip 60 s · **C** spawn a treasure box · **U** spawn every power-up, an artifact and all three chest tiers, plus the three one-time items · **X** spawn a treasure spot now · **I** fill the item bag · **K** feed every cat · **H** heal · **G** +1000 gold (in the harbor) · **B** a local walks up now (in the harbor) · **P** the Princess comes for Sebastian (in the harbor; counts every other town cat as met for this visit) · **R** Sebastian appears now (in a Cat Town run with her request). Dispatch `new CustomEvent("cs-step", {detail: frames})` on `document` to advance the game or Cat Home by hand.
+With `?debug`, `window.CS` in the browser console opens any screen or pop-up. For example: `CS.building('shop')`, `CS.talk('princess')`, `CS.pay()`, `CS.home()`, `CS.intro(25)`, `CS.run()`, `CS.levelUp()`, `CS.chest()`, `CS.pause()`, `CS.results()`, `CS.mission()`, `CS.discover('tortie')`, `CS.loot()`, `CS.banner()` and `CS.fish()` (fishing, in the harbor). `CS.bag()` shows the fish bucket and `CS.fishStep(dt)` advances the fishing game by hand. Screenshots of every screen are in **`docs/ui_screens/`** (open `index.html` there).
 
 ## Important files
 - `index.html` — the whole game (HTML, CSS and JS in one file)
