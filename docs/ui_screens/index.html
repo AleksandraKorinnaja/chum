@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chum Storm UI Screens</title>
+<style>
+  :root{--bg:#fbf6ec;--card:#ffffff;--ink:#2b1a0c;--muted:#7a6a58;--line:#e7dcc9;--accent:#e8643a;--chip:#fff1d6;}
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){--bg:#1d1814;--card:#29221c;--ink:#f4ead9;--muted:#b8a890;--line:#3d342b;--accent:#ff8a5c;--chip:#3a2f22;} }
+  :root[data-theme="dark"]{--bg:#1d1814;--card:#29221c;--ink:#f4ead9;--muted:#b8a890;--line:#3d342b;--accent:#ff8a5c;--chip:#3a2f22;}
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:'Nunito',system-ui,-apple-system,Segoe UI,sans-serif;line-height:1.45;}
+  header{padding:32px 16px 8px;max-width:1240px;margin:0 auto;}
+  h1{margin:0 0 6px;font-size:clamp(24px,4vw,34px);}
+  header p{margin:0;color:var(--muted);font-weight:600;max-width:760px;}
+  nav{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);}
+  nav div{max-width:1240px;margin:0 auto;padding:10px 16px;display:flex;gap:8px;flex-wrap:wrap;}
+  nav a{font-size:13px;font-weight:800;color:var(--ink);text-decoration:none;background:var(--chip);border:1px solid var(--line);padding:5px 12px;border-radius:999px;}
+  nav a:hover{border-color:var(--accent);}
+  main{max-width:1240px;margin:0 auto;padding:8px 16px 60px;}
+  section{padding-top:22px;}
+  h2{font-size:20px;margin:0 0 4px;}
+  section > p{margin:0 0 14px;color:var(--muted);font-weight:600;font-size:14px;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,360px),1fr));gap:16px;}
+  figure{margin:0;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;}
+  figure img{display:block;width:100%;height:auto;cursor:zoom-in;background:#ddd;}
+  figcaption{padding:10px 12px 12px;}
+  figcaption b{display:block;font-size:14.5px;}
+  figcaption span{display:block;font-size:13px;color:var(--muted);font-weight:600;}
+  .num{display:inline-block;min-width:26px;font-size:11px;font-weight:900;color:var(--accent);}
+  dialog{border:none;padding:0;background:transparent;max-width:96vw;max-height:94vh;}
+  dialog img{max-width:96vw;max-height:90vh;display:block;border-radius:10px;}
+  dialog::backdrop{background:rgba(10,6,4,.85);}
+  dialog p{color:#fff;font-weight:800;text-align:center;margin:8px 0 0;}
+</style>
+</head>
+<body>
+<header>
+  <h1>Chum Storm UI Screens</h1>
+  <p>Every screen and pop-up in the game, captured from the current build. Click any picture to see it full size. In the harbor and Cat Home the pictures show the whole screen; the run screens show the 3D camera.</p>
+</header>
+<nav><div>
+  <a href="#start">Start &amp; story</a><a href="#harbor">Harbor</a><a href="#panels">Harbor panels</a><a href="#talk">Locals &amp; requests</a><a href="#home">Cat Home</a><a href="#run">Run HUD</a><a href="#popups">Run pop-ups</a><a href="#screens">Run screens</a><a href="#sebastian">Sebastian</a>
+</div></nav>
+<main>
+  <section id="start"><h2>Start &amp; story</h2><p>The loading screen, then the opening story that plays the first time (and from the 🎬 button).</p><div class="grid">
+    <figure><img src="01_loading.png" alt="Loading screen"><figcaption><b><span class="num">01</span>Loading screen</b><span>Title, tagline and progress bar over the harbor.</span></figcaption></figure>
+    <figure><img src="14_story_start.png" alt="Story start"><figcaption><b><span class="num">14</span>Story · first line</b><span>The piazza at sunset with the townsfolk, caption box and Skip.</span></figcaption></figure>
+    <figure><img src="15_story_dinner_time.png" alt="Story dinner time"><figcaption><b><span class="num">15</span>Story · DINNER TIME!</b><span>The cats take over; the big stamp with bells.</span></figcaption></figure>
+    <figure><img src="16_story_end.png" alt="Story end"><figcaption><b><span class="num">16</span>Story · last line</b><span>You step out of the fish shop; "Let's feed them!" starts the run.</span></figcaption></figure>
+  </div></section>
+
+  <section id="harbor"><h2>Harbor</h2><p>The street between runs: top bar (gold, fish, cats to discover), requests list, the walk prompt and the bottom bar.</p><div class="grid">
+    <figure><img src="02_harbor.png" alt="Harbor"><figcaption><b><span class="num">02</span>Harbor · Big Fish Shop</b><span>Top bar, requests panel, "E · Your cats, tackle &amp; skills" prompt, bottom nav.</span></figcaption></figure>
+    <figure><img src="03_harbor_pier.jpg" alt="Harbor pier"><figcaption><b><span class="num">03</span>Harbor · pier</b><span>Pet Store, Old Gil's stall and your boat, with the "Barter for fish" prompt.</span></figcaption></figure>
+    <figure><img src="12_your_fish_shop_welcome.png" alt="Your fish shop welcome"><figcaption><b><span class="num">12</span>Pop-up · Your fish shop</b><span>The welcome when you first reach the harbor after your first run.</span></figcaption></figure>
+    <figure><img src="09_request_accepted_banner.png" alt="Request accepted"><figcaption><b><span class="num">09</span>Banner · request accepted</b><span>The one-line banner after you take a local's request.</span></figcaption></figure>
+  </div></section>
+
+  <section id="panels"><h2>Harbor panels</h2><p>What opens when you walk into each building.</p><div class="grid">
+    <figure><img src="04_big_fish_shop_tackle_skills.png" alt="Big Fish Shop"><figcaption><b><span class="num">04</span>Big Fish Shop · Tackle &amp; Skills</b><span>The skill tree (Angler / Sailor / Fortune) with the 🏠 Cat Home button on top.</span></figcaption></figure>
+    <figure><img src="05_pet_store.png" alt="Pet Store"><figcaption><b><span class="num">05</span>Pet Store</b><span>Your cat collection, hearts, "Visit your cats" and furniture to decorate.</span></figcaption></figure>
+    <figure><img src="06_old_gils_fish.png" alt="Old Gil's Fish"><figcaption><b><span class="num">06</span>Old Gil's Fish</b><span>Crates of fish for your bucket, with Gil's line and Haggle.</span></figcaption></figure>
+    <figure><img src="07_set_sail.png" alt="Where to?"><figcaption><b><span class="num">07</span>Where to? (the Areas sign)</b><span>Walk off the left of the harbor: pick your fisher and area, and see your fish bucket.</span></figcaption></figure>
+    <figure><img src="30_fishing.png" alt="Fishing"><figcaption><b><span class="num">30</span>Fishing off your boat</b><span>Pick a bait, cast, and steer the hook. Deeper water holds rarer fish.</span></figcaption></figure>
+  </div></section>
+
+  <section id="talk"><h2>Locals &amp; requests</h2><p>Talking to townspeople: new requests, the Princess's quest, and collecting a reward.</p><div class="grid">
+    <figure><img src="08_local_request.png" alt="Local request"><figcaption><b><span class="num">08</span>Local · new request</b><span>Portrait, their line, the request and reward, Deal! / Not now.</span></figcaption></figure>
+    <figure><img src="10_princess_request.png" alt="Princess request"><figcaption><b><span class="num">10</span>Princess Rosalind</b><span>Her request to catch Sebastian with caviar plates.</span></figcaption></figure>
+    <figure><img src="11_reward_collect.png" alt="Collect reward"><figcaption><b><span class="num">11</span>Local · collect reward</b><span>A finished request, paid out with Collect.</span></figcaption></figure>
+  </div></section>
+
+  <section id="home"><h2>Cat Home</h2><p>Your cats' room: pet, laser, yarn and treats along the bottom.</p><div class="grid">
+    <figure><img src="13_cat_home.png" alt="Cat Home"><figcaption><b><span class="num">13</span>Cat Home</b><span>Back button, gold, and the Pet / Laser / Yarn / Treats tools.</span></figcaption></figure>
+  </div></section>
+
+  <section id="run"><h2>Run HUD</h2><p>During a run: HP and XP bars, timer, gold, missions, requests, cats to discover, the dodge button and item slots.</p><div class="grid">
+    <figure><img src="17_run_hud.png" alt="Run HUD"><figcaption><b><span class="num">17</span>Run HUD</b><span>Everything on screen at the start of a run, with the stage banner and speech bubble.</span></figcaption></figure>
+    <figure><img src="18_run_mission_progress.jpg" alt="Mission progress"><figcaption><b><span class="num">18</span>Mission progress pop</b><span>The "2/12" that pops where a mission cat was fed.</span></figcaption></figure>
+  </div></section>
+
+  <section id="popups"><h2>Run pop-ups</h2><p>Cards and banners that drop in during a run.</p><div class="grid">
+    <figure><img src="19_mission_complete.png" alt="Mission complete"><figcaption><b><span class="num">19</span>Mission complete</b><span>The reward card with coins flying to your gold.</span></figcaption></figure>
+    <figure><img src="20_new_cat_discovered.png" alt="New cat discovered"><figcaption><b><span class="num">20</span>New cat discovered</b><span>The cat, where it went, and how many are left.</span></figcaption></figure>
+    <figure><img src="21_cats_to_discover.png" alt="Cats to discover"><figcaption><b><span class="num">21</span>Cats to discover</b><span>Silhouettes of this area's cats you haven't met.</span></figcaption></figure>
+    <figure><img src="23_item_aim_and_sebastian_mission.png" alt="Item aiming"><figcaption><b><span class="num">23</span>Item aiming + item card</b><span>Placing a Yarn Ball (aim circle, "click to place"), its tip card, and the caviar button.</span></figcaption></figure>
+    <figure><img src="24_loot_card_and_banner.png" alt="Loot card and banner"><figcaption><b><span class="num">24</span>Loot card + banner</b><span>The artifact card and the "Treasure dropped!" banner (shown here over the harbor).</span></figcaption></figure>
+  </div></section>
+
+  <section id="screens"><h2>Run screens</h2><p>Full-screen overlays that pause the action.</p><div class="grid">
+    <figure><img src="22_level_up.png" alt="Level up"><figcaption><b><span class="num">22</span>Level up</b><span>Three cards: new projectile, projectile upgrade, stat upgrade.</span></figcaption></figure>
+    <figure><img src="25_treasure_tackle_box.png" alt="Treasure tackle box"><figcaption><b><span class="num">25</span>Treasure tackle box</b><span>What a chest gave you, and Collect.</span></figcaption></figure>
+    <figure><img src="26_pause.png" alt="Pause"><figcaption><b><span class="num">26</span>Pause</b><span>Stage, time, level, your build, Resume / End Run.</span></figcaption></figure>
+    <figure><img src="27_results.png" alt="Results"><figcaption><b><span class="num">27</span>Results</b><span>Survived, level, fed, gold, weapons, cats still out there, Play Again / Back to the harbor.</span></figcaption></figure>
+  </div></section>
+
+  <section id="sebastian"><h2>Sebastian &amp; area complete</h2><p>The Royal Ragdoll quest's pop-ups.</p><div class="grid">
+    <figure><img src="23_item_aim_and_sebastian_mission.png" alt="Sebastian mission"><figcaption><b><span class="num">23</span>Mission: catch Sebastian</b><span>The card at the start of the mission run (top of this shot).</span></figcaption></figure>
+    <figure><img src="28_sebastian_rescued.png" alt="Sebastian rescued"><figcaption><b><span class="num">28</span>Sebastian rescued</b><span>The card when you catch him.</span></figcaption></figure>
+    <figure><img src="29_cat_town_complete.png" alt="Cat Town complete"><figcaption><b><span class="num">29</span>Cat Town complete</b><span>Every town cat, and Willow Park opening.</span></figcaption></figure>
+  </div></section>
+</main>
+<dialog id="zoom"><img alt=""><p></p></dialog>
+<script>
+  const dlg = document.getElementById('zoom');
+  document.querySelectorAll('figure img').forEach(img=>img.addEventListener('click', ()=>{
+    dlg.querySelector('img').src = img.src; dlg.querySelector('p').textContent = img.alt; dlg.showModal();
+  }));
+  dlg.addEventListener('click', ()=>dlg.close());
+</script>
+</body>
+</html>
