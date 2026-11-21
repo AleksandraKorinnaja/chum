@@ -1544,6 +1544,39 @@
   #chest.side.in .side-timer i{animation:sideTimer var(--ct, 4.5s) linear forwards;}
   @keyframes sideTimer{from{transform:scaleX(1);}to{transform:scaleX(0);}}
   #levelup:not(.side) .side-keys, #chest:not(.side) .side-timer{display:none;}
+  /* ---- level-up: three colour-coded cards in the middle (the run pauses) ---- */
+  .cat-trick{--cc:#E0A800;--cd:#9a7200;--ct:#FFF5D1;} .cat-new{--ct:#E3F0FC;} .cat-up{--ct:#FDEBD9;} .cat-stat{--ct:#E3F3E3;} .cat-bonus{--ct:#EFEAE4;}
+  #levelup.center{z-index:22;}
+  #levelup .lv-wrap{zoom:var(--pz, 1);display:flex;flex-direction:column;align-items:center;gap:14px;max-width:calc((100vw - 32px)/var(--pz, 1));}
+  #levelup .lv-title{margin:0;font-family:'Fredoka','Nunito',sans-serif;font-size:48px;font-weight:600;color:#FFFFFF;text-shadow:0 3px 0 rgba(59,46,42,.35);}
+  #levelup .lv-legend{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+  #levelup .lv-legend span{font:800 13px 'Nunito',sans-serif;color:#FFFFFF;background:var(--cc);padding:5px 12px;border-radius:999px;box-shadow:0 2px 0 var(--cd);}
+  body #levelup #upgrades{display:flex !important;flex-direction:row !important;gap:20px !important;align-items:stretch;justify-content:center;}
+  #levelup.in .lcard{animation:lcardIn .38s cubic-bezier(.2,1.5,.4,1) backwards;}
+  #levelup.in .lcard:nth-child(2){animation-delay:.06s;} #levelup.in .lcard:nth-child(3){animation-delay:.12s;}
+  @keyframes lcardIn{from{transform:translateY(40px) scale(.9);opacity:0;}}
+  .lcard{width:270px;display:flex;flex-direction:column;align-items:stretch;gap:10px;padding:0 16px 16px;border-radius:24px;background:#FFFFFF;overflow:hidden;cursor:pointer;color:#3B2E2A;
+    box-shadow:0 0 0 4px var(--cc), 0 8px 0 4px var(--cd);transition:transform .12s;}
+  .lcard:hover{transform:translateY(-6px);}
+  .lcard:active{transform:scale(.97);}
+  .lcard .l-band{margin:0 -16px;padding:10px 12px;background:var(--cc);color:#FFFFFF;font:800 13px 'Nunito',sans-serif;letter-spacing:.08em;text-align:center;display:flex;align-items:center;justify-content:center;gap:6px;}
+  .lcard .l-ic{height:120px;border-radius:16px;background:var(--ct);display:flex;align-items:center;justify-content:center;font-size:60px;}
+  .lcard .l-ic img{max-width:96px;max-height:96px;}
+  .lcard .l-name{font-family:'Fredoka','Nunito',sans-serif;font-size:21px;font-weight:700;line-height:1.15;}
+  .lcard .l-pips{display:flex;align-items:center;gap:4px;flex-wrap:wrap;}
+  .lcard .l-pips i{width:12px;height:12px;border-radius:4px;background:#EFE5D6;}
+  .lcard .l-pips i.on{background:var(--cc);}
+  .lcard .l-pips i.next{background:var(--ct);box-shadow:inset 0 0 0 2px var(--cc);animation:pipBlink .7s ease-in-out infinite alternate;}
+  .lcard .l-pips span{margin-left:6px;font:800 12.5px 'Nunito',sans-serif;color:var(--cd);}
+  .lcard .l-desc{font:700 15px/1.35 'Nunito',sans-serif;color:#7A6A5E;}
+  .lcard .l-desc b{color:#3B2E2A;}
+  .lcard .l-chip{align-self:flex-start;font:800 12.5px 'Nunito',sans-serif;color:var(--cd);background:var(--ct);padding:3px 10px;border-radius:999px;box-shadow:inset 0 0 0 2px var(--cc);}
+  .lcard .l-go{margin-top:auto;min-height:48px;border-radius:999px;background:var(--cc);color:#FFFFFF;display:flex;align-items:center;justify-content:center;gap:8px;
+    font-family:'Fredoka','Nunito',sans-serif;font-size:19px;font-weight:600;box-shadow:0 5px 0 var(--cd);}
+  .lcard .l-go kbd{font:800 13px 'Nunito',sans-serif;background:rgba(255,255,255,.28);border-radius:6px;padding:1px 7px;}
+  #levelup .lv-keys{font:800 14px 'Nunito',sans-serif;color:#FFFFFF;opacity:.9;}
+  #levelup .lv-keys kbd{font:800 13px 'Nunito',sans-serif;background:#FFFFFF;color:#3B2E2A;border-radius:6px;padding:1px 7px;}
+  @media (max-width: 860px){ body #levelup #upgrades{flex-direction:column !important;gap:12px !important;} .lcard{width:min(420px, 86vw);} .lcard .l-ic{height:64px;font-size:38px;} #levelup .lv-title{font-size:34px;} }
   /* while the right-hand panel is up, pop-up cards and the loot card move to its left */
   body.side-open.ui-v2 .callout:not(.dim){right:calc((16px + var(--sar))/var(--pz) + 356px) !important;}
   body.side-open.ui-v2 #loot-card{right:calc((16px + var(--sar))/var(--pz) + 356px) !important;}
@@ -1826,14 +1859,16 @@
     </div>
   </div>
 
-  <div id="side-stack">
-  <div class="overlay side" id="levelup" style="display:none;">
-    <div class="card">
-      <h2>Level up! <span class="side-keys">press <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd></span></h2>
-      <div class="upg-legend"><span class="cat-new">🎯 New projectile</span><span class="cat-up">⬆️ Projectile upgrade</span><span class="cat-stat">📈 Stat upgrade</span></div>
-      <div id="upgrades" class="row"></div>
+  <div class="overlay center" id="levelup" style="display:none;">
+    <div class="lv-wrap">
+      <h2 class="lv-title">Level up!</h2>
+      <div class="lv-legend"><span class="cat-new">🎯 New projectile</span><span class="cat-up">⬆️ Projectile upgrade</span><span class="cat-stat">📈 Stat boost</span><span class="cat-trick">★ New trick</span></div>
+      <div id="upgrades"></div>
+      <div class="lv-keys">Press <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> or click a card</div>
     </div>
   </div>
+
+  <div id="side-stack">
 
   <div class="overlay side" id="chest" style="display:none;">
     <div class="card">
@@ -2433,7 +2468,7 @@ addEventListener('mouseup', ()=>{ if(pointerKind==='mouse') resetPointer(); });
 addEventListener('keydown', e=>{
   if(document.body.classList.contains('runs-mode')) return;
   const key = e.key.toLowerCase();
-  if(state==='playing' && lvlOpen && ['1','2','3'].includes(key)){ const cards = document.querySelectorAll('#upgrades .srow'); if(cards[+key-1]) cards[+key-1].click(); return; }   // a level-up is waiting: 1 / 2 / 3 pick a buff
+  if(state==='levelup' && lvlOpen && ['1','2','3'].includes(key)){ const cards = document.querySelectorAll('#upgrades .lcard'); if(cards[+key-1]) cards[+key-1].click(); return; }   // a level-up is waiting: 1 / 2 / 3 pick a buff
   if(state==='intro'){ if([' ','enter','e','arrowright'].includes(key)){ e.preventDefault(); introNext(); } else if(key==='escape') finishIntro(); return; }
   if(['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright'].includes(key)){ keysDown.add(key); e.preventDefault(); }
   if(key==='escape' && placing){ cancelPlacing(); return; }
@@ -7988,31 +8023,39 @@ function givesProjectile(c){
   const d = def.lv && def.lv[w.level-1];
   return !!(d && d.amount);
 }
-// Level-up cards: one row of tall cards, colour-coded by what you're getting:
-//   🎯 NEW PROJECTILE (blue)  a weapon you don't have yet
-//   ⬆️ PROJECTILE UPGRADE (orange)  the next level of a weapon you have (tricks at Lv 4 / 7 glow gold)
-//   📈 STAT UPGRADE (green)  a passive bonus
-// Pips show the level you're at and the one you'd get; pick with a click or the 1 / 2 / 3 keys.
-const UPG_CAT = {new:['🎯','NEW PROJECTILE','cat-new'], up:['⬆️','PROJECTILE UPGRADE','cat-up'], stat:['📈','STAT UPGRADE','cat-stat'], bonus:['🎁','BONUS','cat-bonus']};
-// The level-up picks and the treasure box sit in a panel on the right while the run keeps going:
-// press 1 / 2 / 3 (or click) to take a buff; the treasure card closes by itself.
+// Level-up cards, in the middle of the screen (the run pauses while you choose), colour-coded by what you get:
+//   blue   🎯 NEW PROJECTILE      a weapon you don't have yet
+//   orange ⬆️ PROJECTILE UPGRADE  the next level of a weapon you have
+//   green  📈 STAT BOOST          a passive bonus
+//   gold   ★ NEW TRICK            an upgrade that teaches a weapon a trick
+//   grey   🎁 BONUS               heal / gold when there's nothing left to upgrade
+// Pick with 1 / 2 / 3 or a click.
+const UPG_CAT = {new:['🎯','NEW PROJECTILE','cat-new'], up:['⬆️','PROJECTILE UPGRADE','cat-up'], stat:['📈','STAT BOOST','cat-stat'], bonus:['🎁','BONUS','cat-bonus'], trick:['★','NEW TRICK','cat-trick']};
+// Treasure boxes sit in a card on the right while the run keeps going, and close by themselves.
 let lvlOpen = false, chestT = 0;
 const CHEST_SHOW = 4.5;                            // seconds the treasure card stays up
 function showLevelUp(){
   levelQueue--;
   lvlOpen = true;
+  state = 'levelup';
+  resetPointer();
   const list = $('upgrades');
   list.innerHTML = '';
   buildChoices().slice(0, 3).forEach((c, i)=>{
     const info = choiceCard(c), proj = givesProjectile(c);
     const w = c.type==='weapon' && player.weapons.find(w=>w.key===c.key);
-    const cat = c.type==='weapon' ? (w ? 'up' : 'new') : c.type==='passive' ? 'stat' : 'bonus';
-    const [, clabel, ccls] = UPG_CAT[cat];
+    const cat = info.trick ? 'trick' : c.type==='weapon' ? (w ? 'up' : 'new') : c.type==='passive' ? 'stat' : 'bonus';
+    const [cic, clabel, ccls] = UPG_CAT[cat];
     const cur = c.type==='weapon' ? (w ? w.level : 0) : c.type==='passive' ? (player.passives[c.key]||0) : -1;
+    const max = c.type==='weapon' ? WEAPON_MAX_LV : c.type==='passive' ? PASSIVES[c.key].max : 0;
+    const pips = max ? `<div class="l-pips">${Array.from({length:max}, (_, k)=>`<i class="${k < cur ? 'on' : k===cur ? 'next' : ''}"></i>`).join('')}<span>${cur ? `Lv ${cur} → ${cur+1}` : 'Lv 1'}</span></div>` : '';
     const div = document.createElement('div');
-    div.className = `srow ${ccls}${info.trick ? ' trick' : ''}`;
-    div.innerHTML = `<kbd>${i+1}</kbd><div class="s-ic">${info.ic}</div><div class="s-b"><div class="s-type">${info.trick ? '★ NEW TRICK' : clabel}${proj ? ' · +1 projectile' : ''}</div>
-      <b>${info.name}${cur > 0 ? ` <small>Lv ${cur} → ${cur+1}</small>` : cur === 0 ? ' <small>new</small>' : ''}</b><span>${info.trick ? `<b>${info.trick[0]}</b>: ${info.trick[1]}` : info.desc}</span></div>`;
+    div.className = `lcard ${ccls}`;
+    div.innerHTML = `<div class="l-band"><span>${cic}</span>${clabel}</div>
+      <div class="l-ic">${info.ic}</div><b class="l-name">${info.name}</b>${pips}
+      <div class="l-desc">${info.trick ? `<b>${info.trick[0]}</b>: ${info.trick[1]}` : info.desc}</div>
+      ${proj ? '<div class="l-chip">🎯 +1 projectile</div>' : ''}
+      <div class="l-go">Choose <kbd>${i+1}</kbd></div>`;
     div.onclick = e=>{ e.stopPropagation(); pickLevelUp(c); };
     list.appendChild(div);
   });
@@ -8020,9 +8063,9 @@ function showLevelUp(){
   vibrate([20,30,20]);
 }
 function pickLevelUp(c){
-  if(!lvlOpen || runOver) return;
+  if(!lvlOpen || runOver || state !== 'levelup') return;
   applyChoice(c); lvlOpen = false; $('levelup').style.display = 'none';
-  if(levelQueue > 0) showLevelUp();
+  if(levelQueue > 0) showLevelUp(); else resumePlay();
 }
 function hideSidePanels(){ lvlOpen = false; chestT = 0; $('levelup').style.display = 'none'; $('chest').style.display = 'none'; document.body.classList.remove('side-open'); }
 /* ============== TREASURE (chests from elites & bosses) ============== */
@@ -8079,7 +8122,7 @@ function openChest(){
 // the treasure card counts down with the game (so it waits while paused); a click closes it early
 function updateSidePanels(dt){
   if(chestT > 0){ chestT -= dt; if(chestT <= 0) $('chest').style.display = 'none'; }
-  document.body.classList.toggle('side-open', lvlOpen || chestT > 0);
+  document.body.classList.toggle('side-open', chestT > 0);
 }
 $('chest').addEventListener('click', ()=>{ chestT = 0; $('chest').style.display = 'none'; });
 function resumePlay(){
