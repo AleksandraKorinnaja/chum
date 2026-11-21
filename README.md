@@ -69,6 +69,34 @@ There are three areas, each with its own ground:
 
 The environment sheet is otherwise only used for the breakable props: a pink pot in town, a flower crate in the park and a teal pot on the beach. The bones panel and the skull sign are not used.
 
+## Runs (save files)
+The game opens on a **Your runs** screen.
+- **Every run is a separate save:** gold, skills, fish bucket, Cat Home and cats found, requests, unlocked areas and tutorial progress.
+- **Each row shows:** the run's name, gold, cats found, areas, best time and when it was last played. Click a name to rename it, **Continue** to play it, and the bin (twice) to delete it.
+- **New run:** type a name and press **Start new run**. It starts completely fresh: the opening story, the tutorial, a new fish shop and no cats.
+- **During a game:** the **☰** button in the harbor's top bar opens the screen to switch or start a run. On wide screens the top bar also shows the current run's name.
+- **Saves from before runs existed** become the first run, called "My run", so nothing is lost.
+- **Storage:** `chumstorm_runs_v1` holds the list. Each run's save and collection use the usual keys with `@id` added; "My run" keeps the original keys. The graphics setting is shared by every run on the device.
+- **Debug:** `?debug` skips the screen and goes straight into the current run (add `&runs` to see it).
+
+## Tutorial
+A white **coach card** with a yellow ring teaches the game one step at a time. Each step finishes when you actually do it, or after a few seconds for tips that only need reading. A progress bar fills as you go, and a green tick shows before the next step.
+- **Part 1, in your first run** (straight after the story): no text, just big flashing keys in the middle of the screen.
+  1. **W A S D** flashes, and each key lights up while you hold it (arrow keys count too). On a phone it's a sliding "hold & drag" hand. Walk a little way to finish it.
+  2. **Space** flashes. Dodge once to finish it.
+  - **Pop-ups wait** while the keys are showing: new-cat and mission cards, banners and item cards appear once you've done it, so nothing covers the keys.
+  - **Your first one-time item:** instead of the item card, an orange arrow points at its slot and the slot's number key (for example **1**) flashes above it ("Tap" on a phone). It goes away once you use an item, and doesn't come back (`save.itemHinted`).
+- **Part 2, on your first visit to the harbor**, in a card at the top of the screen (top right under the top bar; full width on phones, where it takes the Requests panel's place while it shows). A bouncing orange arrow points at the building for each step:
+  1. Take a stroll.
+  2. Go into the Big Fish Shop.
+  3. Visit Old Gil.
+  4. Board your boat.
+  5. Locals with requests.
+  6. Choose an area (the Areas sign at the far left).
+- **Skip and replay:** **Skip tutorial** turns it off. The round **?** button in the harbor's top bar plays it again: the harbor part right away, the run part in your next run.
+- **Saved progress:** in `save.tut` (`{run, harbor, skip}`). Players who started before the tutorial existed only see it if they press **?**.
+- **Code:** `TUT_RUN` / `TUT_HARBOR` in `index.html` list the steps; `tutEvent()` and `tutTick()` decide when each one is done. With `?debug`, `CS.tut()` shows the current step and `CS.tutStart('run' | 'harbor')` restarts a part.
+
 ## The opening story
 The first time the game starts, an animated opening plays **in Cat Town itself**, in the piazza where every run begins. The run is set up but frozen while the story plays on top of the real map, in sunset light under string lights:
 1. A little seaside town somewhere in Italy.
@@ -107,25 +135,25 @@ The first time the game starts, an animated opening plays **in Cat Town itself**
 - One-time items: **1 / 2 / 3** (or **Q** for the first), or tap the item slots at the bottom right. Party Treats fire instantly. Yarn Balls and Cucumbers are **placed by hand**: pick one, then click / tap where it should land (an aiming circle shows its area, time slows while you aim, and you can reach up to 480 px away). Pressing the same number again places it at the circle; Esc, right-click or tapping the slot again cancels.
 
 ## Cat Town's layout
-Cat Town is blocked out as a little Italian town, built from simple 3D shapes (boxes, cylinders and ball-shaped treetops) that stand up on the tilted ground. The layout repeats every `TOWN_TILE` pixels, so it never ends.
-- **The piazza** (where you start):
-  - A big round stone square with a large tiered **fountain**, with water arcs, ripples and sparkles.
-  - Benches and lamp posts around it.
-  - The trattoria, your fish shop and the gelato shop along its north side.
-- **Streets and houses:**
-  - A paved east–west main street, a north street, and a north–south avenue.
-  - Rows of houses face the streets: pastel walls, windows with green shutters and flower boxes, an arched door and a terracotta roof. Some wear the Italian village art.
-  - Gaps between the houses leave lanes to walk through, and trees line the main street.
-- **The park** (south-east): grass, trees, a pond with ripples, flower beds, benches and a lamp along a winding path.
-- **The garden** (south-west): rows of raised flower beds and lemon trees on grass, with crossing paths.
+Cat Town is a low-poly town square, styled after the Ooblets square reference: soft, warm and pastel, seen through the 3D camera.
+- **Paving:** big warm sandstone tiles everywhere, with light grout and a slight colour shift from tile to tile.
+- **Lawns:** soft green lawns with a raised pale-stone curb, light and dark patches, grass tufts and little white, blue and yellow flowers. The big central lawn holds the fountain, and four smaller lawns sit around it.
+- **Low-poly pieces:** drawn flat-shaded with light from the upper left and no black outlines.
+  - a pink-sandstone fountain with three tiers, rippling water and water spilling over each bowl;
+  - round puffy bushes in yellow and green;
+  - red spotted mushrooms;
+  - slim blue lamp posts with glowing lanterns;
+  - wooden benches with blue legs.
+- **Nothing blocks you or the cats.** The fountain, bushes and lamps fade while someone is behind them. The layout repeats every `TOWN_TILE` pixels.
+- **The story still has its set:** the trattoria, your fish shop and the gelato shop only stand on the square during the opening story.
+- **Editing it:** `SQUARE` in `index.html` lists the lawns and pieces, and `SQ` holds the colours. Setting `TOWN_PROPS = true` brings back the old town blockout (streets, houses, park and garden).
 
-**It never gets in the way:**
-- Nothing blocks you or the cats.
-- Any house, tree, shop or the fountain fades to see-through while you or a cat is behind it.
-- Manholes and weeds stay off the grass, the garden and the piazza.
-
-**Editing it:** the layout is the `TOWN` list in `index.html` (`ground` for streets and grass, `things` for what stands up). `BOX3D.Z` sets how much tall things lean with the camera.
 ## How a run works
+- **New cats arrive faster, the crowd doesn't grow faster:** the kinds of cats in each area move ahead every **45 seconds** (`WAVE_MIN`), so new types join about 25% sooner. How many cats are around, and how quickly more come, still follows the original minute-by-minute pace. Timed events (swarms, elites, bosses) keep their own schedule.
+- **Newer cats are worth more XP:** each cat type gives ×1 XP plus 0.25 for every wave later it first appears in that area, up to ×3.5. In Cat Town, orange tabbies give ×1, black cats ×1.5, and the last arrivals up to ×3.5. Elites still give 5× on top.
+- **More treasure and drops:** a treasure spot turns up about every 20 seconds (the first at 0:10), breakable crates about twice as often, and ordinary cats now drop things: about 1 in 80 a treasure box, 1 in 17 a power-up, and sometimes a coin. Every fish find (🐟 pickups and treasure boxes) is always better fish (nice and up), about 50 at a time.
+  - **Tougher areas drop more often:** Willow Park and Sunny Beach cats are tougher, so you feed fewer of them per minute. To keep the loot coming, their cats drop treasure boxes, power-ups and coins more often (×1.6 in Willow Park, ×1.8 on Sunny Beach), which brings drops per minute roughly level with Cat Town.
+- **Speed boosts you can feel:** Fast Feet gives +20% move speed per level (was 10%) and Comfy Boots +10% per rank (was 5%). While you're boosted, dust kicks up behind you as you run, more of it the faster you are.
 **The 3D look:** the run maps look like a tilted, gently curved 3D diorama.
 - **The ground** (floor, decorations, zones, plates, shots):
   - It's drawn flat, then a small WebGL pass tilts it so it falls away toward the top.
@@ -187,13 +215,14 @@ Each card also shows:
   - Jellyfish and Clownfish Cats wobble past in schools. The Narwhal Cat boss cycles hairball rings, a turning spiral and a giant telegraphed slam.
   - Elites are big, gold-glowing versions that drop treasure and a one-time item. The first time you spot a new cat, the banner tells you what it does.
 - **Find every cat:** a cat type you've never fed wears a bouncing **?** tag (plus a banner the first time one appears). The Cat Home shelf and the results screen show silhouettes of the cats you haven't met, with a hint about where and when each one turns up.
-- **Leveling:** fed cats drop XP stars. Each level offers 3 choices (4 with luck): new weapons, weapon levels, or passive items. Every level-up offers at least one upgrade for a weapon you own. Choices that add a projectile glow pink with a **🎯 +PROJECTILE** ribbon.
+- **Leveling:** fed cats drop XP stars. Each level-up slides in a **Level up!** panel on the right side **without pausing the run**: three choices (new weapons, weapon levels or passive items), picked with **1 / 2 / 3** or a click. While it is open, 1 / 2 / 3 pick a buff instead of using items (Q still uses your first item). Further level-ups wait their turn. Every level-up offers at least one upgrade for a weapon you own, and choices that add a projectile say so.
+- **Treasure boxes** open in a card on the right side too, under any level-up choices. The game keeps going; the card lists what you got and closes by itself after a few seconds (a bar shows the time left; click it to close it sooner). Pop-up cards move to the left of the panel while it is open.
 - **Missions:** three missions run at once in the panel at the top left, each worth bonus gold the moment it's done. Each row shows what to do (with the cat's picture for cat missions), a progress bar with the count, and a gold **REWARD** pill. Cats a mission wants wear a gold dashed ring at their feet. A banner introduces the missions at the start of a run and announces each new one; the row bounces when it makes progress. Examples: *Feed 17 Sea Bass Cats*, *Feed 60 cats*, *Grab 4 power-ups*, *Don't get hit for 30 s*, *Reach level 8*, *Dig up a treasure spot*, *Use 2 one-time items*, *Feed a big (elite) cat*. A finished mission is replaced by a slightly harder one; the header tallies missions done and gold earned, and the results screen lists them.
 - **Mission callouts:**
   - **Finishing a mission:** a big *MISSION COMPLETE!* card drops in, showing the mission and its reward, and coins fly into your gold counter.
   - **Cat missions:** feeding a cat a mission wants pops its count (e.g. 📜 5/12) where it was fed.
   - **Almost done:** missions at 75% or more glow and say *almost!*
-- **Cats left to discover:** the HUD chip shows the total and how many are in this area (e.g. ❓ 33 to discover · 5 here), with silhouettes of this area's undiscovered cats underneath.
+- **Cats in this area:** the HUD card (top right) shows every cat in this area, with how many you have found (e.g. *Cats found here · 6 / 13*). Cats you have found show in full colour; the rest are dark silhouettes until you feed one, so you can see how many are left. No frames, just the cat art.
   - **Run start:** a *CATS TO DISCOVER* card lists them.
   - **New cat:** feeding one gives a *NEW CAT DISCOVERED!* card with how many are left.
   - **Elsewhere:** the harbor top bar and the area pop-up's stage list show the counts too.
@@ -234,7 +263,14 @@ Each card also shows:
 - **Treasure boxes come in three tiers:** gold (1 reward), purple **Rare** (3 rewards, may contain an artifact) and rainbow **Legendary** (5 rewards, always an artifact if one is left, triple gold). Bosses always drop Rare or better. Each tier has its own look in the world and on the opening screen.
 
 ## Between runs
-- **The Harbor.** The game opens, and every run ends, on the street outside your fish shop. Walk left and right (**A / D** or the arrow keys, or tap where to go). Walk up to a building and press **E** / **Space** / **↑** (or tap it) to go in:
+- **The Harbor Island.** The harbor is a little floating island seen through the same 3D camera as the runs: flat ground (paving, lawns, sand, the pier) tilted in 3D, with everything that stands up (you, the townsfolk, your cats, Old Gil's stall, the boat, signposts, trees) drawn upright on top as 2D figures. The camera is an isometric 3/4 view, looking at the island from a corner (45° around, `ISO` in `index.html`): the paving runs in diamonds, the island shows its cliffs on two sides, and buildings are blocks showing two faces (the village art on the front, a plain wall on the side), while people, cats and props stay upright 2D figures facing you. WASD moves along the screen (W walks up the screen). `HB_ISO = false` switches back to the straight-on tilted camera.
+  - **Walking:** in every direction with **WASD** or the arrow keys, or tap where to go. Tapping a building, stall or signpost walks you there around obstacles and opens it. Press **E** / **Space** / **Enter** at a door.
+  - **The starting island:** your **Big Fish Shop** (Skills & Cat Sanctuary), the **Pet Store**, two more Italian houses as 3D blocks wearing the village art, a lawn where your cats laze, lamps, bushes and benches. On the south side, **Old Gil's stall** sits on the quay and the **pier** leads down to **your boat** (fishing). A **Cat Town** signpost stands at the end of the road on the west.
+  - **The island grows:** every area has its own piece of land, holding that area's signpost. Willow Park is a park to the north, with low-poly trees, a pond and a path; Sunny Beach is a beach to the east, with palms and umbrellas. Land you haven't unlocked shows as a faint dashed sandbank with a 🔒 and what unlocks it. The first time you come home after unlocking an area, its land rises out of the sea while the camera pans to it, with a "New land!" banner (remembered in `save.hbLand`).
+  - **Signposts:** walking up to one and pressing E opens the "Where to?" panel with that area already picked.
+  - **Code:** `HB3_LAND`, `HB3_HOUSES`, `HB3_SPOTS` and `HB3_PROPS` in `index.html`. Setting `HB3D = false` brings back the old side-view street described below.
+- **Big windows slide in from the right:** Tackle & Skills, the Pet Store, Old Gil's fish and "Where to?" open as a full-height side panel with a scalloped edge and a green header, with the island still visible on the left. Click the island or X to close.
+- **The old side-view street** (`HB3D = false`): the game opens, and every run ends, on the street outside your fish shop. Walk left and right (**A / D** or the arrow keys, or tap where to go). Walk up to a building and press **E** / **Space** / **↑** (or tap it) to go in:
   The street is built from the harbor kit at **`assets/env/harbor_sheet.webp`**:
   - **Buildings:** the Big Fish Shop (your shop, with its own sign) and three houses for the Cat Home, Tackle & Skills and the Pet Store.
   - **Street dressing:** lamp posts, a bench, flower boxes, plant pots, an A-board, a signpost and a banner pole.
@@ -244,13 +280,15 @@ Each card also shows:
   The cream panels on the sheet count as background when it's cut up. Until the sheet loads, the old drawn street shows instead.
   - 🏠 **Cat Home**: visit and squish your cats
   - 🎣 **Tackle & Skills**: the skill tree
-  - 🐟 **Chum Storm Fish Co.** (your shop): the wardrobe for your fisher's look
+  - 🐟 **Big Fish Shop** (your shop): walking in shows two big buttons, **Skills** (the skill tree) and **Cat Sanctuary** (your cats' home). Click one or press **1** / **2**.
   - 🐾 **Pet Store**: furniture for the Cat Home
   - 🐠 **Old Gil's Fish** on the pier: buy fish for your bucket
   - ⛵ **Your boat** at the end of the pier: go fishing (see below).
   - 🗺️ **Out of town** at the far left of the street: a yellow **Areas** sign with arrows on the cobbles. Walk past it (or press **E** by it, or tap **Areas** in the bottom bar) and a pop-up shows every area, your fishers and what is in your fish bucket. Pick and press **Let's go!** to start a run.
   - Your collected cats laze around in front of the shop (tap one to squish it).
-- **Locals with requests.** Now and then a local walks up with a ❗ and asks for something. Requests carry across runs (up to 3 at once) and show in the Requests panel, both in the harbor and during runs:
+- **Missions from the townsfolk** (they used to be called requests). Now and then a local walks up with a ❗ and asks for something. Requests carry across runs (up to 3 at once) and show in the Requests panel, both in the harbor and during runs: Talking to one opens their **mission brief** in the middle of the screen, in large text: who's asking, what they want, the reward, and Deal! / Not now.
+  - **Each mission row** shows a headshot of the townsperson who asked (the same art you see in town, no frame), the job, a progress bar with the count, and the reward in bold with a coin. The harbor's **Missions** panel (top left) lists them; in a run the same panel is called **Town missions**, to tell it apart from the run's own bonus missions.
+  - **The Missions button** in the bottom bar (or clicking the Missions panel) opens a side panel with every mission and its details: who gave it, how far along you are, the reward, and whether it's ready to collect.
   - find and feed a specific cat, often one you've never met
   - feed a number of one cat type
   - feed the Narwhal Cat
@@ -258,7 +296,8 @@ Each card also shows:
   - survive to a set time on a stage
   When one is done, the local waits in the harbor with a 🪙 bubble. Talk to them to collect the gold.
 - **Your fish bucket is your ammo.** It holds real species (the 30 fish from `fish_types.webp`), each in one of five grades: Common, Nice, Great, Rare (+1 pierce) and Legendary.
-  - **Every fish Fish Toss throws comes out of the bucket**, picked at random from what's in it. The fish you see flying is the species that left your bucket, and it hits as hard as its grade: better fish do more damage and are bigger.
+  - **Plain fish are infinite.** Fish Toss never runs dry: common fish (Sardines and friends) are always in your bucket.
+  - **Better fish are thrown first:** while your bucket holds nice, great, rare or legendary fish, every throw uses one of those (picked at random from what you have), and the fish you see flying is that species. When they run out you're back to plain fish, and a banner tells you. Catch, buy or find more.
   - **What you catch is what you get:** hook a Pufferfish and Pufferfish go in your bucket. Hover a grade in the bucket to see which species you have.
   - **Every species has an ability** when Fish Toss throws it (`FISH_AB` in `index.html`). It's shown on the catch card, on fish pickups and at Old Gil's stall:
     - **Puff burst (AoE):** Pufferfish (widest) and Boxfish burst on impact and hit every cat around them.
@@ -274,14 +313,13 @@ Each card also shows:
     - **Speedy:** Mackerel, Trout and Blue Tang fly 40% faster.
     - **Lucky gold:** Goldfish and Golden Arowana have a 20% chance to drop a coin.
     - **Soothing:** Butterflyfish and Seahorse heal you a little with each hit.
-    - Fish scraps and evolved weapons have no ability.
-  - **Fish you don't throw stay** for the next run. The HUD's **Fish** pill shows how many are left; it turns red under 50.
-  - **Empty bucket:** you throw **fish scraps**, which do 25% less damage.
+    - Evolved weapons have no ability.
+  - **Fish you don't throw stay** for the next run. The HUD's **Fish** pill shows "∞ + n", where n is how many better fish you have.
   - **New saves** start with 300 Sardines. **Older saves** are scaled up to the new crate sizes once.
   - **Three ways to get fish:**
-    - **Old Gil** sells crates: 100 Sardines for 40, 50 Mackerel for 90, 25 Bluefin Tuna for 180, 10 Swordfish for 320 (or ×5). The Golden Koi isn't for sale. You can **haggle** once per visit: a 55% chance of 20% off, otherwise prices go up 10%.
+    - **Old Gil** sells crates of the better fish: 50 Mackerel for 90, 25 Bluefin Tuna for 180, 10 Swordfish for 320 (or ×5). The Golden Koi isn't for sale. You can **haggle** once per visit: a 55% chance of 20% off, otherwise prices go up 10%.
     - **Fishing off your boat:** a full-screen side view under the boat. It costs no gold and has no cooldown: fish as much as you like.
-      - **Pick a bait:** Bread is free. Better bait is paid for with fish from your bucket: Worm costs 5 common fish, Shrimp 3 nice fish, Squid 2 great fish.
+      - **Pick a bait:** Bread and Worm are free. Better bait is paid for with fish from your bucket: Shrimp costs 3 nice fish, Squid 2 great fish.
       - **Cast**, then **steer the hook** with the mouse, touch or arrow keys. The line stays out until something bites or you reel in (Space / Reel in).
       - **The deeper you go, the rarer the fish:** Shallows (common), Reef (nice), Open sea (great), Deep (rare) and Abyss (legendary).
       - **Fish that see the hook come and bite.** Fish see only what's in front of them.
@@ -289,7 +327,7 @@ Each card also shows:
       - **Sneak up from behind:** touching any fish with the hook from behind snags it, whatever the bait.
       - **A bite is reeled in on its own.** The whole catch of that species goes in your bucket, for example 60–100 of a common fish or 3–5 of a legendary one; better bait lands a bit more.
       - **Fits any screen:** the sea fills the screen above the bait bar and gets taller on a phone in portrait.
-    - **In the maps:** 🐟 **+FISH** pickups put a small catch in your bucket. ⬆️ **FISH UPGRADE** pickups (from 1:30) make every fish you throw for the rest of the run count as one grade better. The results screen shows how many fish you threw and found.
+    - **In the maps:** every find is a proper catch of about **50 fish** (45–55 common ones; fancier fish come in smaller numbers, down to 5–8 legendary). 🐟 **+FISH** pickups drop from cats, and every **treasure box** now holds a catch too (rare boxes 1.5× and luckier, legendary 2×). ⬆️ **FISH UPGRADE** pickups (from 1:30) make every fish you throw for the rest of the run count as one grade better. The results screen shows how many fish you threw and found.
 - **Fish types:** everything you throw is a real fish from **`assets/fx/fish_types.webp`** (30 species, from sardines to a golden arowana). Each fish grade adds more and fancier fish to the bucket Fish Toss picks from: 6 at first, 30 with the Golden Koi. Salmon Run throws salmon, Golden Catch throws a glowing golden arowana, and Tuxedo Cats' Fish Missiles are random fish.
 - **Gold** collected in a run is kept, even if you're overrun. You spend it on two things:
 - **Skill Tree:** three branches. Each node needs the one above it before you can buy it, and existing purchases carry over.
@@ -334,6 +372,16 @@ The character sheet is **`assets/player/characters.png`** (`.webp` / `.jpg` also
 - **Debug tools:** with `?debug`, the Wardrobe can **Export all layers as PSD** (a fresh file of every piece) or **Use a PSD** (load a file and save it as `avatar_layers.psd`).
 - **Without the PSD:** the game falls back to the sheets and the built-in placement.
 
+## UI size
+- **Speech bubble:** sits just above the player's head (following the 3D camera), so it never covers the face.
+- **Cats found here** (top right in a run) shows every cat in the area: found cats in colour, the rest as silhouettes.
+- **Bigger HUD and harbor UI:** everything is scaled up by `--ui` (1.25 on big screens, 1.15 on medium, about 1 on phones). Each piece grows from the corner it's anchored to, so nothing moves.
+- **Full-size pop-ups:** the panels (Tackle & Skills, Pet Store, Old Gil, Where to?, dialogue, pause, results) use `--pz`, which is full size on big screens and smaller on small ones.
+- **Text:** nothing in the panels is smaller than 13.5px.
+- **New cat, mission and item cards** pop up in the bottom-right corner, just above the item slots. When two show at once they sit side by side.
+- **Items have no Take button:** walk over an item and it goes into an empty slot by itself.
+- **The treasure box window** is bigger, with larger rewards and a bigger Collect button.
+
 ## Performance
 - **Tilt-shift blur:** done inside the 3D camera's WebGL shader as a cheap 5-tap blur at the top and bottom of the view. A full-screen CSS `backdrop-filter` was much too slow on weaker graphics cards.
 - **No extra frame copy:** the WebGL context no longer keeps its drawing buffer (`preserveDrawingBuffer:false`).
@@ -341,14 +389,14 @@ The character sheet is **`assets/player/characters.png`** (`.webp` / `.jpg` also
   - **0:** full quality
   - **1:** no tilt-shift blur and no lens curve
   - **2:** also fewer particles
-  - **3:** also a flat camera (no 3D tilt)
-- **Graphics switch:** the pause screen has **Auto / Fancy / Fast**. Auto steps down by itself, Fancy always uses full quality, and Fast always uses the flat camera with no blur and fewer particles. The choice is remembered (`chumstorm_quality_mode`).
-- **Forcing a level:** add `?quality=0` … `?quality=3` to the URL to force a level, or `?quality=auto` to clear the saved level and mode.
+  - The 3D world and camera are kept at every level. (Hitches over 250 ms, like a throttled background tab, are ignored.)
+- **Graphics switch:** the pause screen has **Auto / Fancy / Fast**. Auto steps down by itself, Fancy always uses full quality, and Fast always uses level 2 (no blur or lens curve, fewer particles, still 3D). The choice is remembered (`chumstorm_quality_mode`).
+- **Forcing a level:** add `?quality=0` … `?quality=2` to the URL to force a level, or `?quality=auto` to clear the saved level and mode.
 - **Profiling:** with `?debug&prof`, `window.__prof` shows the average milliseconds per frame for update, render and each draw pass.
 
 ## Testing shortcuts
 Add `?debug` to the URL: **L** level up · **T** skip 60 s · **C** spawn a treasure box · **U** spawn every power-up, an artifact and all three chest tiers, plus the three one-time items · **X** spawn a treasure spot now · **I** fill the item bag · **K** feed every cat · **H** heal · **G** +1000 gold (in the harbor) · **B** a local walks up now (in the harbor) · **P** the Princess comes for Sebastian (in the harbor; counts every other town cat as met for this visit) · **R** Sebastian appears now (in a Cat Town run with her request). Dispatch `new CustomEvent("cs-step", {detail: frames})` on `document` to advance the game or Cat Home by hand.
-With `?debug`, `window.CS` in the browser console opens any screen or pop-up. For example: `CS.building('shop')`, `CS.talk('princess')`, `CS.pay()`, `CS.home()`, `CS.intro(25)`, `CS.run()`, `CS.levelUp()`, `CS.chest()`, `CS.pause()`, `CS.results()`, `CS.mission()`, `CS.discover('tortie')`, `CS.loot()`, `CS.banner()` and `CS.fish()` (fishing, in the harbor). `CS.bag()` shows the fish bucket, `CS.onlyFish(species, n)` fills the bucket with one species for testing abilities (not saved), and `CS.fishStep(dt)` advances the fishing game by hand. Screenshots of every screen are in **`docs/ui_screens/`** (open `index.html` there).
+With `?debug`, `window.CS` in the browser console opens any screen or pop-up. For example: `CS.building('shop')`, `CS.talk('princess')`, `CS.pay()`, `CS.home()`, `CS.intro(25)`, `CS.run()`, `CS.levelUp()`, `CS.chest()`, `CS.pause()`, `CS.results()`, `CS.mission()`, `CS.discover('tortie')`, `CS.loot()`, `CS.banner()` and `CS.fish()` (fishing, in the harbor). `CS.bag()` shows the fish bucket, `CS.onlyFish(species, n)` fills the bucket with one species for testing abilities (not saved), and `CS.fishStep(dt)` advances the fishing game by hand. `CS.runAt(area)` starts a run in an area, `CS.probe()` reports the run (pickups, level-up and treasure panels), and `CS.sim(area, seconds, true)` plays a run hands-off and counts every drop. Screenshots of every screen are in **`docs/ui_screens/`** (open `index.html` there).
 
 ## Important files
 - `index.html` — the whole game (HTML, CSS and JS in one file)

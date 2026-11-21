@@ -138,7 +138,7 @@
 
   #speech-bubble{
     position:absolute;top:calc(50% - 88px);left:50%;
-    transform:translate(-50%,6px) scale(0.85);
+    transform:translate(-50%,calc(-100% + 6px)) scale(0.85);transform-origin:50% 100%;
     background:var(--cream);border:3px solid var(--ink);border-radius:14px;
     padding:8px 13px;max-width:220px;width:max-content;
     font-family:'Fredoka',sans-serif;font-weight:600;font-size:13px;color:var(--ink);
@@ -146,7 +146,7 @@
     opacity:0;transition:opacity .18s ease, transform .18s cubic-bezier(.3,1.4,.4,1);
     box-shadow:0 4px 0 rgba(43,35,32,0.2);
   }
-  #speech-bubble.show{ opacity:1; transform:translate(-50%,0) scale(1); }
+  #speech-bubble.show{ opacity:1; transform:translate(-50%,-100%) scale(1); }
   #speech-bubble::before{
     content:'';position:absolute;left:50%;bottom:-9px;transform:translateX(-50%);
     width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;
@@ -941,9 +941,10 @@
   body.ui-v2 #disc-label.pop{animation:chipPop .7s cubic-bezier(.3,1.8,.5,1);}
   body.ui-v2 .disc-sil{all:unset;display:flex;flex-wrap:wrap;gap:8px;}
   body.ui-v2 .disc-sil:empty{display:none;}
-  body.ui-v2 .disc-sil i{width:32px;height:32px;border-radius:50%;border:2px solid var(--v2-line);background:var(--v2-soft);box-sizing:border-box;display:flex;align-items:center;justify-content:center;
+  body.ui-v2 .disc-sil i{width:36px;height:36px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;
     font-style:normal;font-size:12px;font-weight:800;color:var(--v2-muted);overflow:hidden;}
-  body.ui-v2 .disc-sil i img{width:28px;height:28px;filter:none;animation:none;}
+  body.ui-v2 .disc-sil i img{width:36px;height:36px;filter:none;animation:none;object-fit:contain;opacity:.8;}
+  body.ui-v2 .disc-sil i.found img{opacity:1;filter:drop-shadow(0 2px 0 rgba(59,46,42,.18));}
   body.ui-v2 .disc-sil span{font-size:12px;font-weight:800;color:var(--v2-muted);align-self:center;}
   body.ui-v2 #hud-right .chip{align-self:flex-end;font-size:13px;padding:4px 12px;}
   /* item slots: teal rounds with a white ring, a dark count badge, and a yellow key pill under each */
@@ -984,7 +985,7 @@
     body.ui-v2 .v2-hp{width:calc(100vw - 160px - var(--sal) - var(--sar));}
     body.ui-v2 #hud .hud-left{width:min(220px, 56vw);}
     body.ui-v2 #hud-right{width:150px;}
-    body.ui-v2 .disc-sil i{width:26px;height:26px;}
+    body.ui-v2 .disc-sil i, body.ui-v2 .disc-sil i img{width:28px;height:28px;}
   }
 
   /* ---- the fish bucket (area pop-up) ---- */
@@ -1063,7 +1064,7 @@
   @media (max-width: 600px){ body.ui-v2 #hb-nav{gap:6px !important;} body.ui-v2 #hb-nav .v2nav i{width:42px !important;height:42px !important;font-size:19px !important;} body.ui-v2 #hb-nav .v2nav span{font-size:10px !important;padding:1px 6px !important;} }
 
   /* ---- 08 / 10 / 11 · Dialogue: dim behind, a 1000-wide card at 75% pinned to the bottom ---- */
-  body.ui-v2 #talk{zoom:.75;width:1000px !important;max-width:calc((100vw - 32px)/0.75);bottom:calc(32px + var(--sab)) !important;height:auto;min-height:296px;
+  body.ui-v2 #talk{zoom:var(--pz);width:1000px !important;max-width:calc((100vw - 32px)/var(--pz));bottom:calc(32px + var(--sab)) !important;height:auto;min-height:296px;
     padding:20px !important;gap:24px !important;display:flex;align-items:stretch;box-shadow:var(--v2-shadow), 0 0 0 200vmax rgba(46,58,63,0.55) !important;}
   body.ui-v2 #talk:not(.show){box-shadow:none !important;}
   body.ui-v2 #talk > canvas{position:static;inset:auto;flex-shrink:0;width:200px !important;height:252px !important;border-radius:12px;background:var(--v2-soft);object-fit:contain;}
@@ -1133,12 +1134,12 @@
   body.ui-v2 #banner.stage{top:calc(140px + var(--sat)) !important;min-width:min(400px, 90vw);min-height:64px;border-radius:12px !important;flex-direction:column;gap:2px;padding:10px 26px;font-size:22px !important;}
 
   /* ---- pop-up cards (19 mission complete · 20 new cat · 21 cats to discover · 23b mission · 28 rescued · 29 area complete · 12 welcome) ---- */
-  body.ui-v2 .callout{zoom:.75;width:var(--cw, 400px) !important;max-width:calc((100vw - 32px)/0.75);box-sizing:border-box;top:calc(120px/0.75 + var(--sat)) !important;padding:20px !important;
+  body.ui-v2 .callout{zoom:var(--pz);width:var(--cw, 400px) !important;max-width:calc((100vw - 32px)/var(--pz));box-sizing:border-box;top:calc(120px/var(--pz) + var(--sat)) !important;padding:20px !important;
     display:flex;flex-direction:column;gap:10px;align-items:center;text-align:center;background:#FFFFFF !important;border-radius:26px !important;color:var(--v2-ink);}
   body.ui-v2 .callout::before{display:none !important;}
   body.ui-v2 .callout.w440{--cw:440px;} body.ui-v2 .callout.w540{--cw:540px;} body.ui-v2 .callout.w600{--cw:600px;} body.ui-v2 .callout.w700{--cw:700px;}
-  body.ui-v2 .callout.top80{top:calc(80px/0.75 + var(--sat)) !important;}
-  body.ui-v2 .callout.dim{box-shadow:var(--v2-shadow), 0 0 0 200vmax rgba(46,58,63,0.55) !important;top:calc(50vh/0.75) !important;transform:translate(-50%, -50%) scale(.6) !important;}
+  body.ui-v2 .callout.top80{top:calc(80px/var(--pz) + var(--sat)) !important;}
+  body.ui-v2 .callout.dim{box-shadow:var(--v2-shadow), 0 0 0 200vmax rgba(46,58,63,0.55) !important;top:calc(50vh/var(--pz)) !important;transform:translate(-50%, -50%) scale(.6) !important;}
   body.ui-v2 .callout.dim.show{transform:translate(-50%, -50%) scale(1) !important;}
   body.ui-v2 .callout.dim:not(.show){box-shadow:none !important;}
   body.ui-v2 .callout .co-btn, body.ui-v2 .callout .co-x{pointer-events:auto;}
@@ -1176,7 +1177,7 @@
     box-shadow:var(--v2-shadow) !important;font-size:16px;font-weight:900;color:var(--v2-ink);margin-top:6px;}
 
   /* ---- 24 · Loot card: label, icon box, name, line, Take ---- */
-  body.ui-v2 #loot-card{zoom:.75;width:340px;max-width:calc((100vw - 32px)/0.75);box-sizing:border-box;top:calc(170px/0.75 + var(--sat)) !important;flex-direction:column !important;gap:10px !important;
+  body.ui-v2 #loot-card{zoom:var(--pz);width:340px;max-width:calc((100vw - 32px)/var(--pz));box-sizing:border-box;top:calc(170px/var(--pz) + var(--sat)) !important;flex-direction:column !important;gap:10px !important;
     align-items:center !important;text-align:center;padding:20px !important;}
   body.ui-v2 #loot-card .lc-label{font-size:11px;font-weight:800;color:var(--v2-muted);letter-spacing:.12em;text-transform:uppercase;}
   body.ui-v2 #loot-card .lc-pic{width:140px;height:140px;border-radius:12px;background:var(--v2-soft);display:flex;align-items:center;justify-content:center;font-size:72px;}
@@ -1185,7 +1186,7 @@
   body.ui-v2 #loot-card .lc-take{pointer-events:auto;width:auto !important;min-height:48px;padding:0 26px !important;margin:8px 0 0 !important;font-size:19px !important;}
 
   /* ---- 25 / 26 / 27 · Chest, Pause, Results: big white sheets at 75% ---- */
-  body.ui-v2 #chest .card, body.ui-v2 #pauseOverlay .card, body.ui-v2 #results .card{zoom:.75;max-width:calc((100vw - 32px)/0.75) !important;max-height:calc(92dvh/0.75) !important;
+  body.ui-v2 #chest .card, body.ui-v2 #pauseOverlay .card, body.ui-v2 #results .card{zoom:var(--pz);max-width:calc((100vw - 32px)/var(--pz)) !important;max-height:calc(92dvh/var(--pz)) !important;
     box-sizing:border-box;padding:24px !important;display:flex;flex-direction:column;gap:18px;text-align:left;}
   body.ui-v2 #chest .card{width:500px;} body.ui-v2 #pauseOverlay .card{width:600px;} body.ui-v2 #results .card{width:800px;}
   body.ui-v2 #chest .card h2, body.ui-v2 #pauseOverlay .card h2, body.ui-v2 #results .card h1{font-family:'Fredoka','Nunito',sans-serif;font-size:24px !important;font-weight:700 !important;margin:0 !important;text-align:left !important;}
@@ -1232,7 +1233,7 @@
   body.ui-v2 #caviar-btn i{top:-8px !important;right:-6px !important;bottom:auto !important;min-width:26px !important;height:24px !important;font-size:12px !important;}
 
   /* ---- 04–07 · harbor panels: a big white sheet at 75%, title row with an X ---- */
-  body.ui-v2.panel-open #menu .home-card{zoom:.75;width:1000px;max-width:calc((100vw - 32px)/0.75) !important;max-height:calc(94dvh/0.75) !important;box-sizing:border-box;padding:24px !important;
+  body.ui-v2.panel-open #menu .home-card{zoom:var(--pz);width:1000px;max-width:calc((100vw - 32px)/var(--pz)) !important;max-height:calc(94dvh/var(--pz)) !important;box-sizing:border-box;padding:24px !important;
     display:flex;flex-direction:column;gap:18px;text-align:left;}
   body.ui-v2.panel-open.panel-gil #menu .home-card{width:800px;}
   body.ui-v2 .panel-head{display:flex;align-items:center;gap:12px;}
@@ -1371,7 +1372,280 @@
   #loot-card .lc-fish{width:110px;height:80px;object-fit:contain;}
 
   #fish-result .fr-ab, .fish-row .fr-ab{display:block;color:#E2582C !important;font-weight:800 !important;}
-</style>
+
+  /* ---- tutorial coach card ---- */
+  #coach{position:absolute;left:50%;bottom:calc(132px + var(--sab));transform:translate(-50%, 20px);z-index:15;width:min(520px, calc(100vw - 32px));box-sizing:border-box;
+    background:#FFFFFF;border-radius:22px;padding:12px 16px 14px;color:#3B2E2A;font-family:'Nunito',sans-serif;
+    box-shadow:0 5px 0 rgba(59,46,42,0.18), 0 10px 22px rgba(59,46,42,0.16), 0 0 0 3px #F8C630;opacity:0;pointer-events:none;transition:opacity .25s, transform .25s;}
+  #coach.show{opacity:1;transform:translate(-50%, 0);pointer-events:auto;}
+  #coach.pop{animation:coachPop .45s cubic-bezier(.3,1.6,.5,1);}
+  @keyframes coachPop{0%{transform:translate(-50%, 16px) scale(.92)}100%{transform:translate(-50%, 0) scale(1)}}
+  body.harbor-mode #coach{bottom:calc(206px + var(--sab));}
+  body.home-mode #coach, body.fishing-mode #coach, body.panel-open #coach, body.intro-mode #coach{display:none;}
+  .coach-top{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+  .coach-top .sp{flex:1;}
+  .coach-lab{font-size:11px;font-weight:800;color:#7A6A5E;letter-spacing:.1em;text-transform:uppercase;}
+  .coach-skip{border:0;background:none;color:#7A6A5E;font:inherit;font-size:12px;font-weight:800;text-decoration:underline;cursor:pointer;padding:2px 4px;}
+  .coach-row{display:flex;gap:12px;align-items:flex-start;}
+  .coach-num{flex-shrink:0;width:36px;height:36px;border-radius:50%;background:#2BB5A5;color:#fff;font-family:'Fredoka','Nunito',sans-serif;font-size:18px;font-weight:700;
+    display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px #FFFFFF, 0 3px 0 3px rgba(59,46,42,0.12);}
+  .coach-num.done{background:#5ad76e;animation:slotPop .4s ease-out;}
+  .coach-txt{flex:1;min-width:0;}
+  .coach-txt > b{display:block;font-family:'Fredoka','Nunito',sans-serif;font-size:18px;font-weight:700;}
+  .coach-txt p b{font-weight:900;color:#E2582C;}
+  .coach-txt p{margin:2px 0 0;font-size:14px;font-weight:700;line-height:1.35;color:#3B2E2A;}
+  .coach-txt kbd{display:inline-block;min-width:18px;padding:0 5px;border-radius:5px;background:#F6EFE4;box-shadow:inset 0 -2px 0 #D9C3A5;font:inherit;font-size:12px;font-weight:900;text-align:center;}
+  .coach-goal{display:inline-block;margin-top:6px;font-size:12px;font-weight:900;color:#E2582C;letter-spacing:.02em;}
+  .coach-bar{height:6px;border-radius:3px;background:#E8DCCB;margin-top:10px;overflow:hidden;}
+  .coach-bar i{display:block;height:100%;background:#F8C630;border-radius:3px;transition:width .15s;}
+  /* the first two steps: just the keys, flashing */
+  #coach.keys{z-index:19;width:auto;padding:14px 18px;background:rgba(255,255,255,0.92);display:flex;justify-content:center;}
+  .kc-wasd{display:flex;flex-direction:column;align-items:center;gap:6px;}
+  .kc-wasd > div{display:flex;gap:6px;}
+  .kc{width:54px;height:54px;border-radius:12px;background:#FFFFFF;color:#3B2E2A;font-style:normal;font-family:'Fredoka','Nunito',sans-serif;font-size:26px;font-weight:700;
+    display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 3px #3B2E2A, 0 5px 0 #3B2E2A;animation:kcFlash 1.1s ease-in-out infinite;}
+  .kc.wide{width:220px;font-size:22px;letter-spacing:.06em;}
+  .kc[data-k="a"]{animation-delay:.15s;} .kc[data-k="s"]{animation-delay:.3s;} .kc[data-k="d"]{animation-delay:.45s;}
+  .kc.on{animation:none;background:#F8C630;transform:translateY(4px);box-shadow:inset 0 0 0 3px #3B2E2A, 0 1px 0 #3B2E2A;}
+  @keyframes kcFlash{0%,100%{background:#FFFFFF}50%{background:#F8C630}}
+  #coach.keys.done .kc{animation:none;background:#5ad76e;color:#FFFFFF;}
+  .kc-touch{display:flex;align-items:center;gap:10px;font-size:40px;animation:kcDrag 1.4s ease-in-out infinite;}
+  .kc-touch span{font-family:'Fredoka','Nunito',sans-serif;font-size:20px;font-weight:700;color:#3B2E2A;}
+  @keyframes kcDrag{0%,100%{transform:translateX(-14px)}50%{transform:translateX(14px)}}
+  @media (max-width: 640px){ #coach{bottom:calc(120px + var(--sab));} body.harbor-mode #coach{bottom:calc(180px + var(--sab));} .coach-txt p{font-size:13px;} }
+  /* ---- Your runs (save files) ---- */
+  #runs-screen{display:none;position:absolute;inset:0;z-index:40;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;background:rgba(46,58,63,0.62);}
+  .runs-card{width:min(640px, 100%);max-height:calc(100dvh - 32px);overflow:auto;box-sizing:border-box;background:#FFFFFF;border-radius:26px;padding:22px 24px;color:#3B2E2A;
+    box-shadow:0 5px 0 rgba(59,46,42,0.18), 0 10px 22px rgba(59,46,42,0.12);display:flex;flex-direction:column;gap:14px;font-family:'Nunito',sans-serif;}
+  .runs-head{display:flex;align-items:center;gap:12px;}
+  .runs-head .sp{flex:1;}
+  .runs-head h1{margin:0;font-family:'Fredoka','Nunito',sans-serif;font-size:34px;font-weight:700;text-transform:uppercase;color:#E2582C;letter-spacing:.02em;text-shadow:0 3px 0 #F8C630;}
+  .runs-h{font-size:15px;font-weight:800;}
+  .runs-list{display:flex;flex-direction:column;gap:10px;}
+  .run-row{display:flex;align-items:center;gap:10px;border:2px solid #EFE5D6;border-radius:16px;padding:10px 12px;}
+  .run-row.cur{border-color:#F8C630;background:#FFFBEA;}
+  .run-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+  .run-name{border:0;background:none;padding:2px 4px;margin-left:-4px;border-radius:8px;font-family:'Fredoka','Nunito',sans-serif;font-size:19px;font-weight:700;color:#3B2E2A;width:100%;box-sizing:border-box;}
+  .run-name:hover, .run-name:focus{background:#F6EFE4;outline:none;}
+  .run-txt > span{font-size:12.5px;font-weight:700;color:#7A6A5E;display:flex;flex-wrap:wrap;align-items:center;gap:3px;}
+  .run-txt .v2coin{width:14px;height:14px;box-shadow:inset 0 0 0 2px #E0A81A;}
+  .run-del{flex-shrink:0;border:0;background:#F6EFE4;border-radius:999px;min-width:36px;height:36px;cursor:pointer;font:inherit;font-size:15px;font-weight:800;color:#7A6A5E;padding:0 10px;}
+  .run-del.sure{background:#E5404B;color:#fff;}
+  .run-go{flex-shrink:0;width:auto !important;margin:0 !important;padding:0 20px !important;min-height:42px !important;font-size:17px !important;}
+  .runs-empty{font-size:14px;font-weight:700;color:#7A6A5E;padding:6px 0;}
+  .runs-new{display:flex;flex-direction:column;gap:8px;border-top:2px dashed #E8DCCB;padding-top:14px;}
+  .runs-new-row{display:flex;gap:10px;flex-wrap:wrap;}
+  #run-new-name{flex:1;min-width:160px;height:46px;box-sizing:border-box;border:2px solid #D9C3A5;border-radius:999px;padding:0 18px;font-family:'Fredoka','Nunito',sans-serif;font-size:17px;color:#3B2E2A;background:#FFFFFF;}
+  #run-new-name:focus{outline:none;border-color:#F8C630;}
+  #run-new-go{width:auto !important;margin:0 !important;padding:0 24px !important;}
+  .runs-note{font-size:12.5px;font-weight:700;color:#7A6A5E;}
+  body.ui-v2 .hb-top .hb-runname{font-family:'Fredoka','Nunito',sans-serif;font-weight:600 !important;padding:0 16px !important;max-width:180px;overflow:hidden;text-overflow:ellipsis;}
+  @media (max-width: 1000px){ body.ui-v2 .hb-top .hb-runname{display:none !important;} }
+
+  /* ================= UI size: everything a bit bigger (--ui scales the HUD & harbor UI, --pz the pop-up panels) =================
+     Each piece is scaled with a transform from the corner it's anchored to, so it stays in place.                      */
+  :root{--ui:1.25;--pz:1;}
+  @media (max-width: 1180px), (max-height: 700px){ :root{--ui:1.15;--pz:0.9;} }
+  @media (max-width: 760px){ :root{--ui:1.05;--pz:0.82;} }
+  @media (max-width: 480px){ :root{--ui:1;--pz:0.78;} }
+  /* run HUD */
+  body.ui-v2 .v2-hp{transform:scale(var(--ui));transform-origin:0 0;}
+  body.ui-v2 .v2-xp{top:calc(18px + 46px*var(--ui) + var(--sat)) !important;transform:translateX(-50%) scale(var(--ui)) !important;transform-origin:50% 0;
+    width:min(620px, calc((100vw - 32px)/var(--ui) - 2*290px)) !important;}
+  body.ui-v2 #timer.timer{transform:translateX(-50%) scale(var(--ui)) !important;transform-origin:50% 0;}
+  body.ui-v2 .hud-stats{right:calc(20px + 50px*var(--ui) + var(--sar)) !important;transform:scale(var(--ui));transform-origin:100% 0;}
+  body.ui-v2 #pause-btn{transform:scale(var(--ui));transform-origin:100% 0;}
+  body.ui-v2 #hud .hud-left{top:calc(18px + 52px*var(--ui) + var(--sat)) !important;transform:scale(var(--ui));transform-origin:0 0;}
+  body.ui-v2 #hud-right{top:calc(20px + 56px*var(--ui) + var(--sat)) !important;transform:scale(var(--ui));transform-origin:100% 0;}
+  body.ui-v2 #item-bar{transform:scale(var(--ui));transform-origin:100% 100%;}
+  body.ui-v2 #roll-btn{right:calc(16px + (3*48px + 3*18px)*var(--ui) + var(--sar)) !important;transform:scale(var(--ui));transform-origin:100% 100%;}
+  body.ui-v2 #caviar-btn{right:calc(16px + (4*48px + 4*18px)*var(--ui) + var(--sar)) !important;transform:scale(var(--ui));transform-origin:100% 100%;}
+  body.ui-v2 #banner{font-size:24px !important;min-height:64px;} body.ui-v2 #banner .bn-ic{width:40px;height:40px;font-size:21px;}
+  body.ui-v2 #speech-bubble{font-size:16px !important;}
+  #coach{width:min(600px, calc(100vw - 32px));} .coach-txt > b{font-size:21px !important;} .coach-txt p{font-size:16.5px !important;} .coach-lab, .coach-skip, .coach-goal{font-size:13.5px !important;} .kc{width:66px !important;height:66px !important;font-size:32px !important;} .kc.wide{width:260px !important;font-size:26px !important;}
+  @media (max-width: 980px){
+    body.ui-v2 .v2-xp{left:calc(16px + var(--sal)) !important;right:auto !important;width:calc((100vw - 32px)/var(--ui)) !important;transform:scale(var(--ui)) !important;transform-origin:0 0;}
+    body.ui-v2 #hud .hud-left, body.ui-v2 #hud-right{top:calc(18px + 104px*var(--ui) + var(--sat)) !important;}
+  }
+  /* harbor */
+  body.ui-v2 .hb-top{right:auto !important;width:calc((100vw - 32px - var(--sal) - var(--sar))/var(--ui));transform:scale(var(--ui));transform-origin:0 0;}
+  body.ui-v2 #hb-requests{top:calc(16px + 64px*var(--ui) + var(--sat)) !important;transform:scale(var(--ui));transform-origin:0 0;}
+  body.ui-v2 #hb-nav{transform:translateX(-50%) scale(var(--ui));transform-origin:50% 100%;}
+  body.ui-v2 #hb-prompt{bottom:calc(36px + 112px*var(--ui) + var(--sab)) !important;transform:translateX(-50%) scale(var(--ui)) !important;transform-origin:50% 100%;}
+  /* harbor: the tutorial card sits at the top, under the top bar, on the right (the Requests panel is on the left) */
+  body.ui-v2.harbor-mode #coach{top:calc(16px + 64px*var(--ui) + var(--sat));bottom:auto;left:auto;right:calc(16px + var(--sar));transform:translateY(-12px);width:min(560px, calc(100vw - 32px - 300px*var(--ui) - 24px));}
+  body.ui-v2.harbor-mode #coach.show{transform:none;}
+  body.ui-v2.harbor-mode #coach.pop{animation:coachDrop .4s cubic-bezier(.3,1.6,.5,1);}
+  @keyframes coachDrop{0%{transform:translateY(-16px) scale(.94)}100%{transform:none}}
+  @media (max-width: 900px){
+    body.ui-v2.harbor-mode #coach{left:calc(16px + var(--sal));right:calc(16px + var(--sar));width:auto;}
+    body.ui-v2.harbor-mode.coach-on #hb-requests{display:none !important;}   /* narrow screens: the card takes the Requests panel's place while it shows */
+  }
+  body.ui-v2 .home-top{transform:scale(var(--ui));transform-origin:0 0;right:auto !important;width:calc((100vw - 32px)/var(--ui));}
+  body.ui-v2 .home-tools{transform:translateX(-50%) scale(var(--ui));transform-origin:50% 100%;}
+  /* text inside the panels: nothing under 13px */
+  body.ui-v2 .tree-head span, body.ui-v2 .snode i, body.ui-v2 .shop-item.decor .dc-t span, body.ui-v2 .ps-cat b, body.ui-v2 .fish-row span, body.ui-v2 .fish-row .fr-own,
+  body.ui-v2 .pick span, body.ui-v2 .stage span, body.ui-v2 .bucket .fb b, body.ui-v2 .bucket .fb i, body.ui-v2 .fb-note, body.ui-v2 .runs-note, body.ui-v2 .run-txt > span,
+  body.ui-v2 .sh-sub, body.ui-v2 .sh-icons > div > small, body.ui-v2 .quality-btns span, body.ui-v2 .co-cell span, body.ui-v2 .rr em, body.ui-v2 .ms-prog em, body.ui-v2 #xp-num{font-size:13.5px !important;}
+  body.ui-v2 .fish-row b, body.ui-v2 .pick b, body.ui-v2 .stage b, body.ui-v2 .shop-item.decor .dc-t b, body.ui-v2 #skill-detail .sd-t b, body.ui-v2 .sh-h, body.ui-v2 .tree-head b{font-size:17px !important;}
+  body.ui-v2 #skill-detail .sd-t span, body.ui-v2 #gil-line, body.ui-v2 .co-line, body.ui-v2 .upg-desc, body.ui-v2 .talk-body p{font-size:16px !important;}
+  body.ui-v2 .ms-txt, body.ui-v2 #run-requests .rr, body.ui-v2 #hb-requests .rr, body.ui-v2 .rr-t{font-size:13.5px !important;}
+  .runs-card{zoom:var(--ui);}
+
+  /* ---- pop-up cards (new cat, mission, loot) sit in the bottom-right corner, over the item slots ---- */
+  body.ui-v2 .callout:not(.dim){left:auto !important;right:calc((16px + var(--sar))/var(--pz)) !important;top:auto !important;
+    bottom:calc((44px + 112px*var(--ui) + var(--sab))/var(--pz)) !important;transform:translateY(24px) scale(.85) !important;transform-origin:100% 100%;}
+  body.ui-v2 .callout:not(.dim).show{transform:none !important;}
+  body.ui-v2 .callout.w440:not(.dim){--cw:420px;}
+  body.ui-v2 #loot-card{left:auto !important;right:calc((16px + var(--sar))/var(--pz)) !important;top:auto !important;
+    bottom:calc((44px + 112px*var(--ui) + var(--sab))/var(--pz)) !important;transform:translateY(24px) scale(.85) !important;transform-origin:100% 100%;z-index:17;}
+  body.ui-v2 #loot-card.show{transform:none !important;}
+  body.ui-v2 .callout:not(.dim):has(~ #loot-card.show){right:calc((16px + var(--sar))/var(--pz) + 356px) !important;}   /* both at once: side by side */
+  /* the treasure box window: bigger */
+  body.ui-v2 #chest .card{width:680px !important;padding:30px !important;gap:20px !important;}
+  body.ui-v2 #chest .card h2{font-size:30px !important;}
+  body.ui-v2 #chest .chest-hero{width:220px !important;height:160px !important;}
+  body.ui-v2 #chest .chest-ic{font-size:88px !important;}
+  body.ui-v2 .reward-list{gap:16px !important;}
+  body.ui-v2 .reward-list .reward .ic{width:64px !important;height:64px !important;font-size:36px !important;border-radius:12px !important;}
+  /* ---- level-up picks and treasure: a panel on the right, the run keeps going ---- */
+  #side-stack{position:fixed;right:calc(16px + var(--sar));top:50%;transform:translateY(-38%);z-index:15;display:flex;flex-direction:column;gap:12px;align-items:flex-end;pointer-events:none;}
+  #side-stack .overlay.side{position:static !important;inset:auto !important;background:none !important;padding:0 !important;display:none;pointer-events:none;}
+  #side-stack .overlay.side.in{animation:sideIn .35s cubic-bezier(.2,1.4,.4,1);}
+  @keyframes sideIn{from{transform:translateX(120%);opacity:0;}to{transform:none;opacity:1;}}
+  body #side-stack .overlay.side .card{zoom:var(--pz, 1);pointer-events:auto;width:340px !important;max-width:calc((100vw - 32px)/var(--pz, 1)) !important;max-height:none !important;box-sizing:border-box;
+    padding:16px !important;gap:10px !important;display:flex;flex-direction:column;text-align:left;background:#FFFFFF !important;border:0 !important;border-radius:22px !important;box-shadow:var(--v2-shadow, 0 6px 0 rgba(0,0,0,.2)) !important;overflow:hidden;}
+  body #side-stack .overlay.side .card h2{font-family:'Fredoka','Nunito',sans-serif;font-size:22px !important;font-weight:700 !important;margin:0 !important;color:#3B2E2A !important;text-align:left !important;text-transform:none !important;
+    display:flex;align-items:center;justify-content:space-between;gap:8px;order:0 !important;}
+  .side-keys{font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;color:#7A6A5E;display:inline-flex;align-items:center;gap:3px;}
+  .side-keys kbd, .srow > kbd{font:800 13px 'Nunito',sans-serif;min-width:22px;height:22px;line-height:22px;text-align:center;border-radius:7px;background:#3B2E2A;color:#FFFFFF;box-shadow:0 2px 0 rgba(0,0,0,.25);}
+  #levelup.side .upg-legend{display:none !important;}
+  #levelup.side #upgrades{display:flex !important;flex-direction:column !important;gap:8px !important;}
+  .srow{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:14px;background:#F6EFE4;cursor:pointer;color:#3B2E2A;box-shadow:inset 4px 0 0 var(--cc, #F8C630);transition:transform .12s;}
+  .srow:hover{transform:translateX(-4px);background:#FFF3D6;}
+  .srow.trick{background:#FFF5D1;box-shadow:inset 4px 0 0 #F8C630, 0 0 0 2px #F8C630;}
+  .srow > kbd{flex-shrink:0;min-width:26px;height:26px;line-height:26px;font-size:15px;}
+  .srow .s-ic{flex-shrink:0;width:44px;height:44px;border-radius:10px;background:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:26px;}
+  .srow .s-ic img{max-width:38px;max-height:38px;}
+  .srow .s-b{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;}
+  .srow .s-type{font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--cd, #7A6A5E);}
+  .srow .s-b > b{font-family:'Fredoka','Nunito',sans-serif;font-size:16px;font-weight:700;}
+  .srow .s-b > b small{font-family:'Nunito',sans-serif;font-size:11.5px;font-weight:800;color:#7A6A5E;}
+  .srow .s-b > span{font-size:12.5px;font-weight:700;color:#7A6A5E;line-height:1.3;}
+  body #side-stack #chest.side .chest-hero, body #side-stack #chest.side #btn-chest{display:none !important;}
+  body #side-stack #chest.side .card{cursor:pointer;}
+  body #side-stack #chest.side .reward-list{gap:8px !important;}
+  body #side-stack #chest.side .reward-list .reward{display:flex !important;align-items:center;gap:10px;padding:0 !important;background:none !important;}
+  body #side-stack #chest.side .reward-list .reward .ic{width:42px !important;height:42px !important;font-size:24px !important;border-radius:10px !important;background:#F6EFE4;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+  body #side-stack #chest.side .reward-list .reward b{font-size:14px;}
+  body #side-stack #chest.side .reward-list .reward span{font-size:12px;}
+  #chest.side .side-timer{height:5px;border-radius:3px;background:#EFE5D6;overflow:hidden;margin-top:2px;}
+  #chest.side .side-timer i{display:block;height:100%;background:#F8C630;transform-origin:0 50%;}
+  #chest.side.in .side-timer i{animation:sideTimer var(--ct, 4.5s) linear forwards;}
+  @keyframes sideTimer{from{transform:scaleX(1);}to{transform:scaleX(0);}}
+  #levelup:not(.side) .side-keys, #chest:not(.side) .side-timer{display:none;}
+  /* while the right-hand panel is up, pop-up cards and the loot card move to its left */
+  body.side-open.ui-v2 .callout:not(.dim){right:calc((16px + var(--sar))/var(--pz) + 356px) !important;}
+  body.side-open.ui-v2 #loot-card{right:calc((16px + var(--sar))/var(--pz) + 356px) !important;}
+  body.side-open.ui-v2 .callout:not(.dim):has(~ #loot-card.show){right:calc((16px + var(--sar))/var(--pz) + 712px) !important;}
+  body.ui-v2 .reward-list .reward b{font-size:19px !important;}
+  body.ui-v2 .reward-list .reward span{font-size:16px !important;}
+  body.ui-v2 #btn-chest{min-height:56px !important;font-size:22px !important;padding:0 40px !important;}
+
+  /* ---- the first one-time item: an arrow at its slot and its key, flashing ---- */
+  #item-hint{position:absolute;z-index:19;pointer-events:none;display:none;flex-direction:column;align-items:center;gap:4px;transform:translate(-50%, -100%);}
+  #item-hint.show{display:flex;animation:ihBob .8s ease-in-out infinite alternate;}
+  #item-hint .kc{width:62px !important;height:62px !important;font-size:32px !important;}
+  #item-hint .ih-tap{background:#FFFFFF;border-radius:999px;padding:6px 16px;font-family:'Fredoka','Nunito',sans-serif;font-size:22px;font-weight:700;color:#3B2E2A;box-shadow:inset 0 0 0 3px #3B2E2A, 0 4px 0 #3B2E2A;animation:kcFlash 1.1s ease-in-out infinite;}
+  #item-hint .ih-arrow{font-size:30px;line-height:1;color:#E2582C;-webkit-text-stroke:2px #FFFFFF;text-shadow:0 3px 0 rgba(59,46,42,.25);}
+  @keyframes ihBob{from{transform:translate(-50%, -100%)}to{transform:translate(-50%, calc(-100% - 10px))}}
+  body.harbor-mode #item-hint, body.home-mode #item-hint{display:none !important;}
+
+  /* ---- the Big Fish Shop's door: Skills or the Cat Sanctuary ---- */
+  #shop-choice{display:none;position:absolute;inset:0;z-index:20;align-items:center;justify-content:center;background:rgba(46,58,63,0.55);padding:16px;box-sizing:border-box;}
+  #shop-choice.show{display:flex;}
+  .sc-card{zoom:var(--pz);width:min(720px, calc((100vw - 32px)/var(--pz)));background:#FFFFFF;border-radius:26px;padding:26px;box-sizing:border-box;color:#3B2E2A;
+    box-shadow:0 5px 0 rgba(59,46,42,0.18), 0 10px 22px rgba(59,46,42,0.12);display:flex;flex-direction:column;gap:20px;animation:coachPop .4s cubic-bezier(.3,1.6,.5,1);}
+  .sc-head{display:flex;align-items:center;gap:12px;}
+  .sc-head .sp{flex:1;}
+  .sc-head b{font-family:'Fredoka','Nunito',sans-serif;font-size:30px;font-weight:700;}
+  .sc-btns{display:flex;gap:20px;}
+  .sc-btn{flex:1;position:relative;display:flex;flex-direction:column;align-items:center;gap:10px;padding:26px 18px 22px;border:0;border-radius:22px;background:#F6EFE4;cursor:pointer;
+    font-family:'Nunito',sans-serif;color:#3B2E2A;box-shadow:inset 0 0 0 3px #EADFCF, 0 6px 0 #D9C3A5;transition:transform .12s;}
+  .sc-btn:hover{transform:translateY(-4px);background:#FFF5D1;box-shadow:inset 0 0 0 3px #F8C630, 0 6px 0 #C99A12;}
+  .sc-btn:active{transform:translateY(3px);}
+  .sc-btn i{width:110px;height:110px;border-radius:50%;background:#2BB5A5;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:52px;
+    box-shadow:inset 0 -8px 0 rgba(0,0,0,0.15), 0 0 0 6px #FFFFFF, 0 8px 0 6px rgba(59,46,42,0.15);}
+  .sc-btn b{font-family:'Fredoka','Nunito',sans-serif;font-size:28px;font-weight:700;margin-top:8px;}
+  .sc-btn span{font-size:16px;font-weight:700;color:#7A6A5E;text-align:center;}
+  .sc-btn kbd{position:absolute;top:12px;right:14px;min-width:26px;height:26px;border-radius:7px;background:#FFFFFF;box-shadow:inset 0 -2px 0 #D9C3A5, 0 0 0 2px #EADFCF;font:inherit;font-size:14px;font-weight:900;display:flex;align-items:center;justify-content:center;}
+  @media (max-width: 560px){ .sc-btns{flex-direction:column;} .sc-btn i{width:80px;height:80px;font-size:38px;} }
+  /* ---- requests from the townsfolk: a mission brief in the middle of the screen, bigger text ---- */
+  body.ui-v2 #talk{top:50% !important;bottom:auto !important;transform:translate(-50%, calc(-50% + 30px)) !important;}
+  body.ui-v2 #talk.show{transform:translate(-50%, -50%) !important;}
+  body.ui-v2 #talk{width:1080px !important;min-height:340px;padding:28px !important;}
+  body.ui-v2 #talk > canvas{width:240px !important;height:300px !important;}
+  body.ui-v2 .talk-name{font-size:32px !important;}
+  body.ui-v2 .tk-tag, body.ui-v2 .tk-lab{font-size:15px !important;}
+  body.ui-v2 .talk-body{gap:18px !important;}
+  body.ui-v2 .talk-body p{font-size:22px !important;line-height:1.45 !important;}
+  body.ui-v2 .talk-req .tr-t, body.ui-v2 .talk-req .tr-t span{font-size:22px !important;font-weight:800 !important;color:var(--v2-ink) !important;display:inline !important;}
+  body.ui-v2.talk-open #coach{display:none !important;}   /* the request brief has the screen to itself */
+  body.ui-v2 .talk-req small{font-size:16px !important;}
+  body.ui-v2 .talk-req .tr-t canvas{width:56px !important;height:56px !important;}
+  body.ui-v2 .talk-req .v2pill{height:46px;font-size:19px;}
+  body.ui-v2 .talk-btns .bigbtn{min-height:56px !important;font-size:22px !important;padding:0 32px !important;}
+  .reward .ic .rw-fish{width:80%;height:80%;object-fit:contain;}
+  /* the harbor island uses the 3D camera too */
+  body.harbor-mode #glc{display:block !important;}
+  body.ui-v2 #hb-hint{display:none !important;}
+  /* ---- big windows: a side panel that slides in from the right (the island stays visible on the left) ---- */
+  body.ui-v2.panel-open #menu{background:linear-gradient(90deg, rgba(46,58,63,0) 0%, rgba(46,58,63,0.25) 100%) !important;justify-content:flex-end !important;align-items:stretch !important;padding:0 !important;}
+  body.ui-v2.panel-open #menu .home-card, body.ui-v2.panel-open.panel-gil #menu .home-card{zoom:1 !important;width:min(720px, 60vw) !important;max-width:none !important;height:100dvh;max-height:none !important;
+    margin:0 !important;border-radius:0 !important;padding:30px 30px 30px 54px !important;overflow-y:auto;
+    background:linear-gradient(#dff0cf 0, #dff0cf 96px, #fbf6ea 96px) !important;box-shadow:-12px 0 30px rgba(59,46,42,0.18) !important;
+    -webkit-mask:radial-gradient(circle 15px at 0 22px, transparent 96%, #000 100%) 0 0 / 100% 44px repeat-y;mask:radial-gradient(circle 15px at 0 22px, transparent 96%, #000 100%) 0 0 / 100% 44px repeat-y;
+    animation:panelIn .38s cubic-bezier(.2,.9,.25,1);}
+  @keyframes panelIn{from{transform:translateX(105%)}to{transform:none}}
+  body.ui-v2.panel-open #menu .panel-head{min-height:44px;}
+  body.ui-v2.panel-open #menu .panel-head h1{font-size:30px !important;color:#2f6b4f !important;}
+  body.ui-v2.panel-open .ps-cols{flex-direction:column;}
+  body.ui-v2.panel-open .pick-grid{grid-template-columns:repeat(2, minmax(0, 1fr)) !important;}
+  body.ui-v2.panel-open .stage-list{grid-template-columns:repeat(2, minmax(0, 1fr)) !important;}
+  body.ui-v2.panel-open #shop-list.tree{gap:10px;}
+  body.ui-v2.panel-open #hb-nav, body.ui-v2.panel-open #hb-requests, body.ui-v2.panel-open #hb-prompt, body.ui-v2.panel-open #coach{visibility:hidden;}
+  @media (max-width: 760px){ body.ui-v2.panel-open #menu .home-card{width:100vw !important;-webkit-mask:none;mask:none;padding:24px 18px !important;} }
+  @media (max-width: 560px){ .run-row{flex-wrap:wrap;} .run-go{flex:1;} .runs-head h1{font-size:26px;} }
+  /* ---- missions (townsfolk requests): face, job, progress bar, reward ---- */
+  .mrow{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:16px;background:#FFFFFF;box-shadow:inset 0 0 0 2px #EFE5D6;color:#3B2E2A;}
+  .mrow.done{background:#EAF7E6;box-shadow:inset 0 0 0 2px #9fd59a;}
+  .mface{flex-shrink:0;width:60px;height:60px;display:flex;align-items:flex-end;justify-content:center;font-style:normal;font-weight:900;font-size:22px;color:#7A6A5E;}
+  .mface img{width:100%;height:100%;object-fit:contain;object-position:50% 100%;filter:drop-shadow(0 2px 0 rgba(59,46,42,0.15));}
+  .mbody{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;}
+  .mtop{display:flex;align-items:center;gap:10px;}
+  .mtext{flex:1;font-size:16px;font-weight:800;line-height:1.25;}
+  .mreward{flex-shrink:0;display:inline-flex;align-items:center;gap:5px;font-family:'Fredoka','Nunito',sans-serif;font-size:19px;font-weight:700;color:#3B2E2A;}
+  .mreward .v2coin{width:20px !important;height:20px !important;}
+  .mprog{display:flex;align-items:center;gap:10px;}
+  .mbar{flex:1;height:12px;border-radius:6px;background:#E8DCCB;overflow:hidden;}
+  .mbar i{display:block;height:100%;border-radius:6px;background:#F8C630;transition:width .3s;}
+  .mrow.done .mbar i{background:#5ad76e;}
+  .mprog em{font-style:normal;font-size:13px;font-weight:800;color:#7A6A5E;white-space:nowrap;}
+  .mrow small{font-size:13px;font-weight:700;color:#7A6A5E;}
+  .mrow.done small{color:#2E8B57;}
+  .missions-list{display:flex;flex-direction:column;gap:12px;}
+  .mcount{font-size:14px;font-weight:800;color:#7A6A5E;margin-left:6px;}
+  .mempty, .mnote{font-size:15px;font-weight:700;color:#7A6A5E;margin:0;}
+  /* compact rows in the harbor's and the run's Missions panel */
+  .mrow.compact{padding:8px 0 0;background:none;box-shadow:none;border-radius:0;gap:10px;}
+  .mrow.compact .mface{width:44px;height:44px;font-size:15px;}
+  .mrow.compact .mtext{font-size:13.5px;}
+  .mrow.compact .mreward{font-size:15px;}
+  .mrow.compact .mreward .v2coin{width:16px !important;height:16px !important;}
+  .mrow.compact .mbar{height:8px;}
+  .mrow.compact .mprog em{font-size:12px;}
+  body.ui-v2 #hb-requests, body.ui-v2 #run-requests{width:330px !important;}
+  body.ui-v2 #hb-requests{pointer-events:auto;cursor:pointer;}</style>
 </head>
 <body>
 <div id="wrap">
@@ -1409,8 +1683,8 @@
     <div class="chip proj-chip" id="proj-label" title="Projectiles per throw">🎯×1</div>
     <div class="chip frenzy-chip" id="frenzy-label" hidden>🔥 8s</div>
     <div class="chip treat-chip" id="treat-label" hidden>🍤 6s</div>
-    <div class="v2-cats"><div class="chip disc-chip" id="disc-label" title="Cat types you haven't fed yet">Cats to discover</div>
-    <div id="disc-sil" class="disc-sil" title="Cats in this area you haven't met yet"></div></div>
+    <div class="v2-cats"><div class="chip disc-chip" id="disc-label" title="The cats in this area: the ones you've found, and silhouettes of the rest">Cats found here</div>
+    <div id="disc-sil" class="disc-sil" title="Every cat in this area"></div></div>
   </div>
   <button id="pause-btn" aria-label="Pause">II</button>
   <div id="item-bar" aria-label="One-time items"></div>
@@ -1450,6 +1724,11 @@
         <div id="skill-detail"></div>
         <button class="smallbtn" id="btn-refund">Refund all upgrades</button>
       </section>
+      <section id="tab-missions" hidden>
+        <div class="sh-h">Missions from the townsfolk <span id="missions-count" class="mcount"></span></div>
+        <div id="missions-list" class="missions-list"></div>
+        <p class="mnote">Up to 3 at a time. They count across runs: finish one, then come back to the harbor and talk to whoever gave it to you for your reward.</p>
+      </section>
       <section id="tab-fish" hidden>
         <div class="gil-head"><canvas id="gil-cv" width="96" height="120"></canvas><p id="gil-line"></p></div>
         <div id="fish-list" class="fish-list"></div>
@@ -1478,7 +1757,7 @@
   </div>
 
   <div id="harbor-ui">
-    <div class="hb-top"><span class="hb-gold v2pill"><span class="v2coin"></span><span id="hb-coin" hidden></span>Gold <span id="hb-gold">0</span></span><span class="hb-fish v2pill" id="hb-fish" title="Fish in your bucket"></span><span class="hb-disc v2pill" id="hb-disc"></span><span class="sp"></span><button id="hb-story" class="v2round" title="Watch the opening story again" aria-label="Replay story">▶</button></div>
+    <div class="hb-top"><span class="hb-gold v2pill"><span class="v2coin"></span><span id="hb-coin" hidden></span>Gold <span id="hb-gold">0</span></span><span class="hb-fish v2pill" id="hb-fish" title="Fish in your bucket"></span><span class="hb-disc v2pill" id="hb-disc"></span><span class="sp"></span><span class="v2pill hb-runname" id="hb-runname"></span><button id="hb-runs" class="v2round" title="Your runs: switch or start a new one" aria-label="Your runs">☰</button><button id="hb-tut" class="v2round" title="Play the tutorial again" aria-label="Replay tutorial">?</button><button id="hb-story" class="v2round" title="Watch the opening story again" aria-label="Replay story">▶</button></div>
     <div id="hb-requests"></div>
     <button id="hb-prompt"></button>
     <div id="hb-nav"></div>
@@ -1494,6 +1773,15 @@
       <div class="fish-hint">Mouse, touch or arrow keys steer the hook · Space casts and reels in · Esc to leave</div>
     </div>
   </div>
+  <div id="coach" aria-live="polite"></div>
+  <div id="runs-screen"></div>
+  <div id="shop-choice"><div class="sc-card">
+    <div class="sc-head"><b>Big Fish Shop</b><span class="sp"></span><button class="v2round v2x" data-go="close" aria-label="Close">X</button></div>
+    <div class="sc-btns">
+      <button class="sc-btn" data-go="skills"><i>⭐</i><b>Skills</b><span>Spend gold on skills that last forever</span><kbd>1</kbd></button>
+      <button class="sc-btn" data-go="cats"><i>🐾</i><b>Cat Sanctuary</b><span>Visit, pet and play with your cats</span><kbd>2</kbd></button>
+    </div>
+  </div></div>
   <div id="new-cat-banner"></div>
   <div id="callout" class="callout"></div>
   <div id="loot-card"></div>
@@ -1538,21 +1826,24 @@
     </div>
   </div>
 
-  <div class="overlay" id="levelup" style="display:none;">
+  <div id="side-stack">
+  <div class="overlay side" id="levelup" style="display:none;">
     <div class="card">
-      <h2>LEVEL UP!</h2>
+      <h2>Level up! <span class="side-keys">press <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd></span></h2>
       <div class="upg-legend"><span class="cat-new">🎯 New projectile</span><span class="cat-up">⬆️ Projectile upgrade</span><span class="cat-stat">📈 Stat upgrade</span></div>
       <div id="upgrades" class="row"></div>
     </div>
   </div>
 
-  <div class="overlay" id="chest" style="display:none;">
+  <div class="overlay side" id="chest" style="display:none;">
     <div class="card">
       <div class="chest-hero" aria-hidden="true"><div class="chest-burst"></div><div class="chest-ic">🧰</div></div>
       <h2 id="chest-title">Treasure Tackle Box!</h2>
       <div class="reward-list" id="chest-rewards"></div>
       <button class="bigbtn" id="btn-chest">Collect</button>
+      <div class="side-timer"><i></i></div>
     </div>
+  </div>
   </div>
 
   <div class="overlay" id="results" style="display:none;">
@@ -1724,7 +2015,7 @@ const STAGES = [
     key:'meadow', name:'Cat Town', swatch:'#b3a48c', roster:'town',
     desc:'Area 1 · The cobbled streets behind the harbor, full of house cats. A gentle start.',
     floor:'cobble', deco:'town', prop:'crate', night:false, bandH:0,
-    hpMul:1, spdMul:1, goldMul:1, unlock:null,
+    hpMul:1, spdMul:1, goldMul:1, lootMul:1, unlock:null,
     waves:[
       [['kitten'],10,1.1], [['kitten'],20,0.9], [['kitten','shades'],28,0.8],
       [['shades','kitten'],32,0.7], [['shades','wizard'],34,0.7], [['kitten','shades','wizard'],45,0.55],
@@ -1744,7 +2035,7 @@ const STAGES = [
     key:'market', name:'Willow Park', swatch:'#8CAE4E', roster:'park',
     desc:'Area 2 · Grass, flowers and a duck pond, full of foxes, owls, bears and stranger park cats. Faster cats, more gold.',
     floor:'meadow', deco:'grass', prop:'basket', night:false, bandH:0,
-    hpMul:1.25, spdMul:1.1, goldMul:1.4,
+    hpMul:1.25, spdMul:1.1, goldMul:1.4, lootMul:1.6,   // tougher cats mean fewer feeds, so each one drops more often
     unlock:{type:'allCats', stage:'meadow', text:'Find every cat in Cat Town (Sebastian too!)'},
     waves:[
       [['kitten','shades'],12,1.0], [['shades'],22,0.85], [['shades','roomba'],28,0.75],
@@ -1765,7 +2056,7 @@ const STAGES = [
     key:'pier', name:'Sunny Beach', swatch:'#e8d29a', roster:'sea',
     desc:'Area 3 · Sand, shells and surf. The sea cats come ashore. Toughest, richest.',
     floor:'sand', deco:'beach', prop:'barrel', night:false, bandH:0,
-    hpMul:1.5, spdMul:1.15, goldMul:1.8,
+    hpMul:1.5, spdMul:1.15, goldMul:1.8, lootMul:1.8,
     unlock:{type:'stageTime', stage:'market', sec:600, text:'Survive 10:00 in Willow Park'},
     waves:[
       [['kitten','wizard'],12,1.0], [['wizard','kitten'],20,0.9], [['wizard','shades'],26,0.8],
@@ -1854,7 +2145,7 @@ const PASSIVES = {
   riptide: { ic:'🌊', name:'Riptide',        desc:'+10% projectile speed',  max:5, apply:(s,l)=>s.speed+=0.10*l },
   serving: { ic:'🍽️', name:'Second Serving', desc:'+1 projectile / bobber / puddle', max:2, apply:(s,l)=>s.amount+=l },
   boots:   { ic:'🥾', name:'Sturdy Boots',   desc:'+20% max HP',            max:5, apply:(s,l)=>s.maxHpMul+=0.20*l },
-  feet:    { ic:'👟', name:'Fast Feet',      desc:'+10% move speed',        max:5, apply:(s,l)=>s.moveSpeed+=0.10*l },
+  feet:    { ic:'👟', name:'Fast Feet',      desc:'+20% move speed',        max:5, apply:(s,l)=>s.moveSpeed+=0.20*l },
   magnet:  { ic:'🧲', name:'Chum Magnet',    desc:'+30% pickup range',      max:5, apply:(s,l)=>s.magnet+=0.30*l },
   snack:   { ic:'💚', name:'Fresh Catch',    desc:'+0.3 HP per second',     max:5, apply:(s,l)=>s.regen+=0.3*l },
   lure:    { ic:'🍀', name:'Lucky Lure',     desc:'+10% luck',              max:5, apply:(s,l)=>s.luck+=0.10*l },
@@ -1912,7 +2203,7 @@ const SHOP = [
   { key:'amount2',  br:'angler',  ic:'🪣', name:'Bottomless Bucket',desc:'+1 more projectile',  max:1, base:10000,apply:(s,r)=>s.amount+=r, proj:1 },
   { key:'maxhp',    br:'sailor',  ic:'❤️', name:'Hearty Breakfast', desc:'+10% max HP',         max:3, base:150,  apply:(s,r)=>s.maxHpMul+=0.10*r },
   { key:'regen',    br:'sailor',  ic:'💚', name:'Packed Lunch',     desc:'+0.15 HP per second', max:5, base:180,  apply:(s,r)=>s.regen+=0.15*r },
-  { key:'move',     br:'sailor',  ic:'👟', name:'Comfy Boots',      desc:'+5% move speed',      max:3, base:200,  apply:(s,r)=>s.moveSpeed+=0.05*r },
+  { key:'move',     br:'sailor',  ic:'👟', name:'Comfy Boots',      desc:'+10% move speed',     max:3, base:200,  apply:(s,r)=>s.moveSpeed+=0.10*r },
   { key:'armor',    br:'sailor',  ic:'🧥', name:'Oilskin Coat',     desc:'+1 armor',            max:3, base:400,  apply:(s,r)=>s.armor+=r },
   { key:'revival',  br:'sailor',  ic:'🛟', name:'Life Ring',        desc:'Revive once per run', max:1, base:6000, apply:()=>{} },
   { key:'greed',    br:'fortune', ic:'🪙', name:'Haggler',          desc:'+10% gold',           max:5, base:150,  apply:(s,r)=>s.greed+=0.10*r },
@@ -1942,8 +2233,26 @@ const MAX_COMFORT = DECOR.reduce((a,d)=>a+d.comfort, 0);
 function comfort(){ return DECOR.reduce((a,d)=>a + (save.decor && save.decor[d.key] ? d.comfort : 0), 0); }
 function happyMul(){ return 1 + 0.06*comfort(); }
 
+/* ---------- Runs: named save files ----------
+   localStorage 'chumstorm_runs_v1' = {active, list:[{id, name, created, played}]}. Each run keeps its own save
+   and cat collection under the usual keys with '@id' on the end; the very first run (id 'main') uses the
+   plain keys, so a save from before runs existed simply becomes "My run". Switching runs reloads the page.  */
+const RUNS_KEY = 'chumstorm_runs_v1';
+function loadRunsIndex(){
+  try{ const r = JSON.parse(localStorage.getItem(RUNS_KEY)||'null'); if(r && Array.isArray(r.list)) return r; }catch(e){}
+  const r = {active:null, list:[]};
+  try{ if(localStorage.getItem('chumstorm_save_v2')){ r.list.push({id:'main', name:'My run', created:Date.now(), played:Date.now()}); r.active = 'main'; } }catch(e){}
+  try{ localStorage.setItem(RUNS_KEY, JSON.stringify(r)); }catch(e){}
+  return r;
+}
+const RUNS = loadRunsIndex();
+const ACTIVE_RUN = RUNS.list.find(x=>x.id===RUNS.active) || null;
+function runKeyFor(id, base){ return id === 'main' ? base : base+'@'+id; }
+function runKey(base){ return runKeyFor(ACTIVE_RUN ? ACTIVE_RUN.id : 'scratch', base); }   // no run picked yet: a scratch save nobody keeps
+function saveRunsIndex(){ try{ localStorage.setItem(RUNS_KEY, JSON.stringify(RUNS)); }catch(e){} }
+
 /* ---------- Persistent save ---------- */
-const SAVE_KEY = 'chumstorm_save_v2';
+const SAVE_KEY = runKey('chumstorm_save_v2');
 function defaultSave(){
   return { gold:0, shop:{}, home:{}, decor:{}, homeGift:false, bounties:[], fishGrade:0, fishBag:[300,0,0,0,0], fishV:2, casts:5, unlocked:['brine','meadow'], char:'brine', stage:'meadow',
     stats:{ best:{}, cleared:{}, totalFed:0, totalGold:0, maxLevel:0, bossFed:0 } };
@@ -2006,8 +2315,10 @@ function fmtTime(t){ t = Math.floor(t); return String(Math.floor(t/60)).padStart
 const camera = { x:0, y:0 };
 let band = null;
 function getViewBounds(pad=0){
-  const o = viewOver();                            // the 3D camera shows more than one screen's worth of ground
-  return {left:camera.x-W/2*o-pad, right:camera.x+W/2*o+pad, top:camera.y-H/2*o-pad, bottom:camera.y+H/2*o+pad};
+  if(isoOn()) return isoBounds(pad);
+  const o = viewOver()/viewZoom();                 // the 3D camera shows more than one screen's worth of ground (and the harbor is zoomed out)
+  const oy = o/viewSquash();
+  return {left:camera.x-W/2*o-pad, right:camera.x+W/2*o+pad, top:camera.y-H/2*oy-pad, bottom:camera.y+H/2*oy+pad};
 }
 function updateCamera(){
   camera.x = player.x;
@@ -2063,14 +2374,15 @@ addEventListener('mousemove', e=>{ if(pointerActive && pointerKind==='mouse') se
 addEventListener('mouseup', ()=>{ if(pointerKind==='mouse') resetPointer(); });
 
 addEventListener('keydown', e=>{
+  if(document.body.classList.contains('runs-mode')) return;
   const key = e.key.toLowerCase();
-  if(state==='levelup' && ['1','2','3','4'].includes(key)){ const cards = document.querySelectorAll('#upgrades .upg2'); if(cards[+key-1]) cards[+key-1].click(); return; }
+  if(state==='playing' && lvlOpen && ['1','2','3'].includes(key)){ const cards = document.querySelectorAll('#upgrades .srow'); if(cards[+key-1]) cards[+key-1].click(); return; }   // a level-up is waiting: 1 / 2 / 3 pick a buff
   if(state==='intro'){ if([' ','enter','e','arrowright'].includes(key)){ e.preventDefault(); introNext(); } else if(key==='escape') finishIntro(); return; }
   if(['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright'].includes(key)){ keysDown.add(key); e.preventDefault(); }
   if(key==='escape' && placing){ cancelPlacing(); return; }
   if(state==='harbor' && !(e.target && e.target.tagName==='INPUT')){
     if(key==='escape'){ if(hbTalk) closeTalk(); else if(hbPanel) closeHarborPanel(); return; }
-    if(['e',' ','enter','w','arrowup'].includes(key) && !hbPanel){
+    if((HB3D ? ['e',' ','enter'] : ['e',' ','enter','w','arrowup']).includes(key) && !hbPanel){
       e.preventDefault();
       if(hbTalk){ const yes = $('talk-yes'); if(yes && key!=='w' && key!=='arrowup') yes.click(); }
       else harborInteract();
@@ -2712,7 +3024,13 @@ function applyUiIcons(){
     e.stopPropagation();
     if(state !== 'harbor' || hbPanel || hbTalk) return;
     const key = btn.dataset.b;
-    if(key==='requests'){ const el = $('hb-requests'); el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); return; }
+    if(key==='requests'){ openBuilding('missions'); return; }      // the Missions button: every mission in the side panel
+    if(HB3D){                                    // walk to it on the island
+      const want = key === 'home' || key === 'tackle' ? 'shop' : key;
+      const tk = want === 'gate' ? (hb3Targets().find(t=>t.key==='gate' && t.stage===save.stage) || hb3Targets().find(t=>t.key==='gate')) : hb3Targets().find(t=>t.key===want);
+      if(tk) hbGoTo(tk, ()=>{ if(tk.stage){ save.stage = tk.stage; persist(); } openBuilding(key); });
+      return;
+    }
     const b = HB_BUILDINGS.find(x=>x.key===key), at = b && b.decor ? HB_BUILDINGS.find(x=>x.key==='shop') : b;   // home & tackle live in the Big Fish Shop
     if(b) hbWalkTo(at.x, ()=>openBuilding(b.key));
   });
@@ -3380,7 +3698,7 @@ function sliceEnvSheet(){
 }
 
 /* ============== SAVE: CAT COLLECTION ============== */
-const COLLECTION_KEY = 'chumstorm_collection_v1';
+const COLLECTION_KEY = runKey('chumstorm_collection_v1');
 let collected = new Set();
 try{ collected = new Set(JSON.parse(localStorage.getItem(COLLECTION_KEY)||'[]')); }catch(e){}
 function saveCollection(){ try{ localStorage.setItem(COLLECTION_KEY, JSON.stringify([...collected])); }catch(e){} }
@@ -3513,9 +3831,11 @@ function runEvents(){
     }
   }
 }
+const WAVE_MIN = 45;         // seconds per wave: new kinds of cats join every 45 s (was a minute)
 function runSpawns(dt){
-  const minute = Math.min(stage.waves.length-1, Math.floor(runT/60));
-  const [types, minCount, interval] = stage.waves[minute];
+  // the crowd (how many, how often) follows the old minute-by-minute pace; only the cat TYPES move ahead every WAVE_MIN seconds
+  const W = stage.waves, minute = Math.min(W.length-1, Math.floor(runT/60)), typeWave = Math.min(W.length-1, Math.floor(runT/WAVE_MIN));
+  const [, minCount, interval] = W[minute], types = W[typeWave][0];
   let alive = 0;
   for(const c of cats) if(!c.dying && !c.prop && c.ai!=='swarm') alive++;
   let budget = 6;
@@ -3532,7 +3852,7 @@ function runSpawns(dt){
 function manageProps(dt){
   propTimer -= dt;
   if(propTimer > 0) return;
-  propTimer = 1.5;
+  propTimer = 0.8;                             // breakable crates turn up about twice as often
   let near = 0;
   const lim = Math.max(W,H)*1.4;
   for(let i=cats.length-1;i>=0;i--){
@@ -3581,6 +3901,18 @@ function damageCat(c, dmg, ang, w, knock=1){
   c.knock.x += Math.cos(ang)*130*kb; c.knock.y += Math.sin(ang)*130*kb;
   if(c.hp <= 0) killCat(c, ang);
 }
+// Newer, rarer cats are worth more XP: ×(1 + 0.25 per wave later they first show up in this area), up to ×3.5.
+let xpRankStage = null, xpRank = {};
+function catXpMul(def){
+  if(!def || !stage) return 1;
+  if(xpRankStage !== stage){
+    xpRankStage = stage; xpRank = {};
+    stage.waves.forEach((w, m)=>w[0].forEach(k=>{ const key = catFor(stage, k); if(!(key in xpRank)) xpRank[key] = m; }));
+    for(const e of stage.events || []){ const key = e[2] && catFor(stage, e[1]==='boss' ? e[2] : e[2]); const m = Math.floor(e[0]/WAVE_MIN); if(key && !(key in xpRank)) xpRank[key] = m; }
+  }
+  const m = xpRank[def.key] ?? 0;
+  return Math.min(3.5, 1 + 0.25*m);
+}
 function killCat(c, ang){
   c.hp = 0; c.dying = true; c.dyingT = 0.32;
   c.knock.x += Math.cos(ang)*60; c.knock.y += Math.sin(ang)*60;
@@ -3591,7 +3923,7 @@ function killCat(c, ang){
   if(c.def){ bountyEvent('cat', c.def.key); if(c.isBoss) bountyEvent('boss'); }
   const def = c.def;
   if(c.isBoss || c.elite){
-    spawnBossRewardExplosion(c.x, c.y, def.xp*(c.elite?5:1));
+    spawnBossRewardExplosion(c.x, c.y, def.xp*catXpMul(def)*(c.elite?5:1));
     pickups.push({x:c.x, y:c.y, kind:'chest', bob:0, pop:0.55, tier:c.isBoss ? Math.max(3, rollTier(2)) : rollTier(1)});
     showBanner('🧰 Treasure dropped!', 1300);
     const coins = c.isBoss ? 12 : 5;
@@ -3600,8 +3932,11 @@ function killCat(c, ang){
     if(c.isBoss){ bossFedRun++; addShake(12, 0.5); addHitstop(0.12); flash('255,220,120',0.3); }
     else { addShake(6, 0.25); addHitstop(0.05); }
   } else {
-    orbs.push({x:c.x, y:c.y, groundY:c.y, value:def.xp*(treatT > 0 ? 2 : 1), vx:rand(-55,55), vy:rand(-200,-150), bounces:0, settled:false, ph:Math.random()*6});
-    if(Math.random() < 0.012*player.stats.luck) dropCoin(c.x, c.y, 1);
+    orbs.push({x:c.x, y:c.y, groundY:c.y, value:def.xp*catXpMul(def)*(treatT > 0 ? 2 : 1), vx:rand(-55,55), vy:rand(-200,-150), bounces:0, settled:false, ph:Math.random()*6});
+    const dr = Math.random(), L = player.stats.luck*(stage.lootMul||1);   // ordinary cats drop things too (more often in the tougher areas)
+    if(dr < 0.012*L) pickups.push({x:c.x, y:c.y, kind:'chest', bob:0, pop:0.55, tier:rollTier(1)});
+    else if(dr < 0.07*L) pickups.push({x:c.x, y:c.y, kind:randomPowerupKind(), bob:Math.random()*6, pop:0.55});
+    else if(dr < 0.1*L) dropCoin(c.x, c.y, 1);
     spawnLoveBurst(c.x, c.y);
   }
   spawnPoof(c.x, c.y, def.fur);
@@ -3690,7 +4025,8 @@ function fireToss(w, s){
   for(let i=0;i<n;i++){
     const slot = i===0 ? 0 : (i%2===1 ? 1 : -1)*Math.ceil(i/2);
     const a = aim + slot*spread + rand(-0.01,0.01);
-    const fg = takeFish(), G = fishStats(fg);              // one fish out of your bucket
+    const fg = takeFish(); if(fg < 0) break;               // one fish out of your bucket (ran out mid-volley: stop)
+    const G = fishStats(fg);
     const ft = WEAPONS[w.key].evo ? 3 : fg < 0 ? fishTypeFor(0) : lastThrownSp, ab = fg < 0 || WEAPONS[w.key].evo ? '' : fishAbility(ft);
     const spd = ab === 'fast' ? 1.4 : 1, crit = ab === 'crit' && Math.random() < 0.25;
     fish.push({x:player.x - Math.sin(aim)*slot*7, y:player.y + Math.cos(aim)*slot*7,
@@ -4035,6 +4371,8 @@ function drawCrown(x, y, s){
 /* ============== UPDATE ============== */
 function update(dt){
   runT += dt;
+  tutTick(dt);
+  fishRescue(dt);
   updateLighting();
   if(runT >= RUN_LENGTH){ dinnerBell(); return; }
   runEvents();
@@ -4068,8 +4406,9 @@ function update(dt){
   if(shakeT > 0){ shakeT -= dt; if(shakeT <= 0) shakeMag = 0; }
   if(flashT > 0) flashT -= dt;
   updateHud();
+  updateSidePanels(dt);
   if(chestQueue > 0) openChest();
-  else if(levelQueue > 0) showLevelUp();
+  if(levelQueue > 0 && !lvlOpen) showLevelUp();
 }
 /* ---------- Dodge (Space, or the 💨 button) ----------
    A snappy dash the way you're moving (or facing). It bursts out fast and eases into the landing
@@ -4094,6 +4433,7 @@ function startRoll(){
   const v = rollInput();
   const mx = v ? v[0] : Math.cos(player.facing), my = v ? v[1] : Math.sin(player.facing), n = Math.hypot(mx, my) || 1;
   player.rollX = mx/n; player.rollY = my/n; player.rollQ = 0;
+  tutEvent('dodge');
   if(Math.abs(player.rollX) > 0.15) player.faceX = player.rollX > 0 ? 1 : -1;
   player.rollN = (player.rollN||0) + 1;
   player.rollT = ROLL.time; player.rollCd = ROLL.cd + ROLL.time; player.dodged = false; player.rollTrail = []; player.landT = 0;
@@ -4168,6 +4508,9 @@ function movePlayer(dt){
     if(Math.abs(mx) > 0.15) player.faceX = mx > 0 ? 1 : -1;
     player.moving = true;
     player.walkT += dt;
+    // boosted speed shows: dust kicks up behind you, more of it the faster you are
+    const boost = player.stats.moveSpeed - 1;
+    if(boost > 0.08){ player.dustT = (player.dustT||0) - dt; if(player.dustT <= 0){ player.dustT = 0.16/Math.min(3, 1 + boost*2); const a = Math.atan2(my, mx) + Math.PI + rand(-0.4, 0.4); addP({x:player.x - mx*14, y:player.y + 6, vx:Math.cos(a)*rand(40, 90), vy:Math.sin(a)*rand(20, 50) - 20, life:0.4, type:'poof', color:'#f3e2c8'}); } }
   }
   player.knock.x -= player.knock.x*8.5*dt; player.knock.y -= player.knock.y*8.5*dt;
   player.x += player.knock.x*dt; player.y += player.knock.y*dt;
@@ -4906,7 +5249,7 @@ function randomPowerupKind(){
     frenzy:  m < 3 ? 0 : 9,
     bait:    m < 4 || player.baitBonus >= 2 ? 0 : 4*L,
     foghorn: m < 2 ? 0 : 3*L,
-    catchfish: 9,
+    catchfish: 14,
     fishup:  m < 1.5 || runFishIdx() >= FISH_GRADES.length-1 ? 0 : 5,
   };
   let r = Math.random()*Object.values(w).reduce((a,b)=>a+b, 0);
@@ -4922,7 +5265,7 @@ function availableArtifacts(){
 function updateHunt(dt){
   huntT -= dt;
   if(huntT > 0) return;
-  huntT = rand(38, 50)*player.stats.hunt;
+  huntT = rand(16, 24)*player.stats.hunt;          // a treasure spot about every 20 s (was 40-50)
   if(pickups.some(p=>p.kind==='xspot')) return;
   const a = Math.random()*Math.PI*2, d = rand(650, 900);
   let x = player.x + Math.cos(a)*d, y = player.y + Math.sin(a)*d;
@@ -4977,11 +5320,11 @@ function gainArtifact(key){
 }
 let lootCardTimer = null;
 function showLootCard(ic, kicker, name, desc, proj){
+  if(tutKeysActive()){ heldPops.push(()=>showLootCard(ic, kicker, name, desc, proj)); return; }
   const el = $('loot-card');
   el.className = proj ? 'proj' : '';
-  el.innerHTML = `<div class="lc-label"></div><div class="lc-pic">${ic}</div><b class="lc-name"></b><span class="lc-desc"></span><button class="bigbtn lc-take">Take</button>`;
+  el.innerHTML = `<div class="lc-label"></div><div class="lc-pic">${ic}</div><b class="lc-name"></b><span class="lc-desc"></span>`;
   el.querySelector('.lc-label').textContent = kicker; el.querySelector('.lc-name').textContent = name; el.querySelector('.lc-desc').textContent = desc;
-  el.querySelector('.lc-take').onclick = e=>{ e.stopPropagation(); clearTimeout(lootCardTimer); el.classList.remove('show'); };
   void el.offsetWidth; el.classList.add('show');
   clearTimeout(lootCardTimer);
   lootCardTimer = setTimeout(()=>el.classList.remove('show'), 2600);
@@ -5242,7 +5585,7 @@ function drawDeco(t){
       if(grassImg.complete && grassImg.naturalWidth){ ctx.imageSmoothingEnabled = false; ctx.drawImage(grassImg, -17, -32, 34, 34); }
     } else if(stage.deco==='town'){
       // Cat Town: manhole covers, puddles, little flower pots and weeds between the cobbles
-      if(nearPiazza(g.x, g.y) || townZone(g.x, g.y)){ /* the piazza, the park and the garden keep their own ground */ }
+      if(!TOWN_PROPS || nearPiazza(g.x, g.y) || townZone(g.x, g.y)){ /* plain cobbles (TOWN_PROPS brings the street clutter back) */ }
       else if(g.h < 0.12){
         ctx.fillStyle = '#5d5548'; ctx.beginPath(); ctx.ellipse(0, 0, 20, 12, 0, 0, Math.PI*2); ctx.fill();
         ctx.strokeStyle = '#463f35'; ctx.lineWidth = 2; ctx.stroke();
@@ -6087,8 +6430,32 @@ function randomItem(){ const r = Math.random(); return r < 0.3 ? 'treat' : r < 0
 function gainItem(k){
   player.items.push(k); renderItemBar();
   const it = ITEMS[k];
-  showLootCard(it.ic, 'One-time item · press '+player.items.length, it.name, it.desc);
+  if(!save.itemHinted) showItemHint(player.items.length - 1);   // the very first item: point at it and flash its key instead of the card
+  else showLootCard(it.ic, 'One-time item · press '+player.items.length, it.name, it.desc);
 }
+// the first one-time item you ever get: an arrow points at its slot and its key flashes until you use it
+var itemHintSlot = -1;
+function showItemHint(i){
+  itemHintSlot = i;
+  let el = $('item-hint');
+  if(!el){ el = document.createElement('div'); el.id = 'item-hint'; $('wrap').appendChild(el); }
+  const touch = matchMedia('(pointer: coarse)').matches;
+  el.innerHTML = `${touch ? '<span class="ih-tap">Tap</span>' : `<i class="kc">${i + 1}</i>`}<b class="ih-arrow">▼</b>`;
+  placeItemHint();
+  el.classList.add('show');
+}
+function placeItemHint(){
+  const el = $('item-hint'); if(!el || itemHintSlot < 0) return;
+  const b = document.querySelectorAll('#item-bar .slot')[itemHintSlot]; if(!b) return;
+  const r = b.getBoundingClientRect(), w = $('wrap').getBoundingClientRect();
+  el.style.left = (r.left + r.width/2 - w.left)+'px'; el.style.top = (r.top - w.top - 8)+'px';
+}
+function hideItemHint(used){
+  if(itemHintSlot < 0) return;
+  itemHintSlot = -1; const el = $('item-hint'); if(el) el.classList.remove('show');
+  if(used){ save.itemHinted = true; persist(); }
+}
+addEventListener('resize', ()=>placeItemHint());
 function renderItemBar(){
   const el = $('item-bar'); if(!el) return;
   const items = player ? player.items : [];
@@ -6132,6 +6499,7 @@ function aimPoint(){
 function useItem(slot, viaKey, ptype){
   if(state !== 'playing' || !player) return;
   const k = player.items[slot]; if(!k) return;
+  hideItemHint(true);
   if(k==='treat'){ cancelPlacing(); consumeItem(slot); startTreat(); return; }
   if(placing && placing.slot === slot){
     if(viaKey){ throwItemAt(aimPoint()); return; }      // same key again: throw at the circle
@@ -6369,7 +6737,7 @@ function stageCatsAround(m0, m1){
   return [...set];
 }
 function makeMission(){
-  const tier = missionsDone, m = Math.floor(runT/60);
+  const tier = missionsDone, m = Math.floor(runT/WAVE_MIN);
   const taken = new Set(missions.filter(x=>!x.done).map(x=>x.type+(x.cat||'')));
   const pool = [];
   // feed a cat type that's around right now (tougher cats need fewer)
@@ -6409,7 +6777,7 @@ function missionEvent(type, key, amt=1){
    A reward-style card that drops in near the top of the screen (one at a time, queued), so the
    important moments can't be missed under the action.                                         */
 let calloutQ = [], calloutOn = false;
-function callout(html, cls, ms){ calloutQ.push({html, cls, ms}); if(!calloutOn) nextCallout(); }
+function callout(html, cls, ms){ calloutQ.push({html, cls, ms}); if(!calloutOn && !tutKeysActive()) nextCallout(); }
 function nextCallout(){
   const c = calloutQ.shift(); if(!c){ calloutOn = false; return; }
   calloutOn = true;
@@ -6454,8 +6822,9 @@ function undiscoveredTotal(){ return ALL_CAT_DEFS.filter(d=>!collected.has(d.key
 // the silhouettes of this area's undiscovered cats, under the HUD chip
 function renderDiscStrip(){
   const el = $('disc-sil'); if(!el) return;
-  const keys = undiscoveredIn(stage);
-  el.innerHTML = keys.slice(0, keys.length > 5 ? 4 : 5).map(k=>`<i title="??? Cat">?</i>`).join('') + (keys.length > 5 ? `<i>+${keys.length - 4}</i>` : '');
+  // every cat in this area: the ones you've found in full colour, the rest as dark silhouettes
+  const keys = stageCatKeys(stage);
+  el.innerHTML = keys.map(k=>{ const f = collected.has(k); return `<i class="${f ? 'found' : ''}" title="${f ? CAT_NAMES[k] : '??? Cat'}"><img src="${catIconURL(ENEMIES[k], 56, !f)}" alt=""></i>`; }).join('');
 }
 function announceDiscovery(def){
   const here = undiscoveredIn(stage).length, left = undiscoveredTotal();
@@ -6802,7 +7171,8 @@ function render(){
   ctx.restore();
   const s = playerScreenPos();
   const bubble = $('speech-bubble');
-  bubble.style.left = s.x+'px'; bubble.style.top = Math.max(18, s.y-92)+'px';
+  { const f = tiltOn() ? tiltFwd(player.x - camera.x + W/2, player.y - camera.y + H/2) : {x:s.x, y:s.y, s:1};        // the bubble's tail sits just above the head
+    bubble.style.left = f.x+'px'; bubble.style.top = Math.max(60, f.y - (PLAYER_H + 34)*f.s)+'px'; }
   if(!tilted) drawLighting();
   // Power-ups draw above the night overlay so they always glow.
   ctx.save();
@@ -6832,7 +7202,7 @@ const TILT = {on:true, k:0.3, focus:0.55, fish:0.1, strip:4};
 const TILT_HAZE = {town:['#f7e2d2','#efd3c0'], park:['#e2f0d8','#cfe5c4'], sea:['#dcf0f6','#c4e4ef']};
 let tiltBuf = null, tiltGL = null;
 function tiltOn(){ return TILT.on && TILT.k > 0; }
-function tiltActive(){ return tiltOn() && ['playing','paused','levelup','chest','results','intro'].includes(state); }
+function tiltActive(){ return tiltOn() && (['playing','paused','levelup','chest','results','intro'].includes(state) || (state === 'harbor' && HB3D && !HB_ISO)); }
 function tiltM(u){ return 1 + TILT.k*(u - TILT.focus); }
 // which row of the flat frame ends up at (tilted) row u, as fractions of the height; and back again
 function tiltSrcU(u){ const k = TILT.k; if(!k) return u; return 0.5 + Math.log((1 + k*(u - TILT.focus))/(1 + k*(0.5 - TILT.focus)))/k; }
@@ -6859,10 +7229,17 @@ function tiltFwd(sx, sy){
   return {x:dx*W, y:dy*H, s};
 }
 // set the transform so world point (wx, wy) lands on the tilted ground, drawn upright at its distance's size
+// the harbor island is seen from further away than the runs (a diorama); everything else is 1:1
+function viewZoom(){ return state === 'harbor' && typeof HB3D !== 'undefined' && HB3D ? 0.8 : 1; }
+// the harbor's camera sits lower (a 3/4 view): the ground is foreshortened by this much; things standing up are not
+function viewSquash(){ return state === 'harbor' && typeof HB3D !== 'undefined' && HB3D && !HB_ISO ? 0.6 : 1; }
+let bbAnchorY = 0;                                   // the ground y of whatever billboard() last set up (boxPt squashes ground depth around it)
 function billboard(wx, wy, ox=0, oy=0){
+  if(isoOn()){ const [sx, sy] = isoP(wx, wy, 0), Z = viewZoom(); isoAnchor = {x:wx, y:wy, sx, sy}; ctx.setTransform(Z, 0, 0, Z, sx - wx*Z + ox, sy - wy*Z + oy); return; }
   if(!tiltOn()){ ctx.setTransform(1, 0, 0, 1, Math.round(W/2 - camera.x) + ox, Math.round(H/2 - camera.y) + oy); return; }
-  const f = tiltFwd(wx - camera.x + W/2, wy - camera.y + H/2);
-  ctx.setTransform(f.s, 0, 0, f.s, f.x - wx*f.s + ox, f.y - wy*f.s + oy);
+  const Z = viewZoom(), FY = viewSquash(), f = tiltFwd((wx - camera.x)*Z + W/2, (wy - camera.y)*Z*FY + H/2), k = f.s*Z;
+  bbAnchorY = wy;
+  ctx.setTransform(k, 0, 0, k, f.x - wx*k + ox, f.y - wy*k + oy);
 }
 // How much wider than the screen the flat ground has to be so the tilt and lens never show past its edge.
 let tiltOverKey = '', tiltOverVal = 1;
@@ -6970,7 +7347,7 @@ function drawUpright(){
   const items = [];
   for(const c of cats) items.push([c.y, c.x, c.y, ()=>drawCat(c)]);
   if(player) items.push([player.y, player.x, player.y, drawPlayer]);
-  if(kitReady && stage && stage.roster==='town'){
+  if(kitReady && stage && stage.roster==='town' && (state==='intro' || TOWN_PROPS)){
     for(const b of PIAZZA_BOXES){ const fade = townHides(b[1], b[2], b[3], 360); items.push([b[2] - 12, b[1], b[2], ()=>{ if(fade) ctx.globalAlpha = 0.35; drawHouseBox(...b); }]); }   // see-through when someone's behind
     for(const [k, x, y, h] of PIAZZA) items.push([y, x, y, ()=>{
       ctx.fillStyle = 'rgba(0,0,0,0.18)'; ctx.beginPath(); ctx.ellipse(x, y + 2, h*0.4, h*0.075, 0, 0, Math.PI*2); ctx.fill();
@@ -6999,6 +7376,7 @@ const TOWN_COL = {pave:'#d8c6a4', paveLine:'rgba(120,90,60,0.18)', street:'#cdb8
   water:'#7cc6e8', waterDark:'#4fa6cf', stone:'#e6dccb', stoneDark:'#b9ab95', roof:'#d9653b', roofDark:'#b44c2a', wood:'#9a6a3e', soil:'#6e4a2e', line:'#3a2a22'};
 const HOUSE_WALLS = ['#f6d7a8','#f3c2a2','#f7e3b5','#eab6a8','#f2d0c0','#e9d9a6','#f5c99a','#dfe7c8'];
 // one tile of town, in tile coordinates (centre 0,0 = the piazza; you start at 0,0)
+const TOWN_PROPS = false;                     // true brings back Cat Town's houses, trees, flower beds, benches and lamps
 const TOWN = (()=>{
   const ground = [], things = [];
   // streets and squares (flat, drawn on the ground)
@@ -7008,14 +7386,12 @@ const TOWN = (()=>{
   ground.push({t:'rect', x0:-70, x1:70, y0:780, y1:1700, c:'street'});                 // avenue south
   ground.push({t:'rect', x0:-1700, x1:1700, y0:1580, y1:1700, c:'street'});            // south street
   ground.push({t:'circle', x:0, y:240, r:560, c:'pave'});                              // the piazza
-  ground.push({t:'rrect', x0:360, x1:1560, y0:640, y1:1520, r:90, c:'grass'});         // park
-  ground.push({t:'pond', x:960, y:1080, rx:180, ry:105});
   ground.push({t:'path', pts:[[330, 660], [700, 860], [960, 930], [1250, 1250], [1560, 1400]], w:70});
-  ground.push({t:'rrect', x0:-1560, x1:-360, y0:640, y1:1520, r:90, c:'garden'});      // garden
   ground.push({t:'path', pts:[[-360, 1080], [-1560, 1080]], w:60});
   ground.push({t:'path', pts:[[-960, 640], [-960, 1520]], w:60});
-  // the piazza: fountain, benches and lamps around it
+  // the piazza: just the big fountain (the houses, trees, beds, benches and lamps are gone: an open map to fight in)
   things.push({t:'fountain', x:0, y:240});
+  if(TOWN_PROPS){
   for(let i=0;i<6;i++){ const a = Math.PI*0.15 + i*Math.PI*0.14; things.push({t:'bench', x:Math.cos(a)*420*(i < 3 ? 1 : -1), y:240 + Math.sin(a)*300}); }
   for(let i=0;i<8;i++){ const a = i/8*Math.PI*2 + 0.2; if(Math.sin(a) < -0.7) continue; things.push({t:'lamp', x:Math.cos(a)*520, y:240 + Math.sin(a)*400}); }
   // house rows (fronts face south, onto the streets); gaps leave lanes to walk through
@@ -7035,6 +7411,7 @@ const TOWN = (()=>{
   // the garden: rows of flower beds and lemon trees
   for(let r=0;r<3;r++) for(let c=0;c<2;c++) things.push({t:'bed', x:-1260 + c*600 + (r%2)*60, y:780 + r*260 + (r > 1 ? 120 : 0), w:240, d:70, seed:r*2 + c + 5});
   [[-460, 720], [-1480, 1420], [-460, 1440], [-1480, 720]].forEach(([x, y])=>things.push({t:'kit', k:'lemonTree', x, y, h:110}));
+  }
   return {ground, things};
 })();
 // the tiles near the camera (the town repeats)
@@ -7056,6 +7433,7 @@ function townZone(x, y){
 /* ---- the ground: streets, the piazza, grass, the pond, paths ---- */
 function drawTownGround(t){
   if(!townOn()) return;
+  if(!TOWN_PROPS){ drawSquareGround(t); return; }      // the low-poly square (TOWN_PROPS brings back the old blockout)
   const C = TOWN_COL;
   for(const [ox, oy] of townTiles(400)){
     ctx.save(); ctx.translate(ox, oy);
@@ -7090,6 +7468,146 @@ function drawTownGround(t){
     ctx.restore();
   }
 }
+/* ---- Cat Town's square, low-poly (after the Ooblets town square reference) ----
+   Big warm sandstone paving tiles everywhere, soft green lawns with a raised pale-stone curb, a chunky
+   flat-shaded tiered fountain, round puffy bushes, spotted mushrooms, slim lamp posts and wooden benches.
+   No black outlines: shapes are told apart by flat light and shade, like low-poly 3D.                 */
+const SQ = {tile:116, tiles:['#e8bd93','#e3b68b','#ebc39b','#dfb085','#e6ba8f'], grout:'rgba(250,226,198,0.9)', groutShadow:'rgba(160,105,65,0.25)',
+  grass:'#8fcd6b', grassLight:'#a6dc80', grassDark:'#79bb58', curb:'#f6e2c9', curbSide:'#d9b591', stone:'#ecb894', stoneLight:'#f6cfae', stoneDark:'#c98e6a',
+  water:'#9ad7e3', waterDeep:'#74c1d3'};
+function lpShade(hex, k){ const n = parseInt(hex.slice(1), 16), c = v => Math.max(0, Math.min(255, Math.round(v*k))); return `rgb(${c((n>>16)&255)},${c((n>>8)&255)},${c(n&255)})`; }
+function sqHash(i, j){ let h = (i*73856093) ^ (j*19349663); h = (h ^ (h >>> 13))*1274126177; return ((h ^ (h >>> 16)) >>> 0)/4294967295; }
+// a flat-shaded n-sided cylinder (or a cone/frustum with r2), base at height z0; light from the upper left
+function lpCyl(x, y, r, h, z0, col, opt){
+  opt = opt || {}; const n = opt.n || 12, r2 = opt.r2 ?? r, F = MESH_FLAT;
+  const [bx, by] = boxPt(x, y, z0), [tx, ty] = boxPt(x, y, z0 + h);
+  const ring = (cx, cy, rr) => Array.from({length:n}, (_, i)=>{ const a = i/n*Math.PI*2 + Math.PI/n; return [cx + Math.cos(a)*rr, cy + Math.sin(a)*rr*F, a]; });
+  const B = ring(bx, by, r), T = ring(tx, ty, r2);
+  for(let i=0;i<n;i++){
+    const j = (i + 1) % n, am = (B[i][2] + B[j][2])/2 + (j === 0 ? Math.PI : 0);
+    if(Math.sin(am) < -0.05) continue;                                   // back facets are hidden
+    const k = 0.78 + 0.22*Math.cos(am - Math.PI*0.85);                  // lit from the left-front
+    ctx.fillStyle = lpShade(col, k); ctx.beginPath(); ctx.moveTo(B[i][0], B[i][1]); ctx.lineTo(B[j][0], B[j][1]); ctx.lineTo(T[j][0], T[j][1]); ctx.lineTo(T[i][0], T[i][1]); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = lpShade(col, k*0.97); ctx.lineWidth = 1; ctx.stroke();  // hide hairline seams
+  }
+  ctx.fillStyle = opt.top || lpShade(col, 1.08); ctx.beginPath(); T.forEach(([px, py], i)=>i ? ctx.lineTo(px, py) : ctx.moveTo(px, py)); ctx.closePath(); ctx.fill();
+  return {tx, ty, r:r2, T};
+}
+// a round low-poly blob (bushes, tree tops): a faceted dome
+function lpBlob(cx, cy, R, col){
+  const n = 9;
+  for(let ring = 0; ring < 3; ring++){
+    const rr = R*(1 - ring*0.3), oy = -ring*R*0.22;
+    for(let i=0;i<n;i++){
+      const a0 = i/n*Math.PI*2 + ring*0.35, a1 = (i + 1)/n*Math.PI*2 + ring*0.35, am = (a0 + a1)/2;
+      const k = 0.8 + 0.2*Math.cos(am + Math.PI*0.75) + ring*0.07;
+      ctx.fillStyle = lpShade(col, k); ctx.beginPath(); ctx.moveTo(cx, cy + oy - rr*0.15);
+      ctx.lineTo(cx + Math.cos(a0)*rr, cy + oy + Math.sin(a0)*rr*0.86); ctx.lineTo(cx + Math.cos(a1)*rr, cy + oy + Math.sin(a1)*rr*0.86); ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = lpShade(col, k*0.98); ctx.lineWidth = 1; ctx.stroke();
+    }
+  }
+}
+function sqShadow(x, y, rx, ry, a){ ctx.fillStyle = `rgba(150,95,60,${a || 0.22})`; ctx.beginPath(); ctx.ellipse(x + rx*0.12, y + 2, rx, ry, 0, 0, Math.PI*2); ctx.fill(); }
+const SQUARE = (()=>{
+  const lawns = [{x0:-560, x1:560, y0:20, y1:520, r:150}, {x0:-1320, x1:-820, y0:-760, y1:-330, r:110}, {x0:820, x1:1320, y0:-760, y1:-330, r:110},
+                 {x0:-1320, x1:-820, y0:900, y1:1320, r:110}, {x0:820, x1:1320, y0:900, y1:1320, r:110}];
+  const things = [{t:'fountain', x:0, y:240}];
+  const bush = (x, y, s, c) => things.push({t:'bush', x, y, s, c});
+  bush(-470, 110, 1, '#f2d45a'); bush(-410, 70, 0.7, '#f2d45a'); bush(470, 470, 1.05, '#7cc35c'); bush(400, 500, 0.75, '#9fd36a'); bush(-470, 470, 0.85, '#7cc35c');
+  [[-1200, -660, '#f2d45a'], [1200, -440, '#7cc35c'], [-940, 1220, '#9fd36a'], [1210, 1000, '#f2d45a']].forEach(([x, y, c])=>bush(x, y, 0.95, c));
+  [[180, 470], [205, 452], [228, 478], [-360, 180], [-338, 200], [1000, -500], [-1080, 1080], [-1060, 1098]].forEach(([x, y], i)=>things.push({t:'mush', x, y, s:0.8 + (i%3)*0.18}));
+  [[-640, 0], [640, 0], [-640, 560], [640, 560], [-760, -280], [760, -280], [-760, 870], [760, 870]].forEach(([x, y])=>things.push({t:'lamp', x, y}));
+  [[-260, 590], [260, 590], [-1070, -270], [1070, -270]].forEach(([x, y])=>things.push({t:'bench', x, y}));
+  return {lawns, things};
+})();
+// paving + lawns, drawn on the ground (under everything)
+function drawSquareGround(t){
+  const v = getViewBounds(40), S = SQ.tile;
+  const i0 = Math.floor(v.left/S), i1 = Math.ceil(v.right/S), j0 = Math.floor(v.top/S), j1 = Math.ceil(v.bottom/S);
+  for(let j=j0;j<=j1;j++) for(let i=i0;i<=i1;i++){ ctx.fillStyle = SQ.tiles[Math.floor(sqHash(i, j)*SQ.tiles.length)]; ctx.fillRect(i*S, j*S, S, S); }
+  ctx.strokeStyle = SQ.groutShadow; ctx.lineWidth = 4;
+  ctx.beginPath(); for(let i=i0;i<=i1;i++){ ctx.moveTo(i*S + 1.5, j0*S); ctx.lineTo(i*S + 1.5, (j1 + 1)*S); } for(let j=j0;j<=j1;j++){ ctx.moveTo(i0*S, j*S + 1.5); ctx.lineTo((i1 + 1)*S, j*S + 1.5); } ctx.stroke();
+  ctx.strokeStyle = SQ.grout; ctx.lineWidth = 3;
+  ctx.beginPath(); for(let i=i0;i<=i1;i++){ ctx.moveTo(i*S, j0*S); ctx.lineTo(i*S, (j1 + 1)*S); } for(let j=j0;j<=j1;j++){ ctx.moveTo(i0*S, j*S); ctx.lineTo((i1 + 1)*S, j*S); } ctx.stroke();
+  // lawns, in every repeat of the town tile near the camera
+  for(const [ox, oy] of townTiles(300)) for(const L of SQUARE.lawns){
+    const x0 = L.x0 + ox, y0 = L.y0 + oy, w = L.x1 - L.x0, h = L.y1 - L.y0;
+    if(x0 > v.right || x0 + w < v.left || y0 > v.bottom || y0 + h < v.top) continue;
+    ctx.fillStyle = SQ.curbSide; roundRect(x0 - 16, y0 - 10, w + 32, h + 34, L.r + 16); ctx.fill();          // the curb's side, showing below
+    ctx.fillStyle = SQ.curb; roundRect(x0 - 16, y0 - 16, w + 32, h + 32, L.r + 16); ctx.fill();              // the curb's top
+    ctx.fillStyle = SQ.grass; roundRect(x0, y0, w, h, L.r); ctx.fill();
+    ctx.save(); roundRect(x0, y0, w, h, L.r); ctx.clip();
+    ctx.fillStyle = 'rgba(90,150,60,0.28)'; ctx.fillRect(x0, y0, w, 14);                                         // the curb's shadow on the grass
+    for(let k=0;k<10;k++){ const hx = x0 + sqHash(k, L.x0)*w, hy = y0 + sqHash(L.y0, k)*h;                      // soft lighter patches
+      ctx.fillStyle = k%2 ? SQ.grassLight : SQ.grassDark; ctx.globalAlpha = 0.45; ctx.beginPath(); ctx.ellipse(hx, hy, 60 + k*7, 26 + k*3, 0, 0, Math.PI*2); ctx.fill(); }
+    ctx.globalAlpha = 1;
+    // grass tufts and little flowers
+    const N = Math.round(w*h/5200);
+    for(let k=0;k<N;k++){
+      const fx = x0 + 14 + sqHash(k*7 + 1, L.x0 + 3)*(w - 28), fy = y0 + 14 + sqHash(L.y0 + 5, k*11 + 2)*(h - 28), r = sqHash(k, k + 9);
+      if(r < 0.55){ ctx.strokeStyle = SQ.grassDark; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(fx - 4, fy); ctx.lineTo(fx - 6, fy - 7); ctx.moveTo(fx, fy); ctx.lineTo(fx, fy - 9); ctx.moveTo(fx + 4, fy); ctx.lineTo(fx + 6, fy - 7); ctx.stroke(); }
+      else { const col = r < 0.75 ? '#ffffff' : r < 0.88 ? '#9cc7f2' : '#ffd96a';
+        ctx.fillStyle = col; for(let p=0;p<5;p++){ const a = p/5*Math.PI*2 + t*0; ctx.beginPath(); ctx.arc(fx + Math.cos(a)*3.2, fy + Math.sin(a)*2.4, 2.4, 0, Math.PI*2); ctx.fill(); }
+        ctx.fillStyle = '#f5b83c'; ctx.beginPath(); ctx.arc(fx, fy, 1.8, 0, Math.PI*2); ctx.fill(); }
+    }
+    ctx.restore();
+  }
+}
+// the low-poly tiered fountain
+function drawSquareFountain(o, t){
+  sqShadow(o.x, o.y + 6, 196, 196*MESH_FLAT*1.05, 0.2);
+  const base = lpCyl(o.x, o.y, 178, 30, 0, SQ.stone, {n:16, top:SQ.stoneLight});
+  ctx.fillStyle = SQ.waterDeep; ctx.beginPath(); ctx.ellipse(base.tx, base.ty + 2, 152, 152*MESH_FLAT, 0, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = SQ.water; ctx.beginPath(); ctx.ellipse(base.tx, base.ty + 4, 146, 146*MESH_FLAT - 4, 0, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle = 'rgba(255,255,255,0.7)'; ctx.lineWidth = 2;
+  for(let i=0;i<3;i++){ const k = (t*0.45 + i/3) % 1; ctx.globalAlpha = 1 - k; ctx.beginPath(); ctx.ellipse(base.tx, base.ty + 4, 36 + k*100, (36 + k*100)*MESH_FLAT, 0, 0, Math.PI*2); ctx.stroke(); }
+  ctx.globalAlpha = 1;
+  lpCyl(o.x, o.y, 34, 70, 26, SQ.stone, {n:8, r2:26});
+  const b1 = lpCyl(o.x, o.y, 44, 18, 92, SQ.stone, {n:10, r2:92, top:SQ.waterDeep});
+  ctx.fillStyle = SQ.water; ctx.beginPath(); ctx.ellipse(b1.tx, b1.ty + 2, 80, 80*MESH_FLAT - 4, 0, 0, Math.PI*2); ctx.fill();
+  lpCyl(o.x, o.y, 20, 40, 108, SQ.stone, {n:8, r2:16});
+  const b2 = lpCyl(o.x, o.y, 26, 12, 146, SQ.stone, {n:10, r2:52, top:SQ.waterDeep});
+  ctx.fillStyle = SQ.water; ctx.beginPath(); ctx.ellipse(b2.tx, b2.ty + 1, 44, 44*MESH_FLAT - 3, 0, 0, Math.PI*2); ctx.fill();
+  lpCyl(o.x, o.y, 10, 22, 156, SQ.stoneLight, {n:6, r2:4});
+  // water spilling over each bowl's rim, and a few drops
+  ctx.strokeStyle = 'rgba(200,238,248,0.8)'; ctx.lineWidth = 3; ctx.lineCap = 'round';
+  for(const [b, rr, drop] of [[b2, 52, 50], [b1, 92, 70]]){
+    for(let i=0;i<8;i++){ const a = i/8*Math.PI*2 + 0.2; if(Math.sin(a) < -0.2) continue;
+      const sx = b.tx + Math.cos(a)*rr, sy = b.ty + Math.sin(a)*rr*MESH_FLAT, ph = (t*1.6 + i*0.37) % 1;
+      ctx.beginPath(); ctx.moveTo(sx, sy); ctx.quadraticCurveTo(sx + Math.cos(a)*10, sy + drop*0.3, sx + Math.cos(a)*16, sy + drop); ctx.stroke();
+      ctx.fillStyle = 'rgba(230,250,255,0.9)'; ctx.beginPath(); ctx.arc(sx + Math.cos(a)*14, sy + drop*ph, 2.2, 0, Math.PI*2); ctx.fill(); }
+  }
+}
+function drawSquareBush(o){
+  const s = o.s || 1; sqShadow(o.x, o.y, 58*s, 20*s, 0.22);
+  const [cx, cy] = boxPt(o.x, o.y, 34*s); lpBlob(cx, cy, 52*s, o.c);
+}
+function drawSquareMush(o){
+  const s = o.s || 1; sqShadow(o.x, o.y, 12*s, 4*s, 0.2);
+  lpCyl(o.x, o.y, 6*s, 14*s, 0, '#f4ead8', {n:6, r2:5*s});
+  const [cx, cy] = boxPt(o.x, o.y, 16*s);
+  ctx.fillStyle = '#d9473f'; ctx.beginPath(); ctx.ellipse(cx, cy, 15*s, 11*s, 0, Math.PI, 0); ctx.lineTo(cx + 15*s, cy + 2*s); ctx.lineTo(cx - 15*s, cy + 2*s); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#ef6a5d'; ctx.beginPath(); ctx.ellipse(cx - 4*s, cy - 3*s, 8*s, 6*s, 0, Math.PI, 0); ctx.fill();
+  ctx.fillStyle = '#fff6ea'; for(const [dx, dy, r] of [[-6, -5, 2.6], [4, -7, 2.2], [8, -2, 1.8], [-1, -1, 1.6]]){ ctx.beginPath(); ctx.arc(cx + dx*s, cy + dy*s, r*s, 0, Math.PI*2); ctx.fill(); }
+}
+function drawSquareLamp(o, t){
+  sqShadow(o.x, o.y, 16, 6, 0.22);
+  lpCyl(o.x, o.y, 11, 10, 0, '#4a5f86', {n:6, r2:9});
+  lpCyl(o.x, o.y, 4, 120, 10, '#4a5f86', {n:6});
+  const lamp = lpCyl(o.x, o.y, 8, 24, 130, '#cfe4f2', {n:6, r2:12, top:'#4a5f86'});
+  lpCyl(o.x, o.y, 12, 6, 154, '#4a5f86', {n:6, r2:3});
+  const [lx, ly] = boxPt(o.x, o.y, 142);
+  const g = ctx.createRadialGradient(lx, ly, 2, lx, ly, 40); g.addColorStop(0, 'rgba(255,240,190,0.55)'); g.addColorStop(1, 'rgba(255,240,190,0)'); ctx.fillStyle = g; ctx.fillRect(lx - 40, ly - 40, 80, 80);
+}
+function drawSquareBench(o){
+  sqShadow(o.x, o.y, 54, 12, 0.2);
+  const wood = '#c98a5c', leg = '#5b6b8f', P = boxPt, slat = (y, z, d) => meshPolyFlat([P(o.x - 48, y - d, z), P(o.x + 48, y - d, z), P(o.x + 48, y, z), P(o.x - 48, y, z)], lpShade(wood, z > 30 ? 0.92 : 1.05));
+  for(const dx of [-40, 40]) lpCyl(o.x + dx, o.y - 6, 3.5, 20, 0, leg, {n:4});
+  for(let k=0;k<3;k++) slat(o.y - k*7, 20, 6);
+  for(let k=0;k<2;k++){ const z = 30 + k*10; meshPolyFlat([P(o.x - 48, o.y - 24, z), P(o.x + 48, o.y - 24, z), P(o.x + 48, o.y - 24, z + 7), P(o.x - 48, o.y - 24, z + 7)], lpShade(wood, 0.9 + k*0.08)); }
+  for(const dx of [-40, 40]) lpCyl(o.x + dx, o.y - 24, 3, 46, 0, leg, {n:4});
+}
+function meshPolyFlat(pts, fill){ ctx.fillStyle = fill; ctx.beginPath(); pts.forEach(([px, py], i)=>i ? ctx.lineTo(px, py) : ctx.moveTo(px, py)); ctx.closePath(); ctx.fill(); }
 /* ---- simple meshes (drawn in world coordinates; heights lean away from the camera like the house blocks) ---- */
 const MESH_FLAT = 0.55;     // how deep (squashed) ground-plane circles look from this camera
 function meshPoly(pts, fill, stroke){ ctx.beginPath(); pts.forEach(([px, py], i)=>i ? ctx.lineTo(px, py) : ctx.moveTo(px, py)); ctx.closePath(); if(fill){ ctx.fillStyle = fill; ctx.fill(); } if(stroke){ ctx.strokeStyle = TOWN_COL.line; ctx.lineWidth = 3; ctx.lineJoin = 'round'; ctx.stroke(); } }
@@ -7201,9 +7719,10 @@ function townHides(x, y, w, back){
 function townItems(items, t){
   if(!townOn()) return;
   const v = getViewBounds(350);
-  for(const [ox, oy] of townTiles(350)) for(const o of TOWN.things){
+  const THINGS = TOWN_PROPS ? TOWN.things : SQUARE.things;
+  for(const [ox, oy] of townTiles(350)) for(const o of THINGS){
     const x = o.x + ox, y = o.y + oy; if(x < v.left || x > v.right || y < v.top || y > v.bottom) continue;
-    const w = o.w || (o.t==='fountain' ? 340 : o.t==='tree' ? 110*(o.s || 1) : 80), tall = o.t==='house' ? (o.h || 200) + 120 : o.t==='tree' ? 170*(o.s || 1) : o.t==='fountain' ? 200 : 0;
+    const w = o.w || (o.t==='fountain' ? 340 : o.t==='tree' ? 110*(o.s || 1) : 80), tall = o.t==='house' ? (o.h || 200) + 120 : o.t==='tree' ? 170*(o.s || 1) : o.t==='fountain' ? 200 : o.t==='bush' ? 90*(o.s || 1) : o.t==='lamp' ? 160 : 0;
     const fade = tall && townHides(x, y, w, tall);
     items.push([y, x, y, ()=>{
       if(fade) ctx.globalAlpha = 0.35;
@@ -7211,10 +7730,12 @@ function townItems(items, t){
       const p = Object.assign({}, o, {x, y});
       if(o.t==='house') drawTownHouse(p);
       else if(o.t==='tree') drawTownTree(p);
-      else if(o.t==='fountain') drawFountain(p, t);
+      else if(o.t==='fountain') (TOWN_PROPS ? drawFountain : drawSquareFountain)(p, t);
+      else if(o.t==='bush') drawSquareBush(p);
+      else if(o.t==='mush') drawSquareMush(p);
       else if(o.t==='bed') drawFlowerBed(p);
-      else if(o.t==='bench') drawBench(p);
-      else if(o.t==='lamp') drawLampPost(p, t);
+      else if(o.t==='bench') (TOWN_PROPS ? drawBench : drawSquareBench)(p);
+      else if(o.t==='lamp') (TOWN_PROPS ? drawLampPost : drawSquareLamp)(p, t);
       else if(o.t==='kit'){ ctx.fillStyle = 'rgba(0,0,0,0.18)'; ctx.beginPath(); ctx.ellipse(x, y + 2, o.h*0.4, o.h*0.08, 0, 0, Math.PI*2); ctx.fill(); kitSprite(o.k, x, y, o.h); }
       ctx.globalAlpha = 1;
     }]);
@@ -7225,15 +7746,14 @@ function townItems(items, t){
 /* ---- Quality: steps down automatically on slow machines ----
    During a run the frame time is watched; if it stays under ~40 fps for a couple of seconds the game
    drops one step and remembers it (localStorage 'chumstorm_quality'):
-     0 full · 1 no tilt-shift blur, no lens curve · 2 + fewer particles · 3 + flat camera (no 3D tilt)
-   ?quality=0..3 forces a level (and ?quality=auto clears the saved one).                              */
+     0 full · 1 no tilt-shift blur, no lens curve · 2 + fewer particles. The 3D camera is always kept.
+   ?quality=0..2 forces a level (and ?quality=auto clears the saved one).                              */
 var QUALITY = {level:0, maxP:520, ema:16.7, slowT:0, warm:0};
 function applyQuality(){
   const L = QUALITY.level;
   TILT.fish = L >= 1 ? 0 : 0.1;
   QUALITY.maxP = L >= 2 ? 220 : 520;
-  TILT.on = L < 3;
-  if(L >= 3){ const g = $('glc'); if(g) g.style.visibility = 'hidden'; }
+  TILT.on = true;                                       // the 3D world and camera stay at every level
   tiltOverKey = '';
 }
 // the player's choice in the pause screen: 'auto' (step down when slow), 'fancy' (always full), 'fast' (always lowest)
@@ -7241,7 +7761,7 @@ function qualityMode(){ try{ return localStorage.getItem('chumstorm_quality_mode
 function setQualityMode(m){
   try{ localStorage.setItem('chumstorm_quality_mode', m); }catch(e){}
   QUALITY.forced = m !== 'auto';
-  QUALITY.level = m === 'fancy' ? 0 : m === 'fast' ? 3 : (()=>{ try{ return clamp(+(localStorage.getItem('chumstorm_quality')||0), 0, 3); }catch(e){ return 0; } })();
+  QUALITY.level = m === 'fancy' ? 0 : m === 'fast' ? 2 : (()=>{ try{ return clamp(+(localStorage.getItem('chumstorm_quality')||0), 0, 2); }catch(e){ return 0; } })();
   QUALITY.slowT = 0; QUALITY.warm = 0; QUALITY.ema = 16.7;
   applyQuality(); renderQualityBtns();
 }
@@ -7249,17 +7769,18 @@ function renderQualityBtns(){
   const el = $('quality-btns'); if(!el) return;
   const m = qualityMode();
   el.innerHTML = [['auto','Auto'], ['fancy','Fancy'], ['fast','Fast']].map(([k, t])=>`<button data-q="${k}" class="${k===m ? 'on' : ''}">${t}</button>`).join('') +
-    `<span>${m === 'auto' ? 'Steps down by itself if the game runs slowly' + (QUALITY.level ? ` (now level ${QUALITY.level} of 3)` : '') : m === 'fast' ? 'Flat camera, no blur, fewer particles' : '3D camera with every effect'}</span>`;
+    `<span>${m === 'auto' ? 'Steps down by itself if the game runs slowly' + (QUALITY.level ? ` (now level ${QUALITY.level} of 2)` : '') : m === 'fast' ? 'No blur or lens curve, fewer particles' : '3D camera with every effect'}</span>`;
   el.querySelectorAll('button').forEach(b=>b.onclick = ()=>setQualityMode(b.dataset.q));
 }
 (function initQuality(){
   const q = /[?&]quality=(\w+)/.exec(location.search);
   if(q && q[1] === 'auto'){ try{ localStorage.removeItem('chumstorm_quality'); localStorage.removeItem('chumstorm_quality_mode'); }catch(e){} }
-  else if(q){ QUALITY.level = clamp(+q[1]||0, 0, 3); QUALITY.forced = true; applyQuality(); return; }
+  else if(q){ QUALITY.level = clamp(+q[1]||0, 0, 2); QUALITY.forced = true; applyQuality(); return; }
   setQualityMode(qualityMode());
 })();
 function watchQuality(frameMs){
-  if(QUALITY.forced || QUALITY.level >= 3) return;
+  if(QUALITY.forced || QUALITY.level >= 2) return;
+  if(frameMs > 250) return;                            // a hitch or a throttled background tab, not a slow machine
   QUALITY.warm += frameMs;
   if(QUALITY.warm < 1500) return;                      // ignore the first moment (loading, a new run)
   QUALITY.ema += (Math.min(frameMs, 100) - QUALITY.ema)*0.08;
@@ -7377,36 +7898,40 @@ function givesProjectile(c){
 //   📈 STAT UPGRADE (green)  a passive bonus
 // Pips show the level you're at and the one you'd get; pick with a click or the 1 / 2 / 3 keys.
 const UPG_CAT = {new:['🎯','NEW PROJECTILE','cat-new'], up:['⬆️','PROJECTILE UPGRADE','cat-up'], stat:['📈','STAT UPGRADE','cat-stat'], bonus:['🎁','BONUS','cat-bonus']};
+// The level-up picks and the treasure box sit in a panel on the right while the run keeps going:
+// press 1 / 2 / 3 (or click) to take a buff; the treasure card closes by itself.
+let lvlOpen = false, chestT = 0;
+const CHEST_SHOW = 4.5;                            // seconds the treasure card stays up
 function showLevelUp(){
   levelQueue--;
-  state = 'levelup';
-  resetPointer();
+  lvlOpen = true;
   const list = $('upgrades');
   list.innerHTML = '';
-  buildChoices().forEach((c, i)=>{
+  buildChoices().slice(0, 3).forEach((c, i)=>{
     const info = choiceCard(c), proj = givesProjectile(c);
     const w = c.type==='weapon' && player.weapons.find(w=>w.key===c.key);
     const cat = c.type==='weapon' ? (w ? 'up' : 'new') : c.type==='passive' ? 'stat' : 'bonus';
-    const [cic, clabel, ccls] = UPG_CAT[cat];
+    const [, clabel, ccls] = UPG_CAT[cat];
     const cur = c.type==='weapon' ? (w ? w.level : 0) : c.type==='passive' ? (player.passives[c.key]||0) : -1;
-    const max = c.type==='weapon' ? WEAPON_MAX_LV : c.type==='passive' ? PASSIVES[c.key].max : 0;
-    const pips = max ? `<div class="pips">${Array.from({length:max}, (_, k)=>`<i class="${k < cur ? 'on' : k===cur ? 'next' : ''}"></i>`).join('')}</div><div class="upg-lv">${cur ? `Lv ${cur} → ${cur+1}` : 'Lv 1'}${max ? ` / ${max}` : ''}</div>` : '';
     const div = document.createElement('div');
-    div.className = `upg2 ${ccls}${proj ? ' proj' : ''}${info.trick ? ' trick' : ''}`;
-    div.innerHTML = `<div class="upg-type">${info.trick ? '★ NEW TRICK' : clabel}</div><div class="upg-ic">${info.ic}</div><b class="upg-name">${info.name}</b>${pips}
-      <div class="upg-desc">${info.desc}</div>${proj ? '<div class="upg-chip">🎯 +1 PROJECTILE</div>' : ''}
-      ${info.trick ? `<div class="trick-line">★ <b>${info.trick[0]}</b>: ${info.trick[1]}</div>` : info.tricksLine ? `<div class="hint">${info.tricksLine}</div>` : ''}${info.hint ? `<div class="hint">${info.hint}</div>` : ''}<kbd>${i+1}</kbd><span class="upg-choose">Choose<kbd>${i+1}</kbd></span>`;
-    div.onclick = ()=>{ if(state!=='levelup') return; applyChoice(c); $('levelup').style.display = 'none'; resumePlay(); };
+    div.className = `srow ${ccls}${info.trick ? ' trick' : ''}`;
+    div.innerHTML = `<kbd>${i+1}</kbd><div class="s-ic">${info.ic}</div><div class="s-b"><div class="s-type">${info.trick ? '★ NEW TRICK' : clabel}${proj ? ' · +1 projectile' : ''}</div>
+      <b>${info.name}${cur > 0 ? ` <small>Lv ${cur} → ${cur+1}</small>` : cur === 0 ? ' <small>new</small>' : ''}</b><span>${info.trick ? `<b>${info.trick[0]}</b>: ${info.trick[1]}` : info.desc}</span></div>`;
+    div.onclick = e=>{ e.stopPropagation(); pickLevelUp(c); };
     list.appendChild(div);
   });
-  $('levelup').style.display = 'flex';
+  const el = $('levelup'); el.style.display = 'flex'; el.classList.remove('in'); void el.offsetWidth; el.classList.add('in');
   vibrate([20,30,20]);
 }
+function pickLevelUp(c){
+  if(!lvlOpen || runOver) return;
+  applyChoice(c); lvlOpen = false; $('levelup').style.display = 'none';
+  if(levelQueue > 0) showLevelUp();
+}
+function hideSidePanels(){ lvlOpen = false; chestT = 0; $('levelup').style.display = 'none'; $('chest').style.display = 'none'; document.body.classList.remove('side-open'); }
 /* ============== TREASURE (chests from elites & bosses) ============== */
 function openChest(){
   chestQueue--;
-  state = 'chest';
-  resetPointer();
   const L = player.stats.luck, r = Math.random();
   const n = chestTiers.length ? chestTiers.shift() : (r < 0.04*L ? 5 : r < 0.2*L ? 3 : 1);
   const rewards = [];
@@ -7440,21 +7965,29 @@ function openChest(){
     player.artifacts.push(k);
     rewards.unshift({ic:a.ic, name:a.name, text:'Artifact! '+a.desc, evo:true, proj:a.proj});
   }
+  { const fg = rollSpecialGrade(player.stats.luck*(n >= 5 ? 2 : n >= 3 ? 1.4 : 1)), fft = fishTypeFor(fg), fn = mapFishCount(fg, n >= 5 ? 2 : n >= 3 ? 1.5 : 1);
+    addFish(fft, fn); runCaught[fg] += fn; fishWarned = 0;
+    rewards.push({ic:spImgHTML(fft, 'rw-fish'), name:fn+' '+fishName(fft), text:'Into your bucket · '+((FISH_ABILITY_INFO[fishAbility(fft)]||{}).name||'fish')}); }
   const g = Math.round(rand(10,30)*stage.goldMul*player.stats.greed*(n >= 5 ? 3 : n >= 3 ? 1.8 : 1));
   runGold += g;
   rewards.push({ic:'🪙', name:'Gold', text:'+'+g+' gold'});
   recomputeStats(); renderBuildIcons();
   $('chest-rewards').innerHTML = rewards.map((rw,i)=>`<div class="reward${rw.evo?' evo':''}${rw.proj?' proj':''}" style="animation-delay:${0.35+i*(n>=3?0.3:0.14)}s"><div class="ic">${rw.ic}</div><div><b>${rw.name}</b><span>${rw.text}</span></div></div>`).join('');
-  $('chest').className = 'overlay tier-'+n;
+  $('chest').className = 'overlay side tier-'+n;
   $('chest-title').textContent = n >= 5 ? 'LEGENDARY Treasure!' : n >= 3 ? 'Rare Treasure!' : 'Treasure Tackle Box!';
-  $('chest').style.display = 'flex';
+  const el = $('chest'); el.style.display = 'flex'; el.classList.remove('in'); void el.offsetWidth; el.classList.add('in');
+  chestT = CHEST_SHOW + Math.min(3, rewards.length*0.4);      // it closes by itself (a bit later when there's more to read)
+  el.style.setProperty('--ct', chestT+'s');
   vibrate([20,40,20,40,40]);
 }
-$('btn-chest').addEventListener('click', ()=>{ $('chest').style.display = 'none'; resumePlay(); });
+// the treasure card counts down with the game (so it waits while paused); a click closes it early
+function updateSidePanels(dt){
+  if(chestT > 0){ chestT -= dt; if(chestT <= 0) $('chest').style.display = 'none'; }
+  document.body.classList.toggle('side-open', lvlOpen || chestT > 0);
+}
+$('chest').addEventListener('click', ()=>{ chestT = 0; $('chest').style.display = 'none'; });
 function resumePlay(){
   if(runOver) return;
-  if(chestQueue > 0){ openChest(); return; }
-  if(levelQueue > 0){ showLevelUp(); return; }
   state = 'playing';
   startLoop();
 }
@@ -7480,14 +8013,14 @@ function updateHud(){
   const left = ALL_CAT_DEFS.length - ALL_CAT_DEFS.filter(d=>collected.has(d.key)).length;
   if(left !== lastDiscShown){
     const el = $('disc-label');
-    const here = undiscoveredIn(stage).length;
-    el.innerHTML = left ? `Cats to discover <span>· ${here ? here+' here' : 'none here'}</span>` : 'All cats found!';
+    const all = stageCatKeys(stage).length, here = undiscoveredIn(stage).length;
+    el.innerHTML = here ? `Cats found here <span>· ${all - here} / ${all}</span>` : `All cats found here! <span>· ${all} / ${all}</span>`;
     if(lastDiscShown >= 0){ el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
     lastDiscShown = left;
   }
   setIconText('gold-label', 'coin', '🪙', Math.floor(runGold));
   setIconText('fed-label', 'fishCur', '🐟', fedCount);
-  { const b = $('ammo-label').querySelector('b'), t = String(fishTotal()); if(b.textContent !== t) b.textContent = t; $('ammo-label').classList.toggle('low', fishTotal() < 50); }
+  { const b = $('ammo-label').querySelector('b'), t = '∞ + '+fishSpecial(); if(b.textContent !== t) b.textContent = t; $('ammo-label').classList.toggle('low', fishTotal() < 50); }
   const n = 1 + player.stats.amount;
   if(n !== lastProjShown){ const el = $('proj-label'); el.textContent = '🎯×'+n; if(lastProjShown){ el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); } lastProjShown = n; }
   const fl = $('frenzy-label'); fl.hidden = !(player.frenzyT > 0); if(player.frenzyT > 0) fl.textContent = '🔥 '+Math.ceil(player.frenzyT)+'s';
@@ -7505,6 +8038,7 @@ function renderBuildIcons(){
 }
 let bannerTimeout = null;
 function showBanner(text, ms, label){
+  if(tutKeysActive()){ heldPops.push(()=>showBanner(text, ms, label)); return; }   // the tutorial's keys are showing: wait
   const el = $('banner');
   el.classList.toggle('stage', !!label);
   const m = !label && /^(\p{Extended_Pictographic}[\uFE0F\u200D\p{Extended_Pictographic}]*)\s+(.+)$/u.exec(text);
@@ -7533,23 +8067,149 @@ function startRun(opts){
   hazards = []; yarns = []; cucumbers = []; thrown = []; treatT = 0; placing = null; obstacles = [];
   decoState.clear();
   runT = 0; fedCount = 0; runGold = 0; spawnTimer = 0.5; eventIdx = 0; propTimer = 0; bossCountRun = 0;
-  runOver = false; levelQueue = 0; chestQueue = 0; bossFedRun = 0; chestTiers = []; huntT = 20; spottedNew = new Set(); lastProjShown = 0; lastDiscShown = -1; $('lvl-label').textContent = '';
+  runOver = false; levelQueue = 0; chestQueue = 0; bossFedRun = 0; chestTiers = []; huntT = 10; spottedNew = new Set(); lastProjShown = 0; lastDiscShown = -1; $('lvl-label').textContent = '';
   shakeT = shakeMag = hitstop = flashT = 0;
   speechTimer = rand(9,14);
   updateLighting();
   for(const id of ['menu','results','pauseOverlay','levelup','chest']) $(id).style.display = 'none';
+  hideSidePanels();
   renderBuildIcons(); renderItemBar(); startMissions(); runRequestsDirty = true; renderRunRequests(); updateHud();
   // how many cats this area still hides: silhouettes under the chip, and a callout after the mission intro
   renderDiscStrip();
-  { const here = undiscoveredIn(stage), all = stageCatKeys(stage).length; if(here.length) pending.push({t:4.6, fn:()=>callout(`<div class="co-head"><b>Cats to discover</b><button class="v2round v2x co-x" aria-label="Close">X</button></div><div class="co-sub">${stage.name} · ${all - here.length} of ${all} found</div><div class="co-grid">${here.slice(0, 10).map(k=>`<div class="co-cell"><i><img src="${catIconURL(ENEMIES[k], 56, true)}" alt=""></i><span>???</span></div>`).join('')}</div>`, 'dim w600', 3400)}); }
+  { const here = undiscoveredIn(stage), all = stageCatKeys(stage).length; if(here.length && !save.introRun) pending.push({t:4.6, fn:()=>callout(`<div class="co-head"><b>Cats to discover</b><button class="v2round v2x co-x" aria-label="Close">X</button></div><div class="co-sub">${stage.name} · ${all - here.length} of ${all} found</div><div class="co-grid">${here.slice(0, 10).map(k=>`<div class="co-cell"><i><img src="${catIconURL(ENEMIES[k], 56, true)}" alt=""></i><span>???</span></div>`).join('')}</div>`, 'dim w600', 3400)}); }
   royalRunStart();
   if(opts && opts.prep === true) return;          // the opening story sets the map up, then calls beginRun()
   beginRun();
+}
+/* ---- Tutorial: a coach card that teaches the game one step at a time ----
+   Part 1 plays in your first run (straight after the story), part 2 on your first visit to the harbor.
+   Each step finishes when you actually do the thing (move, feed cats, level up, dodge, open a building…)
+   or, for tips that only need reading, after a few seconds. Progress is saved in save.tut
+   ({run: next step, harbor: next step, skip: true}); "?" in the harbor top bar replays it.            */
+const TUT_RUN = [
+  {id:'move',   keys:'wasd', title:'Move around', line:'', goal:'', need:260},
+  {id:'dodge',  keys:'space', title:'Dodge!', line:'', goal:''},
+];
+const TUT_HARBOR = [
+  {id:'walk',   title:'Welcome to the harbor', line:'This is your street. Walk with <kbd>A</kbd> <kbd>D</kbd> or the arrow keys, or tap where to go.', goal:'Take a stroll', need:200},
+  {id:'shop',   title:'The Big Fish Shop',     line:'Your shop: spend gold on <b>skills</b> that last forever, and visit your <b>Cat Home</b> upstairs. Walk to the door and press <kbd>E</kbd>, or tap it.', goal:'Go into the shop', target:'shop'},
+  {id:'gil',    title:'Old Gil\'s fish',       line:'Fish are your ammo. Old Gil on the pier sells crates of fish for your bucket.', goal:'Visit Old Gil', target:'gil'},
+  {id:'boat',   title:'Go fishing',            line:'Fishing is free! Steer the hook deeper for rarer fish, and sneak up on fancy fish from behind.', goal:'Board your boat', target:'boat'},
+  {id:'locals', title:'Locals with requests',  line:'Townsfolk with a <b>!</b> over their head have a job for you. Talk to them for bonus gold.', goal:'', wait:7},
+  {id:'gate',   title:'Back to the cats',      line:'When you\'re ready, walk off the <b>left end</b> of the street past the <b>Areas</b> sign (or tap <b>Areas</b> below) to pick where to go.', goal:'Choose an area', target:'gate'},
+];
+let tut = null;           // {part:'run'|'harbor', i, steps, prog, base, t, doneT}
+var heldPops = [];        // pop-ups that waited while the tutorial's keys were showing
+function tutKeysActive(){ try{ return !!(tut && tut.part === 'run' && tut.steps[tut.i] && tut.steps[tut.i].keys); }catch(e){ return false; } }
+function tutFlushPops(){ if(tutKeysActive()) return; const h = heldPops.splice(0); for(const f of h) f(); if(!calloutOn && calloutQ.length) nextCallout(); }
+function tutSave(){ if(!save.tut || typeof save.tut !== 'object') save.tut = {run:0, harbor:0}; return save.tut; }
+function tutStart(part){
+  const S = tutSave(); if(S.skip) return;
+  const steps = part === 'run' ? TUT_RUN : TUT_HARBOR, i = S[part]||0;
+  if(i >= steps.length){ tut = null; tutRender(); return; }
+  tut = {part, i, steps, prog:0, t:0, doneT:0, base:null};
+  tutRender(true);
+}
+function tutStep(){ return tut && tut.steps[tut.i]; }
+function tutAdvance(){
+  if(!tut || tut.doneT) return;
+  tut.doneT = 1.1;                                  // show the tick for a moment, then the next step
+  vibrate(15); tutRender();
+}
+function tutEvent(ev){
+  const st = tutStep(); if(!st || tut.doneT) return;
+  if(ev === 'dodge' && st.id === 'dodge') tutAdvance();
+  else if(ev.startsWith('open:') && st.target){
+    const k = ev.slice(5);
+    if(k === st.target || (st.target === 'shop' && (k === 'tackle' || k === 'home' || k === 'shop'))) tutAdvance();
+  }
+}
+function tutTick(dt){
+  if(!tut) return;
+  if(tut.doneT){
+    tut.doneT -= dt;
+    if(tut.doneT <= 0){
+      const S = tutSave(); S[tut.part] = tut.i + 1; persist();
+      tut.i++; tut.prog = 0; tut.t = 0; tut.doneT = 0; tut.base = null;
+      if(tut.i >= tut.steps.length){
+        const part = tut.part; tut = null; tutRender(); tutFlushPops();
+        if(part === 'harbor') showBanner('🎓 Tutorial complete! Good luck out there', 2200);
+        return;
+      }
+      tutRender(true); tutFlushPops();
+    }
+    return;
+  }
+  const st = tutStep(); if(!st) return;
+  tut.t += dt;
+  if(st.keys === 'wasd'){ const el = $('coach'); if(el) for(const [k, a] of [['w','arrowup'],['a','arrowleft'],['s','arrowdown'],['d','arrowright']]){ const c = el.querySelector('.kc[data-k="'+k+'"]'); if(c) c.classList.toggle('on', keysDown.has(k) || keysDown.has(a)); } }
+  let p = tut.prog;
+  if(st.id === 'move' && player){
+    if(!tut.base) tut.base = {x:player.x, y:player.y, d:0};
+    tut.base.d += Math.hypot(player.x - tut.base.x, player.y - tut.base.y); tut.base.x = player.x; tut.base.y = player.y;
+    p = tut.base.d/st.need;
+  } else if(st.id === 'walk' && hb){
+    if(!tut.base) tut.base = {x:hb.x, y:hb.y||0, d:0};
+    tut.base.d += Math.hypot(hb.x - tut.base.x, (hb.y||0) - tut.base.y); tut.base.x = hb.x; tut.base.y = hb.y||0;
+    p = tut.base.d/st.need;
+  } else if(st.id === 'feed'){
+    if(tut.base === null) tut.base = fedCount;
+    p = (fedCount - tut.base)/st.need;
+  } else if(st.id === 'xp' && player){
+    p = player.level >= st.need ? 1 : player.xp/player.xpToNext*0.95;
+  } else if(st.wait){
+    p = tut.t/st.wait;
+  }
+  if(Math.abs(p - tut.prog) > 0.01 || p >= 1){ tut.prog = Math.min(1, p); tutRenderBar(); }
+  if(p >= 1) tutAdvance();
+}
+function tutRenderBar(){ const b = $('coach') && $('coach').querySelector('.coach-bar i'); if(b) b.style.width = Math.round(tut.prog*100)+'%'; }
+function tutRender(fresh){
+  const el = $('coach'); if(!el) return;
+  const st = tutStep();
+  document.body.classList.toggle('coach-on', !!st && tut.part === 'harbor');
+  if(!st){ el.classList.remove('show'); return; }
+  const n = tut.steps.length;
+  // the first steps are just the keys, flashing (they light up as you press them)
+  if(st.keys){
+    const touch = matchMedia('(pointer: coarse)').matches;
+    const cap = (k, l, cls)=>`<i class="kc ${cls||''}" data-k="${k}">${l}</i>`;
+    el.className = 'keys show' + (tut.doneT ? ' done' : '');
+    el.innerHTML = st.keys === 'wasd'
+      ? (touch ? `<div class="kc-touch">👆<span>hold &amp; drag</span></div>` : `<div class="kc-wasd">${cap('w','W')}<div>${cap('a','A')}${cap('s','S')}${cap('d','D')}</div></div>`)
+      : cap(' ', 'Space', 'wide');
+    if(fresh){ el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
+    return;
+  }
+  el.className = el.classList.contains('show') ? 'show' : '';
+  el.innerHTML = `<div class="coach-top"><span class="coach-lab">${tut.part === 'run' ? 'How to play' : 'Your harbor'} · ${tut.i + 1}/${n}</span><span class="sp"></span><button class="coach-skip" type="button">Skip tutorial</button></div>
+    <div class="coach-row"><div class="coach-num${tut.doneT ? ' done' : ''}">${tut.doneT ? '✓' : tut.i + 1}</div>
+    <div class="coach-txt"><b>${st.title}</b><p>${st.line}</p>${st.goal ? `<div class="coach-goal">${tut.doneT ? 'Done!' : st.goal}</div>` : ''}</div></div>
+    <div class="coach-bar"><i style="width:${Math.round((tut.doneT ? 1 : tut.prog)*100)}%"></i></div>`;
+  el.querySelector('.coach-skip').onclick = e=>{ e.stopPropagation(); tutSave().skip = true; persist(); tut = null; tutRender(); tutFlushPops(); showBanner('Tutorial skipped. Tap ? in the harbor to see it again', 2000); };
+  el.classList.add('show');
+  if(fresh){ el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
+}
+function tutReplay(){
+  save.tut = {run:0, harbor:0}; persist();
+  tutStart('harbor');
+  showBanner('🎓 Tutorial on: the run part plays in your next run', 2000);
+}
+// harbor: a bouncing arrow over the building the current step wants you to visit
+function tutHarborArrow(gy){
+  const st = tutStep(); if(!st || !st.target || tut.part !== 'harbor' || tut.doneT) return;
+  const b = HB_BUILDINGS.find(x=>x.key===st.target); if(!b) return;
+  const y = (b.gate ? gy - 330 : b.boat ? gy - 370 : b.stall ? gy - 340 : gy - 48 - b.h - 180) - Math.abs(Math.sin(hb.t*4))*14;
+  ctx.save(); ctx.fillStyle = '#E2582C'; ctx.strokeStyle = '#FFFFFF'; ctx.lineWidth = 5; ctx.lineJoin = 'round';
+  ctx.beginPath(); ctx.moveTo(b.x - 26, y); ctx.lineTo(b.x - 12, y); ctx.lineTo(b.x - 12, y - 30); ctx.lineTo(b.x + 12, y - 30); ctx.lineTo(b.x + 12, y); ctx.lineTo(b.x + 26, y); ctx.lineTo(b.x, y + 28); ctx.closePath();
+  ctx.stroke(); ctx.fill(); ctx.restore();
 }
 function beginRun(){
   showSpeech(character.key==='brine' ? 'By the gods! The chums are coming!' : 'Dinner time, you lot!', 2400);
   showBanner(stage.name, 1800, 'STAGE '+(STAGES.indexOf(stage) + 1));
   state = 'playing';
+  heldPops.length = 0; hideItemHint(false);
+  if(save.introRun || save.tut) tutStart('run'); else { tut = null; tutRender(); }
   startLoop();
 }
 function dinnerBell(){
@@ -7562,6 +8222,7 @@ function endRun(victory, quit){
   if(runOver) return;
   runOver = true;
   state = 'results';
+  hideSidePanels();
   resetPointer();
   const st = save.stats;
   const gold = Math.floor(runGold);
@@ -7620,7 +8281,8 @@ $('btn-gohome').addEventListener('click', ()=>{
   const first = save.introRun;
   if(first){ delete save.introRun; persist(); }
   showMenu();
-  if(first) setTimeout(()=>callout(`<div class="co-head"><b>Your fish shop</b></div><div class="co-pic wide">${hbParts.shop ? `<img src="${hbParts.shop._url || (hbParts.shop._url = hbParts.shop.toDataURL())}" alt="">` : '🐟'}</div><div class="co-line" style="text-align:left">This is the harbor. Spend your gold on skills and fish, take requests from the locals, go fishing off your boat, then walk out of town (far left) to try again!</div><button class="bigbtn co-btn">Got it</button>`, 'dim w540', 6000), 500);
+  if(first){ tutSave(); persist(); }
+  if(false) setTimeout(()=>callout(`<div class="co-head"><b>Your fish shop</b></div><div class="co-pic wide">${hbParts.shop ? `<img src="${hbParts.shop._url || (hbParts.shop._url = hbParts.shop.toDataURL())}" alt="">` : '🐟'}</div><div class="co-line" style="text-align:left">This is the harbor. Spend your gold on skills and fish, take requests from the locals, go fishing off your boat, then walk out of town (far left) to try again!</div><button class="bigbtn co-btn">Got it</button>`, 'dim w540', 6000), 500);
 });
 $('btn-start').addEventListener('click', startRun);
 $('btn-shop-cathome').addEventListener('click', ()=>{ if(state!=='harbor') return; closeHarborPanel(true); exitHarbor(); enterHome(); });
@@ -7628,6 +8290,9 @@ $('intro-skip').addEventListener('click', e=>{ e.stopPropagation(); finishIntro(
 $('intro-go').addEventListener('click', e=>{ e.stopPropagation(); finishIntro(); });
 $('intro-ui').addEventListener('pointerdown', e=>{ if(e.target.closest('button')) return; introNext(); });
 $('hb-story').addEventListener('click', e=>{ e.stopPropagation(); playIntro(true); });
+$('hb-tut').addEventListener('click', e=>{ e.stopPropagation(); tutReplay(); });
+$('hb-requests').addEventListener('click', e=>{ e.stopPropagation(); if(state === 'harbor' && !hbPanel && !hbTalk) openBuilding('missions'); });
+$('hb-runs').addEventListener('click', e=>{ e.stopPropagation(); showRuns(true); });
 $('caviar-btn').addEventListener('pointerdown', e=>{ e.preventDefault(); e.stopPropagation(); placePlate(); });
 $('roll-btn').addEventListener('pointerdown', e=>{ e.preventDefault(); e.stopPropagation(); startRoll(); });
 document.addEventListener('visibilitychange', ()=>{ if(document.hidden && state==='playing') pauseGame(); });
@@ -7652,7 +8317,8 @@ function drawFisherIcon(cv, ch){
 let selSkill = null;
 function renderMenu(){
   document.querySelectorAll('#menu-tabs button').forEach(b=>b.classList.toggle('on', b.dataset.tab===menuTab));
-  for(const t of ['play','shop','home','look','fish']) $('tab-'+t).hidden = t !== menuTab;
+  for(const t of ['play','shop','home','look','fish','missions']) $('tab-'+t).hidden = t !== menuTab;
+  if(menuTab === 'missions') renderMissionsPanel();
   if(menuTab==='fish') renderFishTab();
   if(menuTab==='look') renderLook();
   if(menuTab==='play') renderBucket();
@@ -7734,7 +8400,7 @@ function firstSighting(key){
   if(key==='royal') return 'Cat Town · Princess Rosalind’s request (after your first run)';
   for(const s of STAGES){
     let t = Infinity;
-    s.waves.forEach((w,m)=>{ if(w[0].some(k=>catFor(s, k)===key)) t = Math.min(t, m*60); });
+    s.waves.forEach((w,m)=>{ if(w[0].some(k=>catFor(s, k)===key)) t = Math.min(t, m*WAVE_MIN); });
     for(const e of s.events) if(e[2] && (catFor(s, e[2])===key || (e[1]==='boss' && bossFor(s)===key))) t = Math.min(t, e[0]);
     if(s.roster==='park' && PARK_SPECIAL_WAVES[key] !== undefined) t = Math.min(t, PARK_SPECIAL_WAVES[key]*60);
     if(t < Infinity) return `${s.name}${isUnlocked(s.key)?'':' 🔒'} · ${t >= 60 ? 'after '+fmtTime(t) : 'early'}`;
@@ -8659,7 +9325,7 @@ if(DEBUG) setInterval(()=>{
 const HB_BUILDINGS = [
   {key:'home',   x:225,  w:420, h:330, sprite:'kit:houses', sh:330, decor:true, name:'Cat Home',          ic:'🏠', verb:'Visit your cats',     body:'#f6cdd0', roof:'#c9566b', door:'#8a3b4e'},
   {key:'tackle', x:690,  w:390, h:330, sprite:'kit:trattoria', sh:330, decor:true, name:'Tackle & Skills',   ic:'🎣', verb:'Open the skill tree', body:'#cfe2ea', roof:'#3f6f8f', door:'#2f4e66'},
-  {key:'shop',   x:1140, w:420, h:400, sprite:'shop', sh:420, ownSign:true, name:'Big Fish Shop', ic:'🐟', verb:'Your cats, tackle & skills',   body:'#fbe2b0', roof:'#d9643a', door:'#7a4a22', awning:['#e8553f','#fff4e0']},
+  {key:'shop',   x:1140, w:420, h:400, sprite:'shop', sh:420, ownSign:true, name:'Big Fish Shop', ic:'🐟', verb:'Skills & Cat Sanctuary',   body:'#fbe2b0', roof:'#d9643a', door:'#7a4a22', awning:['#e8553f','#fff4e0']},
   {key:'pet',    x:1590, w:240, h:340, sprite:'kit:gelato', sh:340, name:'Pet Store',         ic:'🐾', verb:'Buy cat furniture',   body:'#dcefcc', roof:'#5c9a4a', door:'#3d6b30', awning:['#5c9a4a','#f4ffe8']},
   {key:'gil',    x:2060, w:230, h:150, name:"Old Gil's Fish",    ic:'🐠', verb:'Barter for fish',     stall:true},
   {key:'boat',   x:2500, w:300, h:200, name:'Your Boat',         ic:'⛵', verb:'Go fishing',          boat:true},
@@ -8753,6 +9419,7 @@ function randomLook(full){
 function enterHarbor(fromHome){
   hbLoop++;
   for(const id of ['results','pauseOverlay','levelup','chest']) $(id).style.display = 'none';
+  hideSidePanels();
   state = 'harbor';
   resetPointer();
   document.body.classList.remove('home-mode');
@@ -8761,7 +9428,7 @@ function enterHarbor(fromHome){
   stage = STAGES.find(s=>s.key===save.stage) || STAGES[0];
   character = CHARACTERS.find(c=>c.key===save.char) || CHARACTERS[0];
   const keep = fromHome ? hb : null;           // after a run you're back outside your fish shop
-  hb = {x: keep ? keep.x : 1140, face:1, walkT:0, moving:false, target:null, onArrive:null, camX: keep ? keep.camX : 1140, t:0,
+  hb = {x: keep ? keep.x : 1140, y: keep && keep.y != null ? keep.y : null, face:1, walkT:0, moving:false, target:null, onArrive:null, camX: keep ? keep.camX : 1140, t:0,
         cats:[], locals:[], parts:[], offerT:rand(5,9), haggle:null, near:null};
   // your cats, lazing about in front of the shop
   hb.cats = CAT_ORDER.filter(k=>collected.has(k)).map((k, i, arr)=>{
@@ -8772,7 +9439,9 @@ function enterHarbor(fromHome){
   (save.bounties||[]).filter(b=>b.done).forEach((b, i)=>{
     hb.locals.push({b, look:b.look, name:b.giver, princess:b.type==='royal', x:1000 + i*120, tx:1000 + i*120, state:'wait', pay:true, face:-1, walkT:0, idleT:0});
   });
+  if(HB3D) hb3Init(fromHome);
   renderHarborUi();
+  if(save.tut && !save.tut.skip && (save.tut.harbor||0) < TUT_HARBOR.length && !save.introRun) tutStart('harbor'); else if(tut && tut.part !== 'harbor'){ tut = null; tutRender(); }
   if(hb.locals.length) setTimeout(()=>showBanner('📮 Someone is waiting to thank you!', 1800), 400);
   const id = hbLoop;
   let last = performance.now();
@@ -8840,7 +9509,7 @@ function bountyEvent(type, key){
     if(type==='dig' && b.type==='dig') hit = true;
     if(!hit) continue;
     b.prog = Math.min(b.goal, b.prog+1); changed = true;
-    if(b.prog >= b.goal){ b.done = true; showBanner(`📮 Request done! See ${b.giver} at the harbor for ${b.reward} 🪙`, 2200); }
+    if(b.prog >= b.goal){ b.done = true; showBanner(`📮 Mission done! See ${b.giver} at the harbor for ${b.reward} 🪙`, 2200); }
   }
   if(changed){ runRequestsDirty = true; persist(); }
 }
@@ -8852,17 +9521,71 @@ function bountySurviveCheck(){
   }
 }
 let runRequestsDirty = true, runReqT = 0;
+/* ---- Missions (the townsfolk's requests): a row with the giver's face, the job, a progress bar and the reward ---- */
+const npcIconCache = new Map();
+// where a townsperson's head is on their sprite: from the top of their hair down to the chin (where the
+// silhouette narrows into the neck), found once per sprite by scanning its rows
+const headBoxCache = new Map();
+function npcHeadBox(im){
+  if(headBoxCache.has(im)) return headBoxCache.get(im);
+  const W = im.width, H = im.height, c = document.createElement('canvas'); c.width = W; c.height = H;
+  const g = c.getContext('2d', {willReadFrequently:true}); g.drawImage(im, 0, 0); const d = g.getImageData(0, 0, W, H).data;
+  const span = []; let top = -1;
+  for(let y = 0; y < H; y++){ let l = -1, r = -1; for(let x = 0; x < W; x++) if(d[(y*W + x)*4 + 3] > 60){ if(l < 0) l = x; r = x; } span.push(l < 0 ? null : [l, r]); if(top < 0 && l >= 0) top = y; }
+  if(top < 0) top = 0;
+  // the townsfolk are chibi: the head is the top half of the figure (hair to chin)
+  let bot = top; for(let y = H - 1; y > top; y--) if(span[y]){ bot = y; break; }
+  const best = Math.round(top + (bot - top)*0.58);
+  let l = W, r = 0; for(let y = top; y <= best; y++){ const s = span[y]; if(s){ l = Math.min(l, s[0]); r = Math.max(r, s[1]); } }
+  const pad = 4, box = {x:Math.max(0, l - pad), y:Math.max(0, top - pad), w:Math.min(W, r + pad) - Math.max(0, l - pad), h:Math.min(H, best + pad*2) - Math.max(0, top - pad)};
+  headBoxCache.set(im, box); return box;
+}
+// a little round portrait of a townsperson (their head and shoulders), as a data URL
+function npcIconURL(look, name){
+  const key = JSON.stringify(look||{}) + name + (npcReady ? '#npc' : '');   // redrawn once the townsfolk art has loaded
+  if(npcIconCache.has(key)) return npcIconCache.get(key);
+  const S = 96, cv = document.createElement('canvas'); cv.width = cv.height = S;
+  const g = cv.getContext('2d');
+  let ok = false;
+  try{
+    const ni = look ? npcFor(look) : -1;
+    if(ni >= 0 && NPCS[ni]){ const im = NPCS[ni], hb0 = npcHeadBox(im), k = S/Math.max(hb0.w, hb0.h); g.drawImage(im, hb0.x, hb0.y, hb0.w, hb0.h, S/2 - hb0.w*k/2, S - hb0.h*k, hb0.w*k, hb0.h*k); ok = true; }   // the whole head, the same art as in town
+    else if(look && avReady){ const av = composeAvatar(look, 1), k = S*1.7/av.bodyH; g.drawImage(av.cv, S/2 - av.cx*k, S*1.55 - av.footY*k, av.cv.width*k, av.cv.height*k); ok = true; }
+  }catch(e){}
+  const url = ok ? cv.toDataURL() : '';
+  if(ok) npcIconCache.set(key, url);
+  return url;
+}
+function bountyPct(b){ if(b.done) return 1; if(b.type === 'survive') return clamp((b.prog||0)/(b.goal||1), 0, 1); return clamp((b.prog||0)/(b.goal||1), 0, 1); }
+function missionFace(b, cls){ const u = npcIconURL(b.look, b.giver); return `<i class="mface ${cls||''}">${u ? `<img src="${u}" alt="">` : (b.giver||'?')[0]}</i>`; }
+// one mission as a row (compact = the run HUD's panel)
+function missionRow(b, compact){
+  const pct = Math.round(bountyPct(b)*100);
+  return `<div class="mrow${b.done ? ' done' : ''}${compact ? ' compact' : ''}">${missionFace(b)}
+    <div class="mbody"><div class="mtop"><span class="mtext">${bountyText(b)}</span><b class="mreward"><span class="v2coin"></span>${b.reward}</b></div>
+    <div class="mprog"><div class="mbar"><i style="width:${pct}%"></i></div><em>${bountyCount(b)}</em></div>
+    ${compact ? '' : `<small>${b.giver}${b.done ? ' · done! Collect your reward from them at the harbor' : b.type==='royal' ? ' · royal mission' : ' · counts across runs'}</small>`}</div></div>`;
+}
+function renderMissionsPanel(){
+  const el = $('missions-list'); if(!el) return;
+  const bs = activeBounties();
+  el.innerHTML = bs.length ? bs.map(b=>missionRow(b, false)).join('')
+    : `<div class="mempty">No missions yet. Townsfolk with a <b>!</b> over their head have jobs for you: talk to them to take one on.</div>`;
+  $('missions-count').textContent = bs.length+' / 3';
+}
 function renderRunRequests(){
   const el = $('run-requests'); if(!el) return;
   const bs = activeBounties();
-  el.innerHTML = bs.length ? `<div class="rr-head">Requests</div>` + bs.map(b=>`<div class="rr${b.done ? ' done' : ''}"><i class="v2av">${(b.giver||'?')[0]}</i><span class="rr-t">${bountyText(b)}</span> <em>${bountyCount(b)}</em> <span>${b.reward}🪙</span></div>`).join('') : '';
+  el.innerHTML = bs.length ? `<div class="rr-head">Town missions</div>` + bs.map(b=>missionRow(b, true)).join('') : '';
   runRequestsDirty = false;
 }
 
 /* ---- update ---- */
 function hbWalkTo(x, onArrive){ hb.target = clamp(x, HB_MIN, HB_LEN-60); hb.onArrive = onArrive||null; }
 function harborUpdate(dt){
+  if(HB3D) return harborUpdate3(dt);
   hb.t += dt;
+  tutTick(dt);
   const blocked = hbPanel || hbTalk;
   let dir = 0;
   if(!blocked){
@@ -8941,13 +9664,15 @@ function harborUpdate(dt){
 function harborInteract(){
   if(!hb || hbPanel || hbTalk || !hb.near) return;
   if(hb.near.local) openTalk(hb.near.local);
-  else openBuilding(hb.near.b.key);
+  else { if(hb.near.b.stage){ save.stage = hb.near.b.stage; persist(); } openBuilding(hb.near.b.key); }
 }
 function openBuilding(key){
+  tutEvent('open:'+key);
+  if(key==='shop'){ openShopChoice(); return; }        // the shop door: choose Skills or the Cat Sanctuary
   if(key==='home'){ exitHarbor(); enterHome(); return; }
   if(key==='boat'){ openFishing(); return; }
   if(key==='gil') hb.haggleShown = true;
-  const map = {tackle:['shop','Tackle & Skills'], shop:['shop','Tackle & Skills'], pet:['home','Pet Store'], gil:['fish',"Old Gil's Fish"], gate:['play','Where to?']};
+  const map = {tackle:['shop','Tackle & Skills'], shop:['shop','Tackle & Skills'], pet:['home','Pet Store'], gil:['fish',"Old Gil's Fish"], gate:['play','Where to?'], missions:['missions','Missions']};
   document.body.classList.toggle('panel-gil', key==='gil');
   $('ph-cathome').style.display = (key==='tackle' || key==='shop') ? '' : 'none';
   const [tab, title] = map[key];
@@ -8958,18 +9683,43 @@ function openBuilding(key){
   $('menu').style.display = 'flex';
   $('menu').querySelector('.card').scrollTop = 0;
 }
+// the Big Fish Shop's door: two big buttons, Skills (the skill tree) and the Cat Sanctuary (your cats' home)
+function openShopChoice(){
+  hbPanel = 'shopchoice';
+  document.body.classList.add('panel-open');
+  $('shop-choice').classList.add('show');
+  renderPrompt();
+}
+(function wireShopChoice(){
+  const el = $('shop-choice');
+  el.addEventListener('click', e=>{
+    const b = e.target.closest('[data-go]');
+    if(!b){ if(e.target === el) closeHarborPanel(); return; }
+    const go = b.dataset.go;
+    closeHarborPanel(true);
+    if(go === 'skills') openBuilding('tackle');
+    else if(go === 'cats') openBuilding('home');
+    else renderHarborUi();
+  });
+  addEventListener('keydown', e=>{
+    if(hbPanel !== 'shopchoice') return;
+    if(e.key === '1'){ e.preventDefault(); el.querySelector('[data-go="skills"]').click(); }
+    else if(e.key === '2'){ e.preventDefault(); el.querySelector('[data-go="cats"]').click(); }
+  });
+})();
 function closeHarborPanel(silent){
   if(!hbPanel && !silent) return;
   if(hbPanel === 'fishing' || silent) closeFishing();
   hbPanel = null;
   document.body.classList.remove('panel-open', 'panel-gil');
+  $('shop-choice').classList.remove('show');
   $('menu').style.display = 'none';
   if(!silent) renderHarborUi();
 }
 
 /* ---- talking to locals ---- */
 function openTalk(l){
-  hbTalk = l;
+  hbTalk = l; document.body.classList.add('talk-open');
   const el = $('talk');
   const cv = el.querySelector('canvas');
   const g = cv.getContext('2d'); g.clearRect(0,0,cv.width,cv.height);
@@ -8977,9 +9727,9 @@ function openTalk(l){
   else if(avReady){ const av = composeAvatar(l.look, l.pay ? 1 : 9), k = 140/av.bodyH; g.drawImage(av.cv, cv.width/2 - av.cx*k, cv.height - 6 - av.footY*k, av.cv.width*k, av.cv.height*k); }
   const b = l.pay ? l.b : l.offer;
   const catCv = (b.cat ? `<canvas class="talk-cat" width="64" height="64"></canvas>` : '');
-  const tag = l.pay ? 'REQUEST DONE' : (l.princess || b.type==='royal') ? 'ROYAL REQUEST' : 'NEW REQUEST';
+  const tag = l.pay ? 'MISSION DONE' : (l.princess || b.type==='royal') ? 'ROYAL MISSION' : 'NEW MISSION';
   let html = `<div class="tk-head"><b class="talk-name">${l.name}</b><span class="sp"></span><span class="tk-tag">${tag}</span></div>`;
-  const reqBox = note=>`<div class="talk-req"><div class="tr-l"><div class="tk-lab">Request</div><div class="tr-t">${catCv}<span>${bountyText(b)}</span></div>${note ? `<small>${note}</small>` : ''}</div>
+  const reqBox = note=>`<div class="talk-req"><div class="tr-l"><div class="tk-lab">Mission</div><div class="tr-t">${catCv}<span>${bountyText(b)}</span></div>${note ? `<small>${note}</small>` : ''}</div>
       <div class="tr-r"><div class="tk-lab">Reward</div><span class="v2pill"><span class="v2coin"></span>Reward ${b.reward}</span></div></div>`;
   if(l.pay){
     html += `<p>“${b.type==='royal' ? 'SEBASTIAN! Oh, my darling, you’re home! Thank you, thank you. The royal treasury insists.' : 'You did it! The whole harbor’s talking about it. Here, as promised!'}”</p>${reqBox('')}<div class="talk-btns"><button class="bigbtn" id="talk-yes">Collect</button></div>`;
@@ -8999,7 +9749,7 @@ function openTalk(l){
     } else {
       b.giver = l.name; b.look = l.look;
       save.bounties = [...activeBounties(), b]; persist();
-      showBanner(`📮 Request accepted: ${bountyText(b)}`, 1800);
+      showBanner(`📮 Mission accepted: ${bountyText(b)}`, 1800);
       l.offer = null; l.state = 'leave'; l.tx = l.x + (l.x < hb.x ? -1200 : 1200);
     }
     closeTalk(); renderHarborUi();
@@ -9009,7 +9759,7 @@ function openTalk(l){
   el.classList.add('show');
   renderPrompt();
 }
-function closeTalk(){ hbTalk = null; const el = $('talk'); if(el) el.classList.remove('show'); renderPrompt(); }
+function closeTalk(){ hbTalk = null; document.body.classList.remove('talk-open'); const el = $('talk'); if(el) el.classList.remove('show'); renderPrompt(); }
 
 /* ---- harbor HTML (gold, requests, prompt) ---- */
 function renderPrompt(){
@@ -9021,10 +9771,12 @@ function renderPrompt(){
 }
 function renderHarborUi(){
   $('hb-gold').textContent = save.gold.toLocaleString();
+  { const rn = $('hb-runname'); if(rn){ rn.textContent = ACTIVE_RUN ? ACTIVE_RUN.name : ''; rn.style.display = ACTIVE_RUN ? '' : 'none'; } }
   { const all = ALL_CAT_DEFS.length, found = all - undiscoveredTotal(); $('hb-disc').innerHTML = `<span class="v2ic">?</span>Cats to discover ${found}/${all}`; }
-  $('hb-fish').innerHTML = `<span class="v2ic teal">🐟</span>Fish ${fishTotal()}`;
+  $('hb-fish').innerHTML = `<span class="v2ic teal">🐟</span>Fish ∞ + ${fishSpecial()}`;
   const bs = activeBounties();
-  $('hb-requests').innerHTML = `<div class="rr-head">Requests</div>` + (bs.length ? bs.map(b=>`<div class="rr${b.done ? ' done' : ''}"><i class="v2av">${(b.giver||'?')[0]}</i><span class="rr-t">${bountyText(b)}<small>${b.giver} · ${b.done ? 'done! collect ' : ''}${b.reward} gold</small></span><em>${bountyCount(b)}</em></div>`).join('') : `<div class="rr empty">No requests yet. Locals drop by now and then.</div>`);
+  $('hb-requests').innerHTML = `<div class="rr-head">Missions</div>` + (bs.length ? bs.map(b=>missionRow(b, true)).join('') : `<div class="rr empty">No missions yet. Townsfolk drop by now and then.</div>`);
+  if(hbPanel === 'missions') renderMissionsPanel();
   renderPrompt();
 }
 
@@ -9036,13 +9788,13 @@ function renderFishTab(){
   else if(avReady){ const av = composeAvatar(GIL_LOOK, 8), k = 104/av.bodyH; gg.drawImage(av.cv, gc.width/2 - av.cx*k, gc.height - 4 - av.footY*k, av.cv.width*k, av.cv.height*k); }
   if(!hb.haggle) hb.haggle = {mul:1, tried:false};
   const mul = hb.haggle.mul, b = fishBag();
-  $('gil-line').textContent = hb.haggle.tried ? hb.haggle.say : '“Fresh off the boat! You throw ’em, you buy ’em again. Fish Toss throws whatever’s in your bucket, so stock up. Want to haggle?”';
+  $('gil-line').textContent = hb.haggle.tried ? hb.haggle.say : '“Fresh off the boat! You throw ’em, you buy ’em again. Plain fish are free, but the fancy ones hit harder, and those you buy from me. Want to haggle?”';
   el.innerHTML = FISH_GRADES.map((g, i)=>{
     const price = Math.round(FISH_PRICE[i]*mul), pack = FISH_PACK[i];
     return `<div class="fish-row${b[i] ? ' cur' : ''}">
       ${fishImgHTML(i, 'fr-img')}
       <div><b>${fishName(FISH_GRADE_ICON[i])}</b><span class="fr-ab">${abilityText(FISH_GRADE_ICON[i])}</span><span>${i ? `Fish Toss +${Math.round(g.dmg*100)}% damage, ${Math.round((g.size-1)*100)}% bigger${g.pierce ? ', +1 pierce' : ''}` : 'Plain and cheap. Where every fisher starts.'}</span></div>
-      <div class="fr-buy"><span class="fr-own">You have ${b[i]}</span>${FISH_PRICE[i] ? `<button data-g="${i}" data-n="1" ${save.gold < price ? 'disabled' : ''}>${pack} for ${price} 🪙</button><button class="alt" data-g="${i}" data-n="5" ${save.gold < price*5 ? 'disabled' : ''}>×5</button>` : '<em>Catch it yourself!</em>'}</div></div>`;
+      <div class="fr-buy"><span class="fr-own">${i ? "You have "+b[i] : "∞"}</span>${FISH_PRICE[i] ? `<button data-g="${i}" data-n="1" ${save.gold < price ? 'disabled' : ''}>${pack} for ${price} 🪙</button><button class="alt" data-g="${i}" data-n="5" ${save.gold < price*5 ? 'disabled' : ''}>×5</button>` : i ? '<em>Catch it yourself!</em>' : '<em>Always free · never runs out</em>'}</div></div>`;
   }).join('');
   el.querySelectorAll('.fr-buy button').forEach(btn=>btn.onclick = ()=>gilBuy(+btn.dataset.g, +btn.dataset.n));
   $('gil-buy').style.display = 'none'; $('gil-haggle').style.display = hb.haggle.tried ? 'none' : '';
@@ -9070,10 +9822,10 @@ function gilHaggle(){
    save.fishBag[g] = how many fish of grade g you own (g indexes FISH_GRADES). Whatever is in the bucket is
    what Fish Toss (and its evolutions) throws: every fish thrown comes out of the bucket, picked at random
    from what's in it, and hits as hard as its own grade. Fish you don't throw stay for next time.
-   Bucket empty → fish scraps (weaker), so you never run dry. Fill it at Old Gil's stall, by fishing off
+   Bucket empty → Fish Toss stops; 🐟 catches wash up near you every few seconds until you grab one. Fill it at Old Gil's stall, by fishing off
    your boat, or with 🐟 pickups in the maps; ⬆️ fish upgrades make every fish thrown this run a grade better. */
 var FISH_PACK  = [100, 50, 25, 10, 0];                // Old Gil sells fish by the crate…
-var FISH_PRICE = [40, 90, 180, 320, 0];               // …at this price per crate (the Golden Koi isn't for sale)
+var FISH_PRICE = [0, 90, 180, 320, 0];                 // …at this price per crate (the Golden Koi isn't for sale)
 var FISH_HAUL  = [[60,100], [30,50], [15,25], [6,10], [3,5]];   // how many come up in one catch at the boat
 var FISH_SCRAPS = {name:'Fish scraps', ic:'🦴', dmg:-0.25, size:0.9, pierce:0, all:0, filter:'grayscale(0.7) brightness(0.9)', line:'Heads and tails. Better than nothing.'};
 var CATCH_WEIGHTS = [52, 28, 13, 5.5, 1.5];          // what bites at the boat (and what 🐟 pickups hold)
@@ -9105,6 +9857,9 @@ function spImgHTML(ft, cls){ const u = fishTypesReady ? fishIconURL(ft) : ''; re
 var FISH_TIER = ['Common', 'Nice', 'Great', 'Rare', 'Legendary'];
 var lastThrownSp = 0;
 function fishTotal(){ return fishBag().reduce((a, b)=>a + b, 0); }
+function fishSpecial(){ const b = fishBag(); return b[1] + b[2] + b[3] + b[4]; }   // nice fish and up: the ones you catch, buy or find
+// a roll for a catch worth finding: never a common fish (those are infinite)
+function rollSpecialGrade(luck){ let g = 0; for(let k=0;k<20 && g===0;k++) g = rollCatchGrade(luck); return Math.max(1, g); }
 function bestFish(){ const b = fishBag(); for(let g = b.length-1; g >= 0; g--) if(b[g] > 0) return g; return -1; }
 // the HUD / fish-pickup "grade": the best fish in the bucket (plus this run's upgrades)
 function runFishIdx(){ const f = bestFish(), u = runFishUp||0; return f < 0 ? (u ? Math.min(FISH_GRADES.length-1, u-1) : -1) : Math.min(FISH_GRADES.length-1, f + u); }
@@ -9117,22 +9872,40 @@ function rollCatchGrade(luck){
 function rollHaul(g, k){ const [a, b] = FISH_HAUL[g]; return Math.max(1, Math.round(rand(a, b)*(k||1))); }
 function fishImgHTML(g, cls){ const u = g >= 0 && fishTypesReady ? fishIconURL(FISH_GRADE_ICON[g]) : ''; return u ? `<img class="${cls||'fb-img'}" src="${u}" alt="">` : `<span class="${cls||'fb-img'}">${g >= 0 ? FISH_GRADES[g].ic : FISH_SCRAPS.ic}</span>`; }
 // a new run: nothing is packed, the bucket itself goes along
-function packRunFish(){ runFishUp = 0; runCaught = [0,0,0,0,0]; runThrown = [0,0,0,0,0]; runScraps = 0; fishWarned = fishTotal() ? 0 : 2; }
+function packRunFish(){ runFishUp = 0; runCaught = [0,0,0,0,0]; runThrown = [0,0,0,0,0]; runScraps = 0; fishWarned = 0; fishDropT = 4; }
+// the bucket is empty: Fish Toss stops. Say so once (until the bucket fills up again)
+var fishDropT = 0;
+function outOfFish(){ if(fishWarned < 2){ fishWarned = 2; showBanner('🪣 Out of fish! Grab 🐟 in the map to keep throwing', 2200); } }
+// while the bucket is empty, a fish catch washes up near you every few seconds
+function fishRescue(dt){
+  return;                                      // (plain fish never run out now, so no rescue drops)
+  if(!player || fishTotal() > 0) return;
+  fishDropT -= dt; if(fishDropT > 0) return;
+  fishDropT = 6;
+  const a = Math.random()*Math.PI*2, d = rand(220, 340);
+  pickups.push({x:player.x + Math.cos(a)*d, y:player.y + Math.sin(a)*d*0.7, kind:'catchfish', bob:Math.random()*6, pop:0.55});
+}
 // take one fish out of the bucket for a throw (random, weighted by how many of each you have); -1 = scraps
 function takeFish(){
-  const b = fishBag(), n = fishTotal();
-  if(n <= 0){ runScraps++; if(fishWarned < 2){ fishWarned = 2; showBanner('🪣 Bucket empty! Throwing fish scraps', 1800); } return -1; }
-  let r = Math.random()*n, g = 0;
-  for(; g < b.length; g++){ if(r < b[g]) break; r -= b[g]; }
-  g = Math.min(g, b.length-1); lastThrownSp = takeFishOfGrade(g); runThrown[g]++;
-  if(n - 1 === 50 && !fishWarned){ fishWarned = 1; showBanner('🪣 Only 50 fish left in your bucket', 1500); }
+  const b = fishBag(), n = fishSpecial();
+  let g = 0;
+  if(n > 0){                                    // better fish in the bucket: throw those (random, by how many of each)
+    let r = Math.random()*n; g = 1;
+    for(; g < b.length; g++){ if(r < b[g]) break; r -= b[g]; }
+    g = Math.min(g, b.length-1); lastThrownSp = takeFishOfGrade(g);
+    if(n === 1) showBanner('🪣 Out of special fish: back to plain fish', 1600);
+  } else lastThrownSp = fishTypeFor(0);         // plain fish never run out
+  runThrown[g]++;
   return Math.min(FISH_GRADES.length-1, g + (runFishUp||0));
 }
 function fishStats(g){ return g < 0 ? FISH_SCRAPS : FISH_GRADES[g]; }
 // a catch found in the map goes in your bucket; a fish upgrade lifts every fish thrown this run
+// how many fish a find in the map (a 🐟 pickup or a treasure box) is worth: about 50 common fish, fewer of the fancy ones
+var MAP_FISH = [[45,55], [30,40], [18,26], [10,14], [5,8]];
+function mapFishCount(g, k){ const [a, b] = MAP_FISH[g]; return Math.round(rand(a, b)*(k||1)); }
 function gainMapFish(){
-  const g = rollCatchGrade(player ? player.stats.luck : 1), n = rollHaul(g, 0.35), ft = fishTypeFor(g);
-  addFish(ft, n); runCaught[g] += n;
+  const g = rollSpecialGrade(player ? player.stats.luck : 1), n = mapFishCount(g), ft = fishTypeFor(g);
+  addFish(ft, n); runCaught[g] += n; fishWarned = 0;
   showLootCard(spImgHTML(ft, 'lc-fish'), FISH_TIER[g]+' catch · into your bucket', n+' '+fishName(ft), abilityText(ft));
 }
 function gainFishUp(){
@@ -9144,9 +9917,9 @@ function gainFishUp(){
 function renderBucket(){
   const el = $('bucket-list'); if(!el) return;
   const b = fishBag(), n = fishTotal();
-  el.innerHTML = FISH_GRADES.map((g, i)=>`<div class="fb${b[i] ? '' : ' none'}" title="${spList(i)}">${fishImgHTML(i)}<b>${FISH_TIER[i]}</b><i>×${b[i]}</i></div>`).join('') +
-    (n ? `<div class="fb-note">Fish Toss throws whatever is in your bucket, one fish per throw. Fish you don't throw stay for next time.</div>`
-       : `<div class="fb-empty">Your bucket is empty, so you'll throw <b>fish scraps</b> (weaker). Buy fish from Old Gil or go fishing off your boat.</div>`);
+  el.innerHTML = FISH_GRADES.map((g, i)=>`<div class="fb${b[i] || !i ? '' : ' none'}" title="${spList(i)}">${fishImgHTML(i)}<b>${FISH_TIER[i]}</b><i>${i ? '×'+b[i] : '∞'}</i></div>`).join('') +
+    (true ? `<div class="fb-note">Plain fish never run out. Better fish (nice and up) are thrown first, one per throw, until they're used up: catch, buy or find more.</div>`
+       : `<div class="fb-empty">Your bucket is empty, so Fish Toss can't throw anything until you grab 🐟 in the map. Buy fish from Old Gil or go fishing off your boat.</div>`);
   const st = $('btn-start'); if(st) st.textContent = `Let's go!`;
 }
 
@@ -9160,7 +9933,7 @@ function renderBucket(){
    bucket (cheap fish catch better fish), and you can cast as often as you like.                        */
 var BAITS = [
   {name:'Bread',  ic:'🍞', fish:-1, n:0, p:0},           // free
-  {name:'Worm',   ic:'🪱', fish:0,  n:5, p:1},           // costs 5 Sardines
+  {name:'Worm',   ic:'🪱', fish:-1, n:0, p:1},           // free
   {name:'Shrimp', ic:'🦐', fish:1,  n:3, p:2},           // costs 3 Mackerel
   {name:'Squid',  ic:'🦑', fish:2,  n:2, p:3},           // costs 2 Bluefin Tuna
 ];
@@ -9177,6 +9950,7 @@ function fSpawn(g, anywhere){
     sp:rand(34, 50) + g*14, size:28 + g*7, st:'swim', noticed:false, t:rand(0, 6), fleeT:0};
 }
 function openFishing(){
+  tutEvent('open:boat');
   hbPanel = 'fishing';
   document.body.classList.add('panel-open', 'fishing-mode');
   $('fishing').style.display = 'flex';
@@ -9204,7 +9978,7 @@ function fishUi(){
   const f = fishing; if(!f) return;
   const B = BAITS[f.bait], bag = fishBag();
   $('fish-casts').textContent = '';
-  $('fish-bucket').innerHTML = FISH_GRADES.map((G, i)=>`<span class="fb-n" title="${spList(i)}">${fishImgHTML(i, 'fb-mini')}${bag[i]}</span>`).join('');
+  $('fish-bucket').innerHTML = FISH_GRADES.map((G, i)=>`<span class="fb-n" title="${spList(i)}">${fishImgHTML(i, 'fb-mini')}${i ? bag[i] : "∞"}</span>`).join('');
   const idle = f.st === 'ready' || f.st === 'caught' || f.st === 'lost';
   $('fish-baits').innerHTML = BAITS.map((b, i)=>`<button class="fbait${i===f.bait ? ' sel' : ''}${canAffordBait(b) ? '' : ' poor'}" data-i="${i}" ${idle ? '' : 'disabled'}><i>${b.ic}</i><b>${b.name}</b><span>${baitCostText(b)}</span></button>`).join('');
   $('fish-baits').querySelectorAll('.fbait').forEach(btn=>btn.onclick = ()=>{ if(!fishing) return; fishing.bait = +btn.dataset.i; save.bait = fishing.bait; persist(); fishUi(); });
@@ -9568,6 +10342,512 @@ function drawBoat(b, gy, hi){
   ctx.restore();
   drawSign(x - 40, y - 290, b.name, b.ic);
 }
+/* ---- the harbor's isometric 3/4 camera ----
+   The island is seen from a corner, 45° around and looking down at an angle: ground is rotated and foreshortened
+   (tiles become diamonds), buildings are boxes showing two faces, and people, cats and props stand upright as 2D
+   figures facing you. isoP() projects a world point (x, y, height z) to the screen; isoInv() goes back.        */
+const HB_ISO = true;
+const ISO = {c:Math.cos(Math.PI/4), s:Math.sin(Math.PI/4), FY:0.56, cliff:130};
+function isoOn(){ return state === 'harbor' && typeof HB3D !== 'undefined' && HB3D && HB_ISO; }
+function isoP(x, y, z){ const dx = x - camera.x, dy = y - camera.y, Z = viewZoom(); return [W/2 + (ISO.c*dx - ISO.s*dy)*Z, H/2 + (ISO.s*dx + ISO.c*dy)*Z*ISO.FY - (z||0)*Z]; }
+function isoInv(px, py){ const Z = viewZoom(), u = (px - W/2)/Z, v = (py - H/2)/(Z*ISO.FY); return {x:camera.x + ISO.c*u + ISO.s*v, y:camera.y - ISO.s*u + ISO.c*v}; }
+function isoDepth(x, y){ return ISO.s*x + ISO.c*y; }
+let isoAnchor = {x:0, y:0, sx:0, sy:0};
+function isoBounds(pad){
+  const pts = [isoInv(0, 0), isoInv(W, 0), isoInv(0, H), isoInv(W, H)];
+  return {left:Math.min(...pts.map(p=>p.x)) - pad, right:Math.max(...pts.map(p=>p.x)) + pad, top:Math.min(...pts.map(p=>p.y)) - pad, bottom:Math.max(...pts.map(p=>p.y)) + pad};
+}
+// a building block seen from the corner: the art on the south face, a plain wall on the east face, a tiled roof
+function drawIsoHouse(h){
+  const F = kitFacade(h.kit); if(!F) return;
+  const H0 = h.w*Math.hypot(ISO.c, ISO.s*ISO.FY)*F.fh/F.fw, x0 = h.x - h.w/2;       // as tall as the art is for the face's on-screen width
+  const x1 = h.x + h.w/2, y0 = h.y - h.d, y1 = h.y;
+  const P = isoP, [wr, wg, wb] = F.wall, shade = k => `rgb(${wr*k|0},${wg*k|0},${wb*k|0})`;
+  const poly = (pts, fill) => { ctx.beginPath(); pts.forEach(([px, py], i)=>i ? ctx.lineTo(px, py) : ctx.moveTo(px, py)); ctx.closePath(); ctx.fillStyle = fill; ctx.fill(); };
+  ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0);
+  poly([P(x0 + 10, y1 + 10, 0), P(x1 + 30, y1 + 10, 0), P(x1 + 30, y0 + 20, 0), P(x0 + 10, y0, 0)], 'rgba(60,40,30,0.18)');            // shadow
+  poly([P(x1, y1, 0), P(x1, y0, 0), P(x1, y0, H0), P(x1, y1, H0)], shade(0.74));                                                       // east wall
+  poly([P(x0, y1, 0), P(x1, y1, 0), P(x1, y1, H0), P(x0, y1, H0)], shade(0.95));                                                       // south wall
+  // the house art, mapped onto the south face
+  const [ax, ay] = P(x0, y1, H0), [bx, by] = P(x1, y1, H0), [cx, cy] = P(x0, y1, 0);
+  ctx.save(); ctx.transform((bx - ax)/F.fw, (by - ay)/F.fw, (cx - ax)/F.fh, (cy - ay)/F.fh, ax, ay);
+  ctx.imageSmoothingEnabled = true; ctx.drawImage(F.img, 0, F.top, F.fw, F.fh, 0, 0, F.fw, F.fh); ctx.restore();
+  // roof: four tiles of terracotta with rows, a darker band where it meets the walls
+  const R = [P(x0, y0, H0), P(x1, y0, H0), P(x1, y1, H0), P(x0, y1, H0)];
+  poly(R, BOX3D.roof);
+  ctx.strokeStyle = BOX3D.roofDark; ctx.lineWidth = 2;
+  for(let j=1;j<5;j++){ const yy = y0 + (y1 - y0)*j/5, a = P(x0, yy, H0), b = P(x1, yy, H0); ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke(); }
+  ctx.strokeStyle = 'rgba(80,40,30,0.35)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(...P(x0, y1, H0)); ctx.lineTo(...P(x1, y1, H0)); ctx.lineTo(...P(x1, y0, H0)); ctx.stroke();
+  ctx.restore();
+}
+// each piece of land's cliffs: its south and east sides, in layers (drawn in screen space, under the tops)
+function isoCliffs(){
+  ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0);
+  const P = isoP, Hc = ISO.cliff;
+  const quad = (a, b, z0, z1, fill) => { const p = [P(a[0], a[1], -z0), P(b[0], b[1], -z0), P(b[0], b[1], -z1), P(a[0], a[1], -z1)]; ctx.beginPath(); p.forEach(([px, py], i)=>i ? ctx.lineTo(px, py) : ctx.moveTo(px, py)); ctx.closePath(); ctx.fillStyle = fill; ctx.fill(); };
+  const face = (a, b, G, k, alpha) => { ctx.globalAlpha = alpha; quad(a, b, 0, 22, lpShade(G.side[0], k)); quad(a, b, 22, 74, lpShade(G.side[1], k)); quad(a, b, 74, Hc, lpShade(G.side[2], k)); quad(a, b, Hc - 6, Hc, 'rgba(255,255,255,0.4)'); };
+  for(const L of HB3_LAND){
+    const a = hb3Alpha(L.key); if(a <= 0) continue;
+    const G = HB3_GROUND[L.ground], off = (1 - a)*90;
+    for(const r of L.rects){
+      face([r.x0, r.y1 + off], [r.x1, r.y1 + off], G, 1, a);        // south side (lit)
+      face([r.x1, r.y1 + off], [r.x1, r.y0 + off], G, 0.82, a);     // east side (in shade)
+    }
+  }
+  // the pier's posts and edge
+  const Pr = HB3_PIER; ctx.globalAlpha = 1;
+  quad([Pr.x0, Pr.y1], [Pr.x1, Pr.y1], 0, 16, '#8a5a34'); quad([Pr.x1, Pr.y1], [Pr.x1, Pr.y0], 0, 16, '#6e4426');
+  for(let y = Pr.y0 + 120; y < Pr.y1; y += 140) for(const x of [Pr.x0 + 6, Pr.x1 - 6]){ const [px, py] = P(x, y, 0); ctx.fillStyle = '#6e4426'; ctx.fillRect(px - 5, py, 10, 60*viewZoom()); }
+  ctx.restore();
+}
+// the locked land's label, upright (not rotated with the ground)
+function isoLockLabels(){
+  ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0);
+  for(const L of HB3_LAND){
+    if(!L.stage || hb3LandOn(L)) continue;
+    const r = L.rects[0], [px, py] = isoP((r.x0 + r.x1)/2, (r.y0 + r.y1)/2, 0), st = STAGES.find(s=>s.key===L.stage);
+    ctx.fillStyle = 'rgba(59,46,42,0.6)'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.font = "700 26px Fredoka, Nunito, sans-serif"; ctx.fillText('🔒 '+L.name, px, py - 14);
+    ctx.font = "800 16px Nunito, sans-serif"; ctx.fillText(st && st.unlock ? st.unlock.text : 'Unlocks later', px, py + 14);
+  }
+  ctx.restore();
+}
+/* ============== THE HARBOR ISLAND (3/4 top-down) ==============
+   The harbor is a little floating island seen through the same 3D camera as the runs: the flat ground (paving,
+   lawns, sand, the pier) is tilted and curved by the WebGL pass, and everything that stands up (you, the
+   townsfolk, your cats, Old Gil's stall, the boat, signposts, trees) is drawn upright on top as 2D billboards.
+   Buildings are 3D boxes wearing the Italian village art (drawHouseBox). Walk anywhere with WASD / arrows / tap.
+   The island grows: each area you unlock adds its own piece of land (with a signpost to that area), which rises
+   out of the sea the first time you come home after unlocking it. HB3D = false brings back the side-view street. */
+const HB3D = true;
+const HB3_PERSON_H = 112;
+// pieces of land: the harbor (always there) plus one per area; each piece is a few rectangles of ground
+const HB3_LAND = [
+  {key:'harbor', stage:null, name:'The Harbor', ground:'pave', rects:[{x0:-900, x1:900, y0:-560, y1:430}], edge:'quay'},
+  {key:'meadow', stage:'meadow', name:'Cat Town Road', ground:'pave', rects:[{x0:-1500, x1:-900, y0:-180, y1:300}], edge:'quay'},
+  {key:'market', stage:'market', name:'Willow Park', ground:'grass', rects:[{x0:-1500, x1:200, y0:-1360, y1:-560}], edge:'earth'},
+  {key:'pier', stage:'pier', name:'Sunny Beach', ground:'sand', rects:[{x0:900, x1:1800, y0:-560, y1:430}], edge:'sand'},
+];
+const HB3_PIER = {x0:420, x1:580, y0:380, y1:1080};        // overlaps the quay a little so you can step onto it
+// buildings (front edge at y, w wide, d deep, the kit art on the front); key = the building to open
+const HB3_HOUSES = [
+  {kit:'houses', x:-650, y:-300, w:230, d:170},
+  {kit:'fishShop', x:-200, y:-300, w:320, d:190, key:'shop'},
+  {kit:'gelato', x:250, y:-300, w:230, d:170, key:'pet'},
+  {kit:'trattoria', x:660, y:-300, w:240, d:170},
+];
+// everything else you can walk up to: Old Gil's stall, the boat, and one signpost per area
+const HB3_SPOTS = [
+  {key:'gil', x:250, y:330, name:"Old Gil's Fish", ic:'🐠', verb:'Barter for fish', stall:true, w:230},
+  {key:'boat', x:720, y:990, name:'Your Boat', ic:'⛵', verb:'Go fishing', boat:true, w:300, door:{x:530, y:1000}},
+  {key:'gate', land:'meadow', stage:'meadow', x:-1380, y:40, name:'Cat Town', ic:'🏘️', verb:'Go to Cat Town', gate:true},
+  {key:'gate', land:'market', stage:'market', x:-600, y:-1240, name:'Willow Park', ic:'🌳', verb:'Go to Willow Park', gate:true},
+  {key:'gate', land:'pier', stage:'pier', x:1660, y:-100, name:'Sunny Beach', ic:'🏖️', verb:'Go to Sunny Beach', gate:true},
+];
+// little things standing on each piece of land (low-poly pieces from the town square, plus a few kit sprites)
+const HB3_PROPS = [
+  ['lamp', -880, -120, 'harbor'], ['lamp', 880, -120, 'harbor'], ['lamp', -420, 380, 'harbor'], ['lamp', 380, 380, 'harbor'],
+  ['bush', -430, -220, 'harbor', '#f2d45a', 0.8], ['bush', 30, -225, 'harbor', '#7cc35c', 0.7], ['bush', 470, -220, 'harbor', '#9fd36a', 0.75],
+  ['bench', -560, 300, 'harbor'], ['bench', -60, 300, 'harbor'],
+  ['kit', -820, 380, 'harbor', 'pinkPot', 50], ['kit', 820, 380, 'harbor', 'flowerPot', 54], ['kit', -40, -250, 'harbor', 'blueFlowers', 44],
+  ['kit', -1420, -120, 'meadow', 'lemonTree', 110], ['kit', -1000, 260, 'meadow', 'flowerPot', 50], ['lamp', -1000, -150, 'meadow'],
+  ['tree', -1350, -1240, 'market', '#73b24f', 1.1], ['tree', -1100, -900, 'market', '#5f9a42', 1.25], ['tree', -300, -1250, 'market', '#73b24f', 1],
+  ['tree', 60, -900, 'market', '#8cc65a', 1.15], ['tree', -800, -700, 'market', '#5f9a42', 0.9], ['bush', -500, -800, 'market', '#f2d45a', 0.9],
+  ['bush', -1300, -680, 'market', '#9fd36a', 0.8], ['bench', -330, -770, 'market'], ['mush', -200, -700, 'market', '', 1], ['mush', -180, -686, 'market', '', 0.8],
+  ['palm', 1050, -460, 'pier'], ['palm', 1700, -460, 'pier'], ['palm', 1450, 330, 'pier'], ['umbrella', 1200, 0, 'pier', '#E5404B'], ['umbrella', 1450, -250, 'pier', '#2BB5A5'],
+];
+const HB3_POND = {x:-650, y:-1020, rx:200, ry:110, land:'market'};
+const HB3_EXIT = {x:-1450, y:60};                   // where townsfolk walk in from (the Cat Town road)
+function hb3LandOn(L){ return !L.stage || isUnlocked(L.stage); }
+function hb3Revealed(L){ return !L.stage || L.stage === 'meadow' || (save.hbLand||[]).includes(L.key); }
+function hb3Alpha(key){ if(!key || key === 'harbor') return 1; const L = HB3_LAND.find(l=>l.key===key); if(!L || !hb3LandOn(L)) return 0; if(hb.reveal && hb.reveal.key === key) return clamp(hb.reveal.t/1.4, 0, 1); return hb3Revealed(L) ? 1 : 0; }
+function hb3Rects(){ const out = []; for(const L of HB3_LAND) if(hb3Alpha(L.key) >= 1) for(const r of L.rects) out.push(r); out.push(HB3_PIER); return out; }
+function hb3Walkable(x, y){
+  const m = 22, R = hb3Rects(), inAny = (px, py) => R.some(r=>px > r.x0 && px < r.x1 && py > r.y0 && py < r.y1);
+  if(!(inAny(x - m, y) && inAny(x + m, y) && inAny(x, y - m) && inAny(x, y + 6))) return false;     // pieces of land join seamlessly
+  for(const h of HB3_HOUSES) if(x > h.x - h.w/2 - 16 && x < h.x + h.w/2 + 16 && y > h.y - h.d - 10 && y < h.y + 14) return false;
+  { const g = HB3_SPOTS[0]; if(Math.hypot((x - g.x)/130, (y - g.y + 10)/40) < 1) return false; }   // Gil's counter
+  if(hb3Alpha('market') >= 1 && Math.hypot((x - HB3_POND.x)/(HB3_POND.rx + 10), (y - HB3_POND.y)/(HB3_POND.ry + 10)) < 1) return false;
+  return true;
+}
+function hb3Move(dx, dy){
+  const free = !hb3Walkable(hb.x, hb.y);              // wedged somewhere you can't stand: any move gets you out
+  if(free || hb3Walkable(hb.x + dx, hb.y)) hb.x += dx;
+  if(free || hb3Walkable(hb.x, hb.y + dy)) hb.y += dy;
+}
+// the spot you walk to for a building / stall / gate
+function hb3Door(t){
+  if(t.door && typeof t.door === 'object') return t.door;     // (the old street's buildings use 'door' for a paint colour)
+  if(t.kit) return {x:t.x, y:t.y + 60};
+  if(t.stall) return {x:t.x, y:t.y + 70};
+  if(t.gate) return {x:t.x + (t.x < 0 ? 110 : -110), y:t.y + 40};
+  return {x:t.x, y:t.y + 60};
+}
+function hb3Targets(){
+  const out = [];
+  for(const h of HB3_HOUSES) if(h.key){ const B = HB_BUILDINGS.find(b=>b.key===h.key); out.push(Object.assign({}, B, {x:h.x, y:h.y, kit:h.kit, w:h.w})); }
+  for(const s of HB3_SPOTS) if(!s.land || hb3Alpha(s.land) >= 1) out.push(s);
+  return out;
+}
+// a walking route around buildings and counters: a breadth-first search over a 30px grid of the land you can stand on
+function hb3Path(fx, fy, tx, ty){
+  const C = 30, R = hb3Rects();
+  let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+  for(const r of R){ x0 = Math.min(x0, r.x0); x1 = Math.max(x1, r.x1); y0 = Math.min(y0, r.y0); y1 = Math.max(y1, r.y1); }
+  const cols = Math.ceil((x1 - x0)/C), rows = Math.ceil((y1 - y0)/C), N = cols*rows;
+  const cx = x => Math.floor((x - x0)/C), cy = y => Math.floor((y - y0)/C), wx = i => x0 + (i + 0.5)*C, wy = j => y0 + (j + 0.5)*C;
+  const ok = new Uint8Array(N); for(let j=0;j<rows;j++) for(let i=0;i<cols;i++) ok[j*cols + i] = hb3Walkable(wx(i), wy(j)) ? 1 : 0;
+  const near = (i, j)=>{ if(i >= 0 && j >= 0 && i < cols && j < rows && ok[j*cols + i]) return j*cols + i;
+    let best = -1, bd = 1e9; for(let dj=-4;dj<=4;dj++) for(let di=-4;di<=4;di++){ const a = i + di, b = j + dj; if(a < 0 || b < 0 || a >= cols || b >= rows || !ok[b*cols + a]) continue; const d = di*di + dj*dj; if(d < bd){ bd = d; best = b*cols + a; } } return best; };
+  const s = near(cx(fx), cy(fy)), g = near(cx(tx), cy(ty)); if(s < 0 || g < 0) return null;
+  const prev = new Int32Array(N).fill(-1); prev[s] = s; const q = [s];
+  for(let h=0; h<q.length && prev[g] < 0; h++){
+    const c = q[h], i = c % cols, j = (c/cols)|0;
+    for(const [di, dj] of [[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]){
+      const a = i + di, b = j + dj; if(a < 0 || b < 0 || a >= cols || b >= rows) continue;
+      const n = b*cols + a; if(!ok[n] || prev[n] >= 0) continue;
+      if(di && dj && (!ok[j*cols + a] || !ok[b*cols + i])) continue;            // no cutting corners
+      prev[n] = c; q.push(n);
+    }
+  }
+  if(prev[g] < 0) return null;
+  const pts = []; for(let c = g; c !== s; c = prev[c]) pts.push({x:wx(c % cols), y:wy((c/cols)|0)}); pts.reverse(); pts.push({x:tx, y:ty});
+  // straighten: skip points you can walk to in a straight line
+  const clear = (a, b)=>{ const d = Math.hypot(b.x - a.x, b.y - a.y), n = Math.ceil(d/12); for(let k=1;k<n;k++){ if(!hb3Walkable(a.x + (b.x - a.x)*k/n, a.y + (b.y - a.y)*k/n)) return false; } return true; };
+  const out = []; let cur = {x:fx, y:fy}, k = 0;
+  while(k < pts.length){ let far = k; for(let m = pts.length - 1; m > k; m--) if(clear(cur, pts[m])){ far = m; break; } out.push(pts[far]); cur = pts[far]; k = far + 1; }
+  return out;
+}
+function hbGoTo(t, cb){ const d = hb3Door(t); hb3WalkTo(d.x, d.y, cb); }
+function hb3WalkTo(x, y, cb){ hb.path = hb3Path(hb.x, hb.y, x, y) || [{x, y}]; hb.target = hb.path.shift(); hb.onArrive = cb || null; hb.stuckT = 0; }
+// -- entering the harbor: place you, your cats and the waiting townsfolk; then reveal any new land --
+function hb3Init(fromHome){
+  if(!fromHome || hb.y == null){ hb.x = -200; hb.y = -160; }
+  hb.camX = hb.x; hb.camY = hb.y; camera.x = hb.x; camera.y = hb.y;
+  hb.cats.forEach((c, i)=>{ const a = i/Math.max(1, hb.cats.length)*Math.PI*2; c.x = -100 + Math.cos(a)*260; c.y = 80 + Math.sin(a)*120; c.tx = c.x; c.ty = c.y; });
+  hb.locals.forEach((l, i)=>{ l.x = -60 + i*90; l.y = -150; l.tx = l.x; l.ty = l.y; });
+  // newly unlocked land rises out of the sea, one piece at a time
+  const fresh = HB3_LAND.filter(L=>L.stage && hb3LandOn(L) && !hb3Revealed(L));
+  hb.revealQ = fresh.map(L=>L.key); hb.reveal = null;
+  if(hb.revealQ.length) setTimeout(()=>hb3NextReveal(), 600);
+}
+function hb3NextReveal(){
+  if(!hb || state !== 'harbor') return;
+  const key = hb.revealQ.shift(); if(!key){ hb.reveal = null; return; }
+  const L = HB3_LAND.find(l=>l.key===key), r = L.rects[0];
+  hb.reveal = {key, t:0, cx:(r.x0 + r.x1)/2, cy:(r.y0 + r.y1)/2};
+  showBanner('🏝️ New land: '+L.name+'!', 2600);
+  vibrate([20, 40, 20]);
+}
+function hb3RevealTick(dt){
+  const R = hb.reveal; if(!R) return;
+  R.t += dt;
+  if(R.t > 1.4 && !R.saved){ R.saved = true; save.hbLand = [...new Set([...(save.hbLand||[]), R.key])]; persist(); }
+  if(R.t > 3.2){ hb.reveal = null; if(hb.revealQ.length) setTimeout(()=>hb3NextReveal(), 300); }
+}
+function harborUpdate3(dt){
+  hb.t += dt;
+  tutTick(dt);
+  hb3RevealTick(dt);
+  const blocked = hbPanel || hbTalk || (hb.reveal && hb.reveal.t < 2.2);
+  let mx = 0, my = 0;
+  if(!blocked){
+    if(keysDown.has('a') || keysDown.has('arrowleft')) mx -= 1;
+    if(keysDown.has('d') || keysDown.has('arrowright')) mx += 1;
+    if(keysDown.has('w') || keysDown.has('arrowup')) my -= 1;
+    if(keysDown.has('s') || keysDown.has('arrowdown')) my += 1;
+  }
+  const speed = 330, smx = mx;
+  if(isoOn() && (mx || my)){ const u = mx, v = my; mx = ISO.c*u + ISO.s*v; my = -ISO.s*u + ISO.c*v; }   // W walks up the screen
+  hb.moving = false;
+  if(mx || my){
+    hb.target = null; hb.onArrive = null; hb.path = null;
+    const k = Math.hypot(mx, my); hb3Move(mx/k*speed*dt, my/k*speed*dt);
+    if(smx) hb.face = smx > 0 ? 1 : -1; hb.moving = true;
+  } else if(hb.target && !blocked){
+    const dx = hb.target.x - hb.x, dy = hb.target.y - hb.y, d = Math.hypot(dx, dy);
+    if(d < 10){ if(hb.path && hb.path.length){ hb.target = hb.path.shift(); } else { hb.target = null; const f = hb.onArrive; hb.onArrive = null; if(f) f(); } }
+    else {
+      const st = Math.min(d, speed*dt), ox = hb.x, oy = hb.y;
+      hb3Move(dx/d*st, dy/d*st);
+      { const sdx = isoOn() ? ISO.c*dx - ISO.s*dy : dx; if(Math.abs(sdx) > 4) hb.face = Math.sign(sdx); }
+      hb.moving = true;
+      if(Math.hypot(hb.x - ox, hb.y - oy) < st*0.2){                 // blocked: sidestep around it (try both sides), give up after a while
+        hb.stuckT = (hb.stuckT||0) + dt;
+        for(const sgn of [1, -1]){ const a = Math.atan2(dy, dx) + sgn*Math.PI*0.5, bx = hb.x, by = hb.y; hb3Move(Math.cos(a)*st, Math.sin(a)*st); if(hb.x !== bx || hb.y !== by) break; }
+        if(hb.stuckT > 1.6){ const f = hb.onArrive; hb.target = null; hb.onArrive = null; if(f && d < 220) f(); }
+      }
+      else hb.stuckT = 0;
+    }
+  }
+  if(hb.moving) hb.walkT += dt;
+  // camera: follows you (or the land that's rising)
+  const fx = hb.reveal && hb.reveal.t < 2.6 ? hb.reveal.cx : hb.x, fy = hb.reveal && hb.reveal.t < 2.6 ? hb.reveal.cy : hb.y;
+  hb.camX += (fx - hb.camX)*Math.min(1, dt*(hb.reveal ? 2.5 : 6)); hb.camY += (fy - hb.camY)*Math.min(1, dt*(hb.reveal ? 2.5 : 6));
+  if(isoOn()){ camera.x = hb.camX - 50; camera.y = hb.camY - 50; } else { camera.x = hb.camX; camera.y = hb.camY - 60; }          // look a little north, so the buildings fit
+  // your cats: laze about, wander, and come say hi if you're close
+  for(const c of hb.cats){
+    c.t -= dt;
+    if(c.t <= 0){
+      c.t = rand(2, 5); const r = Math.random();
+      if(r < 0.45){ c.mode = 'walk'; c.tx = clamp(c.x + rand(-170, 170), -820, 820); c.ty = clamp(c.y + rand(-100, 100), -230, 400); }
+      else if(r < 0.6 && Math.hypot(hb.x - c.x, hb.y - c.y) < 300){ c.mode = 'walk'; c.tx = hb.x + rand(-70, 70); c.ty = hb.y + rand(-20, 40); }
+      else c.mode = 'idle';
+    }
+    if(c.mode === 'walk'){ const dx = c.tx - c.x, dy = (c.ty ?? c.y) - c.y, d = Math.hypot(dx, dy); if(d < 4) c.mode = 'idle'; else { c.x += dx/d*Math.min(d, 60*dt); c.y += dy/d*Math.min(d, 60*dt); if(Math.abs(dx) > 1) c.face = Math.sign(dx); } }
+    c.sqv += (-c.sq*140 - c.sqv*9)*dt; c.sq += c.sqv*dt;
+    if(c.z > 0 || c.vz){ c.vz -= 900*dt; c.z += c.vz*dt; if(c.z <= 0){ c.z = 0; c.vz = 0; c.sqv -= 4; } }
+  }
+  // townsfolk: someone walks up with a request now and then (in from the Cat Town road)
+  hb.offerT -= dt;
+  const offering = hb.locals.some(l=>!l.pay && l.state!=='leave');
+  if(!offering && !blocked && princessDue() && !hb.princessCame && hb.t > 2.5){
+    hb.princessCame = true;
+    hb.locals.push({offer:makeRoyalBounty(), look:npcReady ? {npc:NPC_ROLE.signora} : randomLook(true), name:PRINCESS, princess:true, x:HB3_EXIT.x, y:HB3_EXIT.y, state:'arrive', face:1, walkT:0, idleT:0, waitT:60});
+    setTimeout(()=>showBanner('👑 The town Princess is looking for you!', 2000), 300);
+  }
+  if(hb.offerT <= 0 && !offering && !blocked){
+    hb.offerT = rand(18, 30);
+    if(activeBounties().length < 3){
+      const name = LOCAL_NAMES.filter(n=>!activeBounties().some(b=>b.giver===n))[Math.floor(Math.random()*8)] || 'Pip';
+      hb.locals.push({offer:makeBounty(), look:randomLook(), name, x:HB3_EXIT.x, y:HB3_EXIT.y + rand(-60, 60), state:'arrive', face:1, walkT:0, idleT:0, waitT:28});
+    }
+  }
+  for(let i=hb.locals.length-1;i>=0;i--){
+    const l = hb.locals[i];
+    if(l.y == null) l.y = hb.y + 10;
+    if(l.state==='arrive' || l.state==='leave'){
+      const tx = l.state==='leave' ? HB3_EXIT.x - 120 : hb.x + (l.x < hb.x ? -90 : 90), ty = l.state==='leave' ? HB3_EXIT.y : hb.y + 6;
+      const dx = tx - l.x, dy = ty - l.y, d = Math.hypot(dx, dy);
+      if(d < 6){ if(l.state==='leave'){ hb.locals.splice(i, 1); continue; } l.state = 'wait'; }
+      else { const st = Math.min(d, 160*dt); l.x += dx/d*st; l.y += dy/d*st; if(Math.abs(dx) > 1) l.face = Math.sign(dx); l.walkT += dt; }
+    } else {
+      l.face = hb.x > l.x ? 1 : -1;
+      if(!l.pay && !hbTalk){ l.waitT -= dt; if(l.waitT <= 0) l.state = 'leave'; }
+    }
+  }
+  for(let i=hb.parts.length-1;i>=0;i--){ const p = hb.parts[i]; p.life -= dt; p.x += p.vx*dt; p.y += p.vy*dt; p.vy += (p.g||0)*dt; if(p.life <= 0) hb.parts.splice(i,1); }
+  // what's in reach: a townsperson first, then a building / stall / gate
+  let near = null;
+  for(const l of hb.locals) if(l.state==='wait' && Math.hypot(l.x - hb.x, l.y - hb.y) < 120){ near = {local:l}; break; }
+  if(!near && !blocked) for(const t of hb3Targets()){ const d = hb3Door(t); if(Math.hypot(d.x - hb.x, d.y - hb.y) < 120){ near = {b:t}; break; } }
+  const key = near ? (near.local ? 'l'+near.local.name : near.b.key + (near.b.stage||'')) : '';
+  if(key !== (hb.nearKey||'')){ hb.near = near; hb.nearKey = key; renderPrompt(); }
+}
+// tap / click: talk to a townsperson, squish a cat, walk into a building, or just walk there
+function hb3Pointer(e){
+  const r = canvas.getBoundingClientRect(), p = unwarp(e.clientX - r.left, e.clientY - r.top);
+  const Z = viewZoom(), iw = isoOn() ? isoInv(e.clientX - r.left, e.clientY - r.top) : null;
+  const wx = iw ? iw.x : camera.x + (p.x - W/2)/Z, wy = iw ? iw.y : camera.y + (p.y - H/2)/(Z*viewSquash());
+  for(const l of hb.locals) if(l.state==='wait' && Math.abs(wx - l.x) < 45 && wy > l.y - 150 && wy < l.y + 25){ hb3WalkTo(l.x + (hb.x < l.x ? -80 : 80), l.y + 4, ()=>openTalk(l)); return; }
+  for(const c of hb.cats) if(Math.abs(wx - c.x) < 40 && wy > c.y - 70 && wy < c.y + 20){
+    c.sqv += 7; c.vz = 260; vibrate(10);
+    for(let i=0;i<4;i++) hb.parts.push({x:c.x + rand(-10,10), y:c.y - 60, vx:rand(-40,40), vy:rand(-120,-70), life:0.9, type:'heart', abs:true});
+    return;
+  }
+  for(const t of hb3Targets()){
+    const hit = t.kit ? (Math.abs(wx - t.x) < t.w/2 && wy > t.y - 320 && wy < t.y + 30) : (Math.abs(wx - t.x) < (t.w||140)/2 && wy > t.y - 260 && wy < t.y + 40);
+    if(hit){ hbGoTo(t, ()=>{ if(t.stage){ save.stage = t.stage; persist(); } openBuilding(t.key); }); return; }
+  }
+  hb3WalkTo(wx, wy, null);
+}
+/* ---- drawing ---- */
+function hb3Ground(part){
+  const v = getViewBounds(60);
+  if(part !== 'top'){
+  // the sea all around, with soft waves
+  const sea = ctx.createLinearGradient(0, v.top, 0, v.bottom); sea.addColorStop(0, '#8fd3e8'); sea.addColorStop(1, '#5fb6d8');
+  ctx.fillStyle = sea; ctx.fillRect(v.left, v.top, v.right - v.left, v.bottom - v.top);
+  ctx.strokeStyle = 'rgba(255,255,255,0.45)'; ctx.lineWidth = 3; ctx.lineCap = 'round';
+  for(let y = Math.floor(v.top/70)*70; y < v.bottom; y += 70) for(let x = Math.floor(v.left/180)*180; x < v.right; x += 180){
+    const ox = ((y*37) % 180) + Math.sin(hb.t*1.2 + y*0.03)*14; ctx.beginPath(); ctx.moveTo(x + ox, y); ctx.quadraticCurveTo(x + ox + 14, y - 7, x + ox + 28, y); ctx.stroke();
+  }
+  if(part === 'sea') return;
+  }
+  // land that isn't yours yet: a faint sandbank with a lock
+  for(const L of HB3_LAND){
+    if(!L.stage || hb3LandOn(L)) continue;
+    const r = L.rects[0];
+    ctx.fillStyle = 'rgba(255,255,255,0.18)'; roundRect(r.x0 + 30, r.y0 + 30, r.x1 - r.x0 - 60, r.y1 - r.y0 - 60, 60); ctx.fill();
+    ctx.setLineDash([18, 14]); ctx.strokeStyle = 'rgba(255,255,255,0.6)'; ctx.lineWidth = 4; ctx.stroke(); ctx.setLineDash([]);
+    if(isoOn()) continue;                         // (upright labels come later)
+    const st = STAGES.find(s=>s.key===L.stage);
+    ctx.fillStyle = 'rgba(59,46,42,0.55)'; ctx.font = "700 34px Fredoka, Nunito, sans-serif"; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('🔒 '+L.name, (r.x0 + r.x1)/2, (r.y0 + r.y1)/2 - 20);
+    ctx.font = "800 22px Nunito, sans-serif"; ctx.fillText(st && st.unlock ? st.unlock.text : 'Unlocks later', (r.x0 + r.x1)/2, (r.y0 + r.y1)/2 + 22);
+  }
+  // the pier
+  const P = HB3_PIER;
+  if(!isoOn()){ ctx.fillStyle = '#7a5230'; for(let y = P.y0 + 60; y < P.y1; y += 140){ ctx.fillRect(P.x0 - 8, y, 14, 60); ctx.fillRect(P.x1 - 6, y, 14, 60); } }
+  ctx.fillStyle = '#c69463'; ctx.fillRect(P.x0, P.y0 - 10, P.x1 - P.x0, P.y1 - P.y0 + 10);
+  ctx.strokeStyle = 'rgba(110,70,40,0.35)'; ctx.lineWidth = 3; for(let y = P.y0; y < P.y1; y += 26){ ctx.beginPath(); ctx.moveTo(P.x0, y); ctx.lineTo(P.x1, y); ctx.stroke(); }
+  ctx.fillStyle = '#8a5a34'; ctx.fillRect(P.x0, P.y1, P.x1 - P.x0, 18);
+  // each piece of land: its cliff (the side you can see), then its top
+  for(const L of HB3_LAND){
+    const a = hb3Alpha(L.key); if(a <= 0) continue;
+    ctx.save(); ctx.globalAlpha = a; ctx.translate(0, (1 - a)*90);
+    for(const r of L.rects) hb3Slab(r, L);
+    ctx.restore();
+  }
+}
+const HB3_GROUND = {pave:{top:null, side:['#e2c3a0','#c59a72','#a77a55']}, grass:{top:'#8fcd6b', side:['#79bb58','#b07a52','#8a5a3a']}, sand:{top:'#f3dcaa', side:['#e6c78e','#c9a46c','#a98456']}};
+function hb3Slab(r, L){
+  const G = HB3_GROUND[L.ground], w = r.x1 - r.x0, h = r.y1 - r.y0;
+  // the cliff below the south edge: three bands (top lip, earth, deep earth) (the isometric camera draws its cliffs separately)
+  if(!isoOn()){
+  ctx.fillStyle = G.side[2]; ctx.fillRect(r.x0, r.y1, w, 150);
+  ctx.fillStyle = G.side[1]; ctx.fillRect(r.x0, r.y1, w, 96);
+  ctx.fillStyle = G.side[0]; ctx.fillRect(r.x0, r.y1, w, 26);
+  ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.fillRect(r.x0, r.y1 + 150, w, 8);
+  }                  // foam at the waterline
+  // the top
+  if(L.ground === 'pave'){
+    const S = SQ.tile, i0 = Math.floor(r.x0/S), i1 = Math.ceil(r.x1/S) - 1, j0 = Math.floor(r.y0/S), j1 = Math.ceil(r.y1/S) - 1;
+    ctx.save(); ctx.beginPath(); ctx.rect(r.x0, r.y0, w, h); ctx.clip();
+    for(let j=j0;j<=j1;j++) for(let i=i0;i<=i1;i++){ ctx.fillStyle = SQ.tiles[Math.floor(sqHash(i, j)*SQ.tiles.length)]; ctx.fillRect(i*S, j*S, S, S); }
+    ctx.strokeStyle = SQ.grout; ctx.lineWidth = 3; ctx.beginPath();
+    for(let i=i0;i<=i1 + 1;i++){ ctx.moveTo(i*S, r.y0); ctx.lineTo(i*S, r.y1); } for(let j=j0;j<=j1 + 1;j++){ ctx.moveTo(r.x0, j*S); ctx.lineTo(r.x1, j*S); } ctx.stroke();
+    ctx.restore();
+    if(L.key === 'harbor'){                                                                             // a lawn in front of the shops
+      ctx.fillStyle = SQ.curb; roundRect(-560, -40, 720, 240, 110); ctx.fill();
+      ctx.fillStyle = SQ.grass; roundRect(-544, -26, 688, 212, 96); ctx.fill();
+      hb3Speckle(-540, -20, 680, 200, 'grass', 7);
+    }
+  } else if(L.ground === 'grass'){
+    ctx.fillStyle = G.top; ctx.fillRect(r.x0, r.y0, w, h); hb3Speckle(r.x0, r.y0, w, h, 'grass', 11);
+    // a winding sandy path through the park to its signpost
+    ctx.strokeStyle = '#ead2a8'; ctx.lineWidth = 80; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.beginPath(); ctx.moveTo(-200, r.y1 + 10); ctx.quadraticCurveTo(-200, -820, -450, -960); ctx.quadraticCurveTo(-650, -1080, -600, -1200); ctx.stroke();
+    if(hb3Alpha('market') > 0){ const P2 = HB3_POND; ctx.fillStyle = '#6fb9d6'; ctx.beginPath(); ctx.ellipse(P2.x, P2.y, P2.rx + 12, P2.ry + 10, 0, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#9ad7e3'; ctx.beginPath(); ctx.ellipse(P2.x, P2.y, P2.rx, P2.ry, 0, 0, Math.PI*2); ctx.fill(); }
+  } else {
+    ctx.fillStyle = G.top; ctx.fillRect(r.x0, r.y0, w, h); hb3Speckle(r.x0, r.y0, w, h, 'sand', 13);
+  }
+}
+function hb3Speckle(x0, y0, w, h, kind, seed){
+  const N = Math.round(w*h/(kind === 'sand' ? 9000 : 6500));
+  for(let k=0;k<N;k++){
+    const fx = x0 + 10 + sqHash(k*7 + seed, seed)*(w - 20), fy = y0 + 10 + sqHash(seed + 3, k*11 + 2)*(h - 20), r = sqHash(k, k + seed);
+    if(kind === 'sand'){ ctx.fillStyle = r < 0.5 ? 'rgba(200,160,100,0.35)' : 'rgba(255,255,255,0.5)'; ctx.fillRect(fx, fy, 4, 3); continue; }
+    if(r < 0.6){ ctx.strokeStyle = SQ.grassDark; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(fx - 4, fy); ctx.lineTo(fx - 6, fy - 7); ctx.moveTo(fx, fy); ctx.lineTo(fx, fy - 9); ctx.moveTo(fx + 4, fy); ctx.lineTo(fx + 6, fy - 7); ctx.stroke(); }
+    else { ctx.fillStyle = r < 0.78 ? '#ffffff' : r < 0.9 ? '#9cc7f2' : '#ffd96a'; for(let p=0;p<5;p++){ const a = p/5*Math.PI*2; ctx.beginPath(); ctx.arc(fx + Math.cos(a)*3, fy + Math.sin(a)*2.3, 2.3, 0, Math.PI*2); ctx.fill(); } }
+  }
+}
+function hb3Tree(o){ const s = o.s || 1; sqShadow(o.x, o.y, 54*s, 18*s, 0.22); lpCyl(o.x, o.y, 10*s, 70*s, 0, '#8a5a32', {n:6, r2:8*s}); const [cx, cy] = boxPt(o.x, o.y, 112*s); lpBlob(cx, cy, 58*s, o.c || '#73b24f'); }
+function hb3Palm(o){
+  sqShadow(o.x, o.y, 44, 14, 0.2);
+  for(let i=0;i<6;i++) lpCyl(o.x + i*3, o.y, 9 - i*0.6, 26, i*26, i%2 ? '#b98a56' : '#a6784a', {n:6, r2:8.5 - i*0.6});
+  const [cx, cy] = boxPt(o.x + 18, o.y, 160);
+  for(let i=0;i<6;i++){ const a = i/6*Math.PI*2 + 0.3; ctx.fillStyle = lpShade('#5fae4a', 0.85 + 0.15*Math.cos(a + 2.3)); ctx.beginPath(); ctx.moveTo(cx, cy);
+    ctx.quadraticCurveTo(cx + Math.cos(a)*50, cy + Math.sin(a)*24 - 26, cx + Math.cos(a)*86, cy + Math.sin(a)*40 + 10); ctx.quadraticCurveTo(cx + Math.cos(a)*44, cy + Math.sin(a)*20, cx, cy); ctx.fill(); }
+}
+function hb3Umbrella(o){
+  sqShadow(o.x + 20, o.y, 70, 24, 0.16);
+  lpCyl(o.x, o.y, 3, 110, 0, '#f6efe4', {n:4});
+  const [cx, cy] = boxPt(o.x, o.y, 120), R = 74;
+  for(let i=0;i<8;i++){ const a0 = i/8*Math.PI*2, a1 = (i + 1)/8*Math.PI*2; ctx.fillStyle = i%2 ? '#ffffff' : (o.c || '#E5404B');
+    ctx.beginPath(); ctx.moveTo(cx, cy - 24); ctx.lineTo(cx + Math.cos(a0)*R, cy + Math.sin(a0)*R*0.42); ctx.lineTo(cx + Math.cos(a1)*R, cy + Math.sin(a1)*R*0.42); ctx.closePath(); ctx.fill(); }
+}
+function hb3Gate(s, hi){
+  const P = boxPt;
+  sqShadow(s.x, s.y, 30, 10, 0.2);
+  lpCyl(s.x, s.y, 7, 150, 0, '#8a5a32', {n:6});
+  const [bx, by] = P(s.x, s.y, 150);
+  const dir = s.x < 0 ? -1 : 1, w = 190, hgt = 54, bob = hi ? Math.sin(hb.t*6)*3 : 0;
+  ctx.save(); ctx.translate(bx + dir*20 + bob*dir, by);
+  ctx.fillStyle = hi ? '#ffd23c' : '#F8C630';
+  ctx.beginPath(); ctx.moveTo(dir*(w*0.5 + 30), 0); ctx.lineTo(dir*w*0.5, -hgt/2); ctx.lineTo(-dir*w*0.5, -hgt/2); ctx.lineTo(-dir*w*0.5, hgt/2); ctx.lineTo(dir*w*0.5, hgt/2); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = 'rgba(0,0,0,0.08)'; ctx.fillRect(-w*0.5, hgt/2 - 8, w, 8);
+  ctx.fillStyle = '#3B2E2A'; ctx.font = "700 24px Fredoka, Nunito, sans-serif"; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(s.ic+' '+s.name, 0, 2);
+  ctx.restore();
+}
+function hb3Marker(x, z, y){
+  const [mx, my] = boxPt(x, y, z), by = my - Math.abs(Math.sin(hb.t*5))*10;
+  ctx.fillStyle = '#ffd23c'; ctx.strokeStyle = '#3B2E2A'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(mx - 14, by); ctx.lineTo(mx + 14, by); ctx.lineTo(mx, by + 16); ctx.closePath(); ctx.fill(); ctx.stroke();
+}
+function harborRender3(){
+  ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0, 0, W, H);
+  const over = tiltOverscan();
+  ctx.save();
+  if(isoOn()){
+    ctx.restore(); $('glc').style.visibility = 'hidden';
+    const isoWorld = ()=>{ ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.translate(W/2, H/2); ctx.scale(viewZoom(), viewZoom()*ISO.FY); ctx.rotate(Math.PI/4); ctx.translate(-camera.x, -camera.y); };
+    isoWorld(); hb3Ground('sea'); isoCliffs(); isoWorld(); hb3Ground('top'); ctx.setTransform(1, 0, 0, 1, 0, 0); isoLockLabels();
+  } else {
+  const Z = viewZoom();
+  const FY = viewSquash();
+  ctx.translate(W/2, H/2); ctx.scale(Z/over, Z*FY/over); ctx.translate(-camera.x, -camera.y);
+  hb3Ground();
+  ctx.restore();
+  applyTilt();
+  }
+  // everything standing up, back to front
+  const items = [], near = hb.near && hb.near.b ? hb.near.b : null, nearKey = near ? near.key + (near.stage||'') : '';
+  for(const h of HB3_HOUSES) items.push([h.y - 12, h.x, h.y, ()=>{ if(isoOn()) drawIsoHouse(h); else drawHouseBox(h.kit, h.x, h.y, h.w, h.d); if(h.key && nearKey === h.key) hb3Marker(h.x, h.w*0.9, h.y); }, isoDepth(h.x - h.w/2, h.y) - 1]);     // (a block is behind anything south or east of its front-left corner)
+  for(const s of HB3_SPOTS){
+    const a = s.land ? hb3Alpha(s.land) : 1; if(a <= 0) continue;
+    const hi = nearKey === s.key + (s.stage||'');
+    items.push([s.y, s.x, s.y, ()=>{
+      ctx.globalAlpha = a;
+      if(s.stall) drawGilStall({x:s.x, w:s.w, name:s.name, ic:s.ic}, s.y + 40, hi);
+      else if(s.boat){ ctx.save(); ctx.scale(0.8, 0.8); ctx.translate(s.x*0.25, s.y*0.25); drawBoat({x:s.x, name:s.name, ic:s.ic}, s.y - 28 + Math.sin(hb.t*1.6)*3, hi); ctx.restore(); }
+      else if(s.gate) hb3Gate(s, hi);
+    }]);
+  }
+  for(const p of HB3_PROPS){
+    const [t, x, y, land, a1, a2] = p, a = hb3Alpha(land); if(a <= 0) continue;
+    items.push([y, x, y, ()=>{
+      ctx.globalAlpha = a; const o = {x, y, c:a1, s:a2};
+      if(t === 'lamp') drawSquareLamp(o, hb.t); else if(t === 'bush') drawSquareBush(o); else if(t === 'bench') drawSquareBench(o); else if(t === 'mush') drawSquareMush(o);
+      else if(t === 'tree') hb3Tree(o); else if(t === 'palm') hb3Palm(o); else if(t === 'umbrella') hb3Umbrella(o);
+      else if(t === 'kit'){ sqShadow(x, y, a2*0.4, a2*0.1, 0.18); kitSprite(a1, x, y, a2); }
+    }]);
+  }
+  for(const c of hb.cats) items.push([c.y, c.x, c.y, ()=>{
+    ctx.fillStyle = 'rgba(80,50,30,0.2)'; ctx.beginPath(); ctx.ellipse(c.x, c.y + 3, 24, 7, 0, 0, Math.PI*2); ctx.fill();
+    ctx.translate(c.x, c.y - c.z);
+    const walk = c.mode==='walk' ? Math.sin(hb.t*12 + c.x)*0.06 : Math.sin(hb.t*2 + c.x)*0.03, s = c.def.ai==='boss' ? 0.75 : 1.2, sq = clamp(c.sq, -0.5, 0.5) + walk;
+    ctx.scale(s*c.face*(1 + sq*0.8), s*(1 - sq)); ctx.translate(0, -21); drawCatShape(ctx, c.def);
+  }]);
+  for(const l of hb.locals) items.push([l.y, l.x, l.y, ()=>{
+    ctx.fillStyle = 'rgba(80,50,30,0.2)'; ctx.beginPath(); ctx.ellipse(l.x, l.y + 4, 22, 7, 0, 0, Math.PI*2); ctx.fill();
+    hbAvatar(l.look, l.pay ? 1 : 9, l.x, l.y + 6, HB3_PERSON_H, l.face, l.walkT, l.state!=='wait');
+    if(l.princess) drawCrown(l.x, l.y + 6 - HB3_PERSON_H + 4, 1);
+    if(l.state==='wait') hbBubble(l.x, l.y - HB3_PERSON_H - 28, l.pay ? '🪙' : '!', l.pay ? '#c9922c' : '#e8402a');
+    ctx.font = '900 14px Nunito, sans-serif'; ctx.textAlign = 'center'; ctx.lineWidth = 4; ctx.strokeStyle = '#3B2E2A'; ctx.strokeText(l.name, l.x, l.y + 26); ctx.fillStyle = '#fff'; ctx.fillText(l.name, l.x, l.y + 26);
+    if(hb.near && hb.near.local === l) hb3Marker(l.x, HB3_PERSON_H + 70, l.y);
+  }]);
+  items.push([hb.y, hb.x, hb.y, ()=>{
+    ctx.fillStyle = 'rgba(80,50,30,0.24)'; ctx.beginPath(); ctx.ellipse(hb.x, hb.y + 4, 22, 7, 0, 0, Math.PI*2); ctx.fill();
+    hbPlayer(hb.x, hb.y + 6, HB3_PERSON_H, hb.face, hb.walkT, hb.moving);
+  }]);
+  if(near && !near.kit) items.push([near.y + 1, near.x, near.y, ()=>hb3Marker(near.x, near.boat ? 260 : near.stall ? 290 : 230, near.y)]);
+  if(typeof tutHarborArrow3 === 'function') tutHarborArrow3(items);
+  if(isoOn()) for(const it of items) it[0] = it[4] != null ? it[4] : isoDepth(it[1], it[2]) + (it[0] - it[2]);
+  items.sort((a, b)=>a[0] - b[0]);
+  for(const [, x, y, fn] of items){ billboard(x, y, 0, 0); ctx.save(); fn(); ctx.restore(); }
+  // hearts and coins
+  for(const p of hb.parts){
+    billboard(p.x, hb.y, 0, 0); ctx.save(); ctx.globalAlpha = Math.min(1, p.life*2);
+    const py = hb.y + p.y;
+    if(p.type==='coin') drawCoin(p.x, py, 7); else { ctx.font = '18px sans-serif'; ctx.textAlign = 'center'; ctx.fillStyle = '#ff6b8a'; ctx.fillText('❤', p.x, py); }
+    ctx.restore();
+  }
+  ctx.setTransform(1,0,0,1,0,0);
+}
+// tutorial: a bouncing orange arrow over the place the current harbor step wants you to visit
+function tutHarborArrow3(items){
+  const st = tutStep(); if(!st || !st.target || !tut || tut.part !== 'harbor' || tut.doneT) return;
+  const t = hb3Targets().find(x=>x.key === st.target); if(!t) return;
+  const z = t.kit ? t.w*0.9 + 70 : t.boat ? 330 : t.stall ? 350 : 290;
+  items.push([t.y + 2, t.x, t.y, ()=>{
+    const [mx, my] = boxPt(t.x, t.y, z), y = my - Math.abs(Math.sin(hb.t*4))*14;
+    ctx.fillStyle = '#E2582C'; ctx.strokeStyle = '#FFFFFF'; ctx.lineWidth = 5; ctx.lineJoin = 'round';
+    ctx.beginPath(); ctx.moveTo(mx - 26, y); ctx.lineTo(mx - 12, y); ctx.lineTo(mx - 12, y - 30); ctx.lineTo(mx + 12, y - 30); ctx.lineTo(mx + 12, y); ctx.lineTo(mx + 26, y); ctx.lineTo(mx, y + 28); ctx.closePath();
+    ctx.stroke(); ctx.fill();
+  }]);
+}
 function drawHarborBackdrop(){
   const S = hbScale(), gy = hbGround(), horizon = (gy - 330)*S;
   const sky = ctx.createLinearGradient(0, 0, 0, horizon);
@@ -9603,6 +10883,7 @@ function drawHarborBackdrop(){
   }
 }
 function harborRender(){
+  if(HB3D) return harborRender3();
   const S = hbScale(), gy = hbGround();
   ctx.setTransform(1,0,0,1,0,0);
   drawHarborBackdrop();
@@ -9678,6 +10959,7 @@ function harborRender(){
     ctx.save(); ctx.fillStyle = '#ffd23c'; ctx.strokeStyle = '#1c1420'; ctx.lineWidth = 3;
     ctx.beginPath(); ctx.moveTo(x-14, by); ctx.lineTo(x+14, by); ctx.lineTo(x, by+16); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.restore();
   }
+  tutHarborArrow(gy);
   for(const p of hb.parts){
     ctx.save(); ctx.globalAlpha = Math.min(1, p.life*2);
     if(p.type==='coin'){ drawCoin(p.x, gy + p.y, 7); }
@@ -9689,6 +10971,7 @@ function harborRender(){
 canvas.addEventListener('pointerdown', e=>{
   if(state !== 'harbor' || hbPanel || hbTalk) return;
   e.preventDefault();
+  if(HB3D){ hb3Pointer(e); return; }
   const S = hbScale(), gy = hbGround();
   const wx = hb.camX + (e.clientX - W/2)/S, wy = e.clientY/S;
   for(const l of hb.locals){
@@ -10099,7 +11382,7 @@ const PIAZZA = [
 const PIAZZA_DOOR = {x:0, y:-200};
 function nearPiazza(x, y){ return x > -720 && x < 720 && y > -440 && y < -150; }
 function drawPiazza(){
-  if(!kitReady || !stage || stage.roster!=='town' || tiltOn()) return;      // (with the 3D camera they're drawn upright)
+  if(!kitReady || !stage || stage.roster!=='town' || tiltOn() || !(state==='intro' || TOWN_PROPS)) return;      // (with the 3D camera they're drawn upright; only in the story now)
   const v = getViewBounds(170);
   if(!(v.top < -150 && v.bottom > -440 && v.left < 720 && v.right > -720)) return;
   for(const [k, x, y, h] of PIAZZA){
@@ -10128,7 +11411,7 @@ function kitFacade(k){
   const wall = n ? [r/n, gg/n, b/n] : [230, 200, 170];
   return facadeCache[k] = {img, top, fh:H - top, fw:W, wall};
 }
-function boxPt(x, y, z){ return [x + (x - camera.x)*z/BOX3D.Z, y - z + (y - camera.y)*z/BOX3D.Z*BOX3D.lean]; }
+function boxPt(x, y, z){ if(isoOn()){ const [px, py] = isoP(x, y, z), Z = viewZoom(), A = isoAnchor; return [A.x + (px - A.sx)/Z, A.y + (py - A.sy)/Z]; } const FY = viewSquash(), gy = FY === 1 ? y : bbAnchorY + (y - bbAnchorY)*FY; return [x + (x - camera.x)*z/BOX3D.Z, gy - z + (y - camera.y)*z/BOX3D.Z*BOX3D.lean]; }
 // a house block: front face centred on x at y (the ground line), w wide, depth d going away from you
 function drawHouseBox(k, x, y, w, d){
   const F = kitFacade(k); if(!F) return false;
@@ -10275,8 +11558,9 @@ function finishIntro(){
   if(introReplay){ enterHarbor(); return; }
   // the run starts right here: the cats that came for dinner are the first ones to feed
   save.stage = 'meadow'; save.introRun = true; persist();
+  const firstKeys = new Set(stage.waves[0][0].map(k=>catFor(stage, k)));
   if(I) for(const c of I.cats){
-    if(c.big || !c.in || !ENEMIES[c.key]) continue;
+    if(c.big || !c.in || !ENEMIES[c.key] || !firstKeys.has(c.key)) continue;     // only the first wave's cats (the tabbies) stay for the run
     const e = spawnEnemy(c.key, {pos:{x:c.x, y:c.y}}); e.chT = rand(1.5, 3);
   }
   beginRun();
@@ -10476,8 +11760,19 @@ if(DEBUG) window.CS = {
   closeTalk:()=>closeTalk(),
   home:()=>{ if(state==='harbor') exitHarbor(); enterHome(); },
   run:()=>startRun(),
+  runAt:k=>{ const o = save.stage; save.stage = k; if(!save.unlocked.includes(k)) save.unlocked.push(k); startRun(); save.stage = o; return stage.key; },
+  sim:(k, secs, auto)=>{ CS.runAt(k); const seen = new WeakSet(), got = {}; let kills = 0; for(let s = 0; s < secs*6; s++){ player.hp = player.maxHp; for(let i=0;i<10;i++){ update(1/60); for(const p of pickups) if(!seen.has(p)){ seen.add(p); got[p.kind] = (got[p.kind]||0) + 1; } } if(!auto && s % 12 === 0){ const before = fedCount; for(const c of cats) if(!c.prop && !c.dying && !c.isBoss && Math.hypot(c.x-player.x, c.y-player.y) < 500) damageCat(c, 1e6, 0, null); kills += fedCount - before; } } return {k, fed:fedCount, props:got, lvl:player.level, t:Math.round(runT)}; },
+  propsAt:()=>cats.filter(c=>c.prop).map(c=>[c.prop, Math.round(c.x-player.x), Math.round(c.y-player.y), inView(c)]),
+  probe:()=>{ const kinds = {}; for(const p of pickups) kinds[p.kind] = (kinds[p.kind]||0) + 1; return {stage:stage.key, state, t:Math.round(runT), props:cats.filter(c=>c.prop && !c.dying).length, cats:cats.filter(c=>!c.prop).length, kinds, chestQueue, levelQueue, lvlOpen, chestT:+chestT.toFixed(1), lvl:player.level}; },
   fish:()=>{ if(state==='harbor'){ openFishing(); } },
   onlyFish:(ft, n)=>{ const sp = fishSp(); for(const k in sp) delete sp[k]; save.fishBag = [0,0,0,0,0]; addFish(ft, n || 200); },   // testing: a bucket of one species (not saved until something persists)
+  giveItem:k=>gainItem(k || 'yarnball'),
+  headBox:i=>({box:npcHeadBox(NPCS[i]), w:NPCS[i].width, h:NPCS[i].height}),
+  npcSheet:()=>{ const c = document.createElement('div'); c.id = 'npc-sheet'; c.style.cssText = 'position:fixed;inset:0;z-index:99;background:#fff;display:flex;flex-wrap:wrap;gap:6px;padding:6px;overflow:auto'; NPCS.forEach((im, i)=>{ const d = document.createElement('div'); d.style.cssText = 'text-align:center;font:12px sans-serif'; const cv = document.createElement('canvas'); cv.width = 70; cv.height = 110; const k = 104/im.height; cv.getContext('2d').drawImage(im, 35 - im.width*k/2, 3, im.width*k, im.height*k); const ic = new Image(); ic.src = npcIconURL({npc:i}, 'x'+i); ic.width = 48; d.append(cv, document.createElement('br'), ic, document.createElement('br'), i); c.append(d); }); document.body.append(c); return NPCS.length; },
+  hbGo:(k, stage)=>{ const t = hb3Targets().find(x=>x.key===k && (!stage || x.stage===stage)); if(t) hbGoTo(t, ()=>{ window._arrived = k; }); return !!t; }, hbPos:()=>hb && [Math.round(hb.x), Math.round(hb.y)], hbDbg:()=>({t:hb.target, st:hb.stuckT, here:hb3Walkable(hb.x, hb.y), r:hb3Walkable(hb.x+5, hb.y), l:hb3Walkable(hb.x-5, hb.y), u:hb3Walkable(hb.x, hb.y-5), dn:hb3Walkable(hb.x, hb.y+5), blocked:!!(hbPanel || hbTalk || hb.reveal), panel:hbPanel, talk:!!hbTalk, rev:hb.reveal}),
+  pickupKinds:()=>{ const o = {}; for(const p of pickups) o[p.kind] = (o[p.kind]||0) + 1; return o; },
+  catKeys:()=>{ const o = {}; for(const c of cats) if(c.def && !c.dying) o[c.def.key] = (o[c.def.key]||0) + 1; return o; },
+  tut:()=>tut && {part:tut.part, i:tut.i, id:tut.steps[tut.i] && tut.steps[tut.i].id, prog:tut.prog}, tutStart:p=>{ save.tut = {run:0, harbor:0}; tutStart(p); },
   fishing:()=>fishing, bag:()=>fishBag().slice(), runFish:()=>runFishIdx(), fishStep:(dt)=>{ if(fishing){ fishUpdate(dt); fishDraw(); } },
   intro:t=>{ playIntro(true); if(t) introJump(t); },
   levelUp:()=>{ levelQueue++; showLevelUp(); },
@@ -10495,6 +11790,84 @@ if(DEBUG) window.CS = {
   catIcon:(k, size)=>catIconURL(ENEMIES[k], size || 72),
 };
 
+/* ---- "Your runs" screen: shown when the game opens; pick a run to continue, or start a new one ---- */
+function runSummary(r){
+  let s = null, coll = [];
+  try{ s = JSON.parse(localStorage.getItem(runKeyFor(r.id, 'chumstorm_save_v2'))||'null'); }catch(e){}
+  try{ coll = JSON.parse(localStorage.getItem(runKeyFor(r.id, 'chumstorm_collection_v1'))||'[]'); }catch(e){}
+  const best = s && s.stats ? Math.max(0, ...Object.values(s.stats.best||{})) : 0;
+  return {gold:s ? s.gold||0 : 0, cats:coll.length, best, areas:s && s.unlocked ? s.unlocked.filter(k=>STAGES.some(x=>x.key===k)).length : 1, fresh:!s || !s.seenIntro};
+}
+function timeAgo(t){
+  const m = Math.round((Date.now() - (t||0))/60000);
+  return m < 1 ? 'just now' : m < 60 ? m+' min ago' : m < 1440 ? Math.round(m/60)+' h ago' : Math.round(m/1440)+' d ago';
+}
+function showRuns(canClose){
+  const el = $('runs-screen');
+  const list = RUNS.list.slice().sort((a, b)=>(b.played||0) - (a.played||0));
+  el.innerHTML = `<div class="runs-card">
+    <div class="runs-head"><h1>Chum Storm</h1><span class="sp"></span>${canClose && ACTIVE_RUN ? '<button class="v2round v2x" id="runs-close" aria-label="Close">X</button>' : ''}</div>
+    <div class="runs-h">Your runs</div>
+    <div class="runs-list">${list.length ? list.map(r=>{ const S = runSummary(r); return `<div class="run-row${ACTIVE_RUN && r.id===ACTIVE_RUN.id ? ' cur' : ''}" data-id="${r.id}">
+        <div class="run-txt"><input class="run-name" maxlength="24" value="${escHTML(r.name)}" aria-label="Run name" title="Click to rename">
+          <span>${S.fresh ? 'Not started yet' : `<span class="v2coin"></span> ${S.gold.toLocaleString()} gold · 🐾 ${S.cats}/${ALL_CAT_DEFS.length} cats · ${S.areas} area${S.areas > 1 ? 's' : ''}${S.best ? ' · best '+fmtTime(S.best) : ''}`} · ${timeAgo(r.played)}</span></div>
+        <button class="run-del" title="Delete this run" aria-label="Delete">🗑</button>
+        <button class="bigbtn run-go">${ACTIVE_RUN && r.id===ACTIVE_RUN.id && canClose ? 'Back to it' : 'Continue'}</button></div>`; }).join('') : '<div class="runs-empty">No runs yet. Name your first one below!</div>'}</div>
+    <div class="runs-new"><div class="runs-h">New run</div>
+      <div class="runs-new-row"><input id="run-new-name" maxlength="24" placeholder="Name your run" value="${list.length ? 'Run '+(list.length + 1) : 'My run'}"><button class="bigbtn" id="run-new-go">Start new run</button></div>
+      <span class="runs-note">A fresh start: the story and the tutorial, a new fish shop and no cats yet. Your other runs stay saved.</span></div>
+  </div>`;
+  el.style.display = 'flex';
+  document.body.classList.add('runs-mode');
+  const close = $('runs-close'); if(close) close.onclick = ()=>hideRuns();
+  el.querySelectorAll('.run-row').forEach(row=>{
+    const id = row.dataset.id, r = RUNS.list.find(x=>x.id===id);
+    row.querySelector('.run-go').onclick = ()=>{ if(canClose && ACTIVE_RUN && id===ACTIVE_RUN.id) return hideRuns(); openRun(id); };
+    const name = row.querySelector('.run-name');
+    name.onchange = ()=>{ r.name = name.value.trim() || r.name; name.value = r.name; saveRunsIndex(); };
+    name.onkeydown = e=>{ e.stopPropagation(); if(e.key==='Enter') name.blur(); };
+    const del = row.querySelector('.run-del');
+    del.onclick = ()=>{
+      if(!del.classList.contains('sure')){ del.classList.add('sure'); del.textContent = 'Delete?'; setTimeout(()=>{ del.classList.remove('sure'); del.textContent = '🗑'; }, 2500); return; }
+      deleteRun(id);
+    };
+  });
+  const nm = $('run-new-name');
+  nm.onkeydown = e=>{ e.stopPropagation(); if(e.key==='Enter') $('run-new-go').click(); };
+  $('run-new-go').onclick = ()=>newRun(nm.value);
+}
+function hideRuns(){ $('runs-screen').style.display = 'none'; document.body.classList.remove('runs-mode'); }
+function escHTML(t){ return String(t).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function openRun(id){
+  const r = RUNS.list.find(x=>x.id===id); if(!r) return;
+  RUNS.active = id; r.played = Date.now(); saveRunsIndex();
+  try{ sessionStorage.setItem('chumstorm_skip_runs', '1'); }catch(e){}
+  location.reload();
+}
+function newRun(name){
+  const id = 'r'+Date.now().toString(36);
+  RUNS.list.push({id, name:(String(name||'').trim() || 'Run '+(RUNS.list.length + 1)).slice(0, 24), created:Date.now(), played:Date.now()});
+  saveRunsIndex();
+  try{ localStorage.removeItem(runKeyFor(id, 'chumstorm_save_v2')); localStorage.removeItem(runKeyFor(id, 'chumstorm_collection_v1')); }catch(e){}
+  openRun(id);                                  // a fresh save: the story plays, then the tutorial
+}
+function deleteRun(id){
+  try{ localStorage.removeItem(runKeyFor(id, 'chumstorm_save_v2')); localStorage.removeItem(runKeyFor(id, 'chumstorm_collection_v1')); }catch(e){}
+  RUNS.list = RUNS.list.filter(x=>x.id!==id);
+  if(RUNS.active === id) RUNS.active = null;
+  saveRunsIndex();
+  if(ACTIVE_RUN && ACTIVE_RUN.id === id){ try{ sessionStorage.removeItem('chumstorm_skip_runs'); }catch(e){} location.reload(); return; }
+  showRuns(true);
+}
+// on boot: straight in after picking a run (the page reloads), otherwise the runs screen first
+function runsGate(){
+  let skip = false;
+  try{ skip = sessionStorage.getItem('chumstorm_skip_runs') === '1'; sessionStorage.removeItem('chumstorm_skip_runs'); }catch(e){}
+  if(DEBUG && !/[?&]runs\b/.test(location.search) && ACTIVE_RUN) skip = true;   // ?debug goes straight in (add &runs to see the screen)
+  if(skip && ACTIVE_RUN){ ACTIVE_RUN.played = Date.now(); saveRunsIndex(); return true; }
+  showRuns(false);
+  return false;
+}
 /* ============== BOOT ============== */
 showMenu();
 (function loadingScreen(){
@@ -10508,7 +11881,7 @@ showMenu();
     finished = true;
     el.classList.add('done');
     if(state==='harbor') renderHarborUi(); else { renderMenu(); drawIdle(); }
-    if(state==='harbor' && wantIntro()) playIntro();
+    if(runsGate() && state==='harbor' && wantIntro()) playIntro();
     setTimeout(()=>{ el.style.display = 'none'; }, 480);
   }
   function onOne(){ loaded++; updateBar(); if(loaded >= total) setTimeout(finishNow, Math.max(0, MIN_MS-(performance.now()-startT))); }
