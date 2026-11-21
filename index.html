@@ -941,9 +941,10 @@
   body.ui-v2 #disc-label.pop{animation:chipPop .7s cubic-bezier(.3,1.8,.5,1);}
   body.ui-v2 .disc-sil{all:unset;display:flex;flex-wrap:wrap;gap:8px;}
   body.ui-v2 .disc-sil:empty{display:none;}
-  body.ui-v2 .disc-sil i{width:32px;height:32px;border-radius:50%;border:2px solid var(--v2-line);background:var(--v2-soft);box-sizing:border-box;display:flex;align-items:center;justify-content:center;
+  body.ui-v2 .disc-sil i{width:36px;height:36px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;
     font-style:normal;font-size:12px;font-weight:800;color:var(--v2-muted);overflow:hidden;}
-  body.ui-v2 .disc-sil i img{width:30px;height:30px;filter:none;animation:none;object-fit:contain;opacity:.85;}
+  body.ui-v2 .disc-sil i img{width:36px;height:36px;filter:none;animation:none;object-fit:contain;opacity:.8;}
+  body.ui-v2 .disc-sil i.found img{opacity:1;filter:drop-shadow(0 2px 0 rgba(59,46,42,.18));}
   body.ui-v2 .disc-sil span{font-size:12px;font-weight:800;color:var(--v2-muted);align-self:center;}
   body.ui-v2 #hud-right .chip{align-self:flex-end;font-size:13px;padding:4px 12px;}
   /* item slots: teal rounds with a white ring, a dark count badge, and a yellow key pill under each */
@@ -984,7 +985,7 @@
     body.ui-v2 .v2-hp{width:calc(100vw - 160px - var(--sal) - var(--sar));}
     body.ui-v2 #hud .hud-left{width:min(220px, 56vw);}
     body.ui-v2 #hud-right{width:150px;}
-    body.ui-v2 .disc-sil i{width:26px;height:26px;}
+    body.ui-v2 .disc-sil i, body.ui-v2 .disc-sil i img{width:28px;height:28px;}
   }
 
   /* ---- the fish bucket (area pop-up) ---- */
@@ -1507,6 +1508,46 @@
   body.ui-v2 #chest .chest-ic{font-size:88px !important;}
   body.ui-v2 .reward-list{gap:16px !important;}
   body.ui-v2 .reward-list .reward .ic{width:64px !important;height:64px !important;font-size:36px !important;border-radius:12px !important;}
+  /* ---- level-up picks and treasure: a panel on the right, the run keeps going ---- */
+  #side-stack{position:fixed;right:calc(16px + var(--sar));top:50%;transform:translateY(-38%);z-index:15;display:flex;flex-direction:column;gap:12px;align-items:flex-end;pointer-events:none;}
+  #side-stack .overlay.side{position:static !important;inset:auto !important;background:none !important;padding:0 !important;display:none;pointer-events:none;}
+  #side-stack .overlay.side.in{animation:sideIn .35s cubic-bezier(.2,1.4,.4,1);}
+  @keyframes sideIn{from{transform:translateX(120%);opacity:0;}to{transform:none;opacity:1;}}
+  body #side-stack .overlay.side .card{zoom:var(--pz, 1);pointer-events:auto;width:340px !important;max-width:calc((100vw - 32px)/var(--pz, 1)) !important;max-height:none !important;box-sizing:border-box;
+    padding:16px !important;gap:10px !important;display:flex;flex-direction:column;text-align:left;background:#FFFFFF !important;border:0 !important;border-radius:22px !important;box-shadow:var(--v2-shadow, 0 6px 0 rgba(0,0,0,.2)) !important;overflow:hidden;}
+  body #side-stack .overlay.side .card h2{font-family:'Fredoka','Nunito',sans-serif;font-size:22px !important;font-weight:700 !important;margin:0 !important;color:#3B2E2A !important;text-align:left !important;text-transform:none !important;
+    display:flex;align-items:center;justify-content:space-between;gap:8px;order:0 !important;}
+  .side-keys{font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;color:#7A6A5E;display:inline-flex;align-items:center;gap:3px;}
+  .side-keys kbd, .srow > kbd{font:800 13px 'Nunito',sans-serif;min-width:22px;height:22px;line-height:22px;text-align:center;border-radius:7px;background:#3B2E2A;color:#FFFFFF;box-shadow:0 2px 0 rgba(0,0,0,.25);}
+  #levelup.side .upg-legend{display:none !important;}
+  #levelup.side #upgrades{display:flex !important;flex-direction:column !important;gap:8px !important;}
+  .srow{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:14px;background:#F6EFE4;cursor:pointer;color:#3B2E2A;box-shadow:inset 4px 0 0 var(--cc, #F8C630);transition:transform .12s;}
+  .srow:hover{transform:translateX(-4px);background:#FFF3D6;}
+  .srow.trick{background:#FFF5D1;box-shadow:inset 4px 0 0 #F8C630, 0 0 0 2px #F8C630;}
+  .srow > kbd{flex-shrink:0;min-width:26px;height:26px;line-height:26px;font-size:15px;}
+  .srow .s-ic{flex-shrink:0;width:44px;height:44px;border-radius:10px;background:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:26px;}
+  .srow .s-ic img{max-width:38px;max-height:38px;}
+  .srow .s-b{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;}
+  .srow .s-type{font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--cd, #7A6A5E);}
+  .srow .s-b > b{font-family:'Fredoka','Nunito',sans-serif;font-size:16px;font-weight:700;}
+  .srow .s-b > b small{font-family:'Nunito',sans-serif;font-size:11.5px;font-weight:800;color:#7A6A5E;}
+  .srow .s-b > span{font-size:12.5px;font-weight:700;color:#7A6A5E;line-height:1.3;}
+  body #side-stack #chest.side .chest-hero, body #side-stack #chest.side #btn-chest{display:none !important;}
+  body #side-stack #chest.side .card{cursor:pointer;}
+  body #side-stack #chest.side .reward-list{gap:8px !important;}
+  body #side-stack #chest.side .reward-list .reward{display:flex !important;align-items:center;gap:10px;padding:0 !important;background:none !important;}
+  body #side-stack #chest.side .reward-list .reward .ic{width:42px !important;height:42px !important;font-size:24px !important;border-radius:10px !important;background:#F6EFE4;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+  body #side-stack #chest.side .reward-list .reward b{font-size:14px;}
+  body #side-stack #chest.side .reward-list .reward span{font-size:12px;}
+  #chest.side .side-timer{height:5px;border-radius:3px;background:#EFE5D6;overflow:hidden;margin-top:2px;}
+  #chest.side .side-timer i{display:block;height:100%;background:#F8C630;transform-origin:0 50%;}
+  #chest.side.in .side-timer i{animation:sideTimer var(--ct, 4.5s) linear forwards;}
+  @keyframes sideTimer{from{transform:scaleX(1);}to{transform:scaleX(0);}}
+  #levelup:not(.side) .side-keys, #chest:not(.side) .side-timer{display:none;}
+  /* while the right-hand panel is up, pop-up cards and the loot card move to its left */
+  body.side-open.ui-v2 .callout:not(.dim){right:calc((16px + var(--sar))/var(--pz) + 356px) !important;}
+  body.side-open.ui-v2 #loot-card{right:calc((16px + var(--sar))/var(--pz) + 356px) !important;}
+  body.side-open.ui-v2 .callout:not(.dim):has(~ #loot-card.show){right:calc((16px + var(--sar))/var(--pz) + 712px) !important;}
   body.ui-v2 .reward-list .reward b{font-size:19px !important;}
   body.ui-v2 .reward-list .reward span{font-size:16px !important;}
   body.ui-v2 #btn-chest{min-height:56px !important;font-size:22px !important;padding:0 40px !important;}
@@ -1574,7 +1615,37 @@
   body.ui-v2.panel-open #shop-list.tree{gap:10px;}
   body.ui-v2.panel-open #hb-nav, body.ui-v2.panel-open #hb-requests, body.ui-v2.panel-open #hb-prompt, body.ui-v2.panel-open #coach{visibility:hidden;}
   @media (max-width: 760px){ body.ui-v2.panel-open #menu .home-card{width:100vw !important;-webkit-mask:none;mask:none;padding:24px 18px !important;} }
-  @media (max-width: 560px){ .run-row{flex-wrap:wrap;} .run-go{flex:1;} .runs-head h1{font-size:26px;} }</style>
+  @media (max-width: 560px){ .run-row{flex-wrap:wrap;} .run-go{flex:1;} .runs-head h1{font-size:26px;} }
+  /* ---- missions (townsfolk requests): face, job, progress bar, reward ---- */
+  .mrow{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:16px;background:#FFFFFF;box-shadow:inset 0 0 0 2px #EFE5D6;color:#3B2E2A;}
+  .mrow.done{background:#EAF7E6;box-shadow:inset 0 0 0 2px #9fd59a;}
+  .mface{flex-shrink:0;width:60px;height:60px;display:flex;align-items:flex-end;justify-content:center;font-style:normal;font-weight:900;font-size:22px;color:#7A6A5E;}
+  .mface img{width:100%;height:100%;object-fit:contain;object-position:50% 100%;filter:drop-shadow(0 2px 0 rgba(59,46,42,0.15));}
+  .mbody{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;}
+  .mtop{display:flex;align-items:center;gap:10px;}
+  .mtext{flex:1;font-size:16px;font-weight:800;line-height:1.25;}
+  .mreward{flex-shrink:0;display:inline-flex;align-items:center;gap:5px;font-family:'Fredoka','Nunito',sans-serif;font-size:19px;font-weight:700;color:#3B2E2A;}
+  .mreward .v2coin{width:20px !important;height:20px !important;}
+  .mprog{display:flex;align-items:center;gap:10px;}
+  .mbar{flex:1;height:12px;border-radius:6px;background:#E8DCCB;overflow:hidden;}
+  .mbar i{display:block;height:100%;border-radius:6px;background:#F8C630;transition:width .3s;}
+  .mrow.done .mbar i{background:#5ad76e;}
+  .mprog em{font-style:normal;font-size:13px;font-weight:800;color:#7A6A5E;white-space:nowrap;}
+  .mrow small{font-size:13px;font-weight:700;color:#7A6A5E;}
+  .mrow.done small{color:#2E8B57;}
+  .missions-list{display:flex;flex-direction:column;gap:12px;}
+  .mcount{font-size:14px;font-weight:800;color:#7A6A5E;margin-left:6px;}
+  .mempty, .mnote{font-size:15px;font-weight:700;color:#7A6A5E;margin:0;}
+  /* compact rows in the harbor's and the run's Missions panel */
+  .mrow.compact{padding:8px 0 0;background:none;box-shadow:none;border-radius:0;gap:10px;}
+  .mrow.compact .mface{width:44px;height:44px;font-size:15px;}
+  .mrow.compact .mtext{font-size:13.5px;}
+  .mrow.compact .mreward{font-size:15px;}
+  .mrow.compact .mreward .v2coin{width:16px !important;height:16px !important;}
+  .mrow.compact .mbar{height:8px;}
+  .mrow.compact .mprog em{font-size:12px;}
+  body.ui-v2 #hb-requests, body.ui-v2 #run-requests{width:330px !important;}
+  body.ui-v2 #hb-requests{pointer-events:auto;cursor:pointer;}</style>
 </head>
 <body>
 <div id="wrap">
@@ -1612,8 +1683,8 @@
     <div class="chip proj-chip" id="proj-label" title="Projectiles per throw">🎯×1</div>
     <div class="chip frenzy-chip" id="frenzy-label" hidden>🔥 8s</div>
     <div class="chip treat-chip" id="treat-label" hidden>🍤 6s</div>
-    <div class="v2-cats"><div class="chip disc-chip" id="disc-label" title="Cat types you haven't fed yet">Cats to discover</div>
-    <div id="disc-sil" class="disc-sil" title="Cats in this area you haven't met yet"></div></div>
+    <div class="v2-cats"><div class="chip disc-chip" id="disc-label" title="The cats in this area: the ones you've found, and silhouettes of the rest">Cats found here</div>
+    <div id="disc-sil" class="disc-sil" title="Every cat in this area"></div></div>
   </div>
   <button id="pause-btn" aria-label="Pause">II</button>
   <div id="item-bar" aria-label="One-time items"></div>
@@ -1652,6 +1723,11 @@
         <div id="shop-list" class="tree"></div>
         <div id="skill-detail"></div>
         <button class="smallbtn" id="btn-refund">Refund all upgrades</button>
+      </section>
+      <section id="tab-missions" hidden>
+        <div class="sh-h">Missions from the townsfolk <span id="missions-count" class="mcount"></span></div>
+        <div id="missions-list" class="missions-list"></div>
+        <p class="mnote">Up to 3 at a time. They count across runs: finish one, then come back to the harbor and talk to whoever gave it to you for your reward.</p>
       </section>
       <section id="tab-fish" hidden>
         <div class="gil-head"><canvas id="gil-cv" width="96" height="120"></canvas><p id="gil-line"></p></div>
@@ -1750,21 +1826,24 @@
     </div>
   </div>
 
-  <div class="overlay" id="levelup" style="display:none;">
+  <div id="side-stack">
+  <div class="overlay side" id="levelup" style="display:none;">
     <div class="card">
-      <h2>LEVEL UP!</h2>
+      <h2>Level up! <span class="side-keys">press <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd></span></h2>
       <div class="upg-legend"><span class="cat-new">🎯 New projectile</span><span class="cat-up">⬆️ Projectile upgrade</span><span class="cat-stat">📈 Stat upgrade</span></div>
       <div id="upgrades" class="row"></div>
     </div>
   </div>
 
-  <div class="overlay" id="chest" style="display:none;">
+  <div class="overlay side" id="chest" style="display:none;">
     <div class="card">
       <div class="chest-hero" aria-hidden="true"><div class="chest-burst"></div><div class="chest-ic">🧰</div></div>
       <h2 id="chest-title">Treasure Tackle Box!</h2>
       <div class="reward-list" id="chest-rewards"></div>
       <button class="bigbtn" id="btn-chest">Collect</button>
+      <div class="side-timer"><i></i></div>
     </div>
+  </div>
   </div>
 
   <div class="overlay" id="results" style="display:none;">
@@ -2297,7 +2376,7 @@ addEventListener('mouseup', ()=>{ if(pointerKind==='mouse') resetPointer(); });
 addEventListener('keydown', e=>{
   if(document.body.classList.contains('runs-mode')) return;
   const key = e.key.toLowerCase();
-  if(state==='levelup' && ['1','2','3','4'].includes(key)){ const cards = document.querySelectorAll('#upgrades .upg2'); if(cards[+key-1]) cards[+key-1].click(); return; }
+  if(state==='playing' && lvlOpen && ['1','2','3'].includes(key)){ const cards = document.querySelectorAll('#upgrades .srow'); if(cards[+key-1]) cards[+key-1].click(); return; }   // a level-up is waiting: 1 / 2 / 3 pick a buff
   if(state==='intro'){ if([' ','enter','e','arrowright'].includes(key)){ e.preventDefault(); introNext(); } else if(key==='escape') finishIntro(); return; }
   if(['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright'].includes(key)){ keysDown.add(key); e.preventDefault(); }
   if(key==='escape' && placing){ cancelPlacing(); return; }
@@ -2945,7 +3024,7 @@ function applyUiIcons(){
     e.stopPropagation();
     if(state !== 'harbor' || hbPanel || hbTalk) return;
     const key = btn.dataset.b;
-    if(key==='requests'){ const el = $('hb-requests'); el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); return; }
+    if(key==='requests'){ openBuilding('missions'); return; }      // the Missions button: every mission in the side panel
     if(HB3D){                                    // walk to it on the island
       const want = key === 'home' || key === 'tackle' ? 'shop' : key;
       const tk = want === 'gate' ? (hb3Targets().find(t=>t.key==='gate' && t.stage===save.stage) || hb3Targets().find(t=>t.key==='gate')) : hb3Targets().find(t=>t.key===want);
@@ -4327,8 +4406,9 @@ function update(dt){
   if(shakeT > 0){ shakeT -= dt; if(shakeT <= 0) shakeMag = 0; }
   if(flashT > 0) flashT -= dt;
   updateHud();
+  updateSidePanels(dt);
   if(chestQueue > 0) openChest();
-  else if(levelQueue > 0) showLevelUp();
+  if(levelQueue > 0 && !lvlOpen) showLevelUp();
 }
 /* ---------- Dodge (Space, or the 💨 button) ----------
    A snappy dash the way you're moving (or facing). It bursts out fast and eases into the landing
@@ -6742,8 +6822,9 @@ function undiscoveredTotal(){ return ALL_CAT_DEFS.filter(d=>!collected.has(d.key
 // the silhouettes of this area's undiscovered cats, under the HUD chip
 function renderDiscStrip(){
   const el = $('disc-sil'); if(!el) return;
-  const keys = undiscoveredIn(stage);
-  el.innerHTML = keys.slice(0, keys.length > 5 ? 4 : 5).map(k=>`<i title="??? Cat"><img src="${catIconURL(ENEMIES[k], 56, true)}" alt=""></i>`).join('') + (keys.length > 5 ? `<i>+${keys.length - 4}</i>` : '');
+  // every cat in this area: the ones you've found in full colour, the rest as dark silhouettes
+  const keys = stageCatKeys(stage);
+  el.innerHTML = keys.map(k=>{ const f = collected.has(k); return `<i class="${f ? 'found' : ''}" title="${f ? CAT_NAMES[k] : '??? Cat'}"><img src="${catIconURL(ENEMIES[k], 56, !f)}" alt=""></i>`; }).join('');
 }
 function announceDiscovery(def){
   const here = undiscoveredIn(stage).length, left = undiscoveredTotal();
@@ -7817,36 +7898,40 @@ function givesProjectile(c){
 //   📈 STAT UPGRADE (green)  a passive bonus
 // Pips show the level you're at and the one you'd get; pick with a click or the 1 / 2 / 3 keys.
 const UPG_CAT = {new:['🎯','NEW PROJECTILE','cat-new'], up:['⬆️','PROJECTILE UPGRADE','cat-up'], stat:['📈','STAT UPGRADE','cat-stat'], bonus:['🎁','BONUS','cat-bonus']};
+// The level-up picks and the treasure box sit in a panel on the right while the run keeps going:
+// press 1 / 2 / 3 (or click) to take a buff; the treasure card closes by itself.
+let lvlOpen = false, chestT = 0;
+const CHEST_SHOW = 4.5;                            // seconds the treasure card stays up
 function showLevelUp(){
   levelQueue--;
-  state = 'levelup';
-  resetPointer();
+  lvlOpen = true;
   const list = $('upgrades');
   list.innerHTML = '';
-  buildChoices().forEach((c, i)=>{
+  buildChoices().slice(0, 3).forEach((c, i)=>{
     const info = choiceCard(c), proj = givesProjectile(c);
     const w = c.type==='weapon' && player.weapons.find(w=>w.key===c.key);
     const cat = c.type==='weapon' ? (w ? 'up' : 'new') : c.type==='passive' ? 'stat' : 'bonus';
-    const [cic, clabel, ccls] = UPG_CAT[cat];
+    const [, clabel, ccls] = UPG_CAT[cat];
     const cur = c.type==='weapon' ? (w ? w.level : 0) : c.type==='passive' ? (player.passives[c.key]||0) : -1;
-    const max = c.type==='weapon' ? WEAPON_MAX_LV : c.type==='passive' ? PASSIVES[c.key].max : 0;
-    const pips = max ? `<div class="pips">${Array.from({length:max}, (_, k)=>`<i class="${k < cur ? 'on' : k===cur ? 'next' : ''}"></i>`).join('')}</div><div class="upg-lv">${cur ? `Lv ${cur} → ${cur+1}` : 'Lv 1'}${max ? ` / ${max}` : ''}</div>` : '';
     const div = document.createElement('div');
-    div.className = `upg2 ${ccls}${proj ? ' proj' : ''}${info.trick ? ' trick' : ''}`;
-    div.innerHTML = `<div class="upg-type">${info.trick ? '★ NEW TRICK' : clabel}</div><div class="upg-ic">${info.ic}</div><b class="upg-name">${info.name}</b>${pips}
-      <div class="upg-desc">${info.desc}</div>${proj ? '<div class="upg-chip">🎯 +1 PROJECTILE</div>' : ''}
-      ${info.trick ? `<div class="trick-line">★ <b>${info.trick[0]}</b>: ${info.trick[1]}</div>` : info.tricksLine ? `<div class="hint">${info.tricksLine}</div>` : ''}${info.hint ? `<div class="hint">${info.hint}</div>` : ''}<kbd>${i+1}</kbd><span class="upg-choose">Choose<kbd>${i+1}</kbd></span>`;
-    div.onclick = ()=>{ if(state!=='levelup') return; applyChoice(c); $('levelup').style.display = 'none'; resumePlay(); };
+    div.className = `srow ${ccls}${info.trick ? ' trick' : ''}`;
+    div.innerHTML = `<kbd>${i+1}</kbd><div class="s-ic">${info.ic}</div><div class="s-b"><div class="s-type">${info.trick ? '★ NEW TRICK' : clabel}${proj ? ' · +1 projectile' : ''}</div>
+      <b>${info.name}${cur > 0 ? ` <small>Lv ${cur} → ${cur+1}</small>` : cur === 0 ? ' <small>new</small>' : ''}</b><span>${info.trick ? `<b>${info.trick[0]}</b>: ${info.trick[1]}` : info.desc}</span></div>`;
+    div.onclick = e=>{ e.stopPropagation(); pickLevelUp(c); };
     list.appendChild(div);
   });
-  $('levelup').style.display = 'flex';
+  const el = $('levelup'); el.style.display = 'flex'; el.classList.remove('in'); void el.offsetWidth; el.classList.add('in');
   vibrate([20,30,20]);
 }
+function pickLevelUp(c){
+  if(!lvlOpen || runOver) return;
+  applyChoice(c); lvlOpen = false; $('levelup').style.display = 'none';
+  if(levelQueue > 0) showLevelUp();
+}
+function hideSidePanels(){ lvlOpen = false; chestT = 0; $('levelup').style.display = 'none'; $('chest').style.display = 'none'; document.body.classList.remove('side-open'); }
 /* ============== TREASURE (chests from elites & bosses) ============== */
 function openChest(){
   chestQueue--;
-  state = 'chest';
-  resetPointer();
   const L = player.stats.luck, r = Math.random();
   const n = chestTiers.length ? chestTiers.shift() : (r < 0.04*L ? 5 : r < 0.2*L ? 3 : 1);
   const rewards = [];
@@ -7888,16 +7973,21 @@ function openChest(){
   rewards.push({ic:'🪙', name:'Gold', text:'+'+g+' gold'});
   recomputeStats(); renderBuildIcons();
   $('chest-rewards').innerHTML = rewards.map((rw,i)=>`<div class="reward${rw.evo?' evo':''}${rw.proj?' proj':''}" style="animation-delay:${0.35+i*(n>=3?0.3:0.14)}s"><div class="ic">${rw.ic}</div><div><b>${rw.name}</b><span>${rw.text}</span></div></div>`).join('');
-  $('chest').className = 'overlay tier-'+n;
+  $('chest').className = 'overlay side tier-'+n;
   $('chest-title').textContent = n >= 5 ? 'LEGENDARY Treasure!' : n >= 3 ? 'Rare Treasure!' : 'Treasure Tackle Box!';
-  $('chest').style.display = 'flex';
+  const el = $('chest'); el.style.display = 'flex'; el.classList.remove('in'); void el.offsetWidth; el.classList.add('in');
+  chestT = CHEST_SHOW + Math.min(3, rewards.length*0.4);      // it closes by itself (a bit later when there's more to read)
+  el.style.setProperty('--ct', chestT+'s');
   vibrate([20,40,20,40,40]);
 }
-$('btn-chest').addEventListener('click', ()=>{ $('chest').style.display = 'none'; resumePlay(); });
+// the treasure card counts down with the game (so it waits while paused); a click closes it early
+function updateSidePanels(dt){
+  if(chestT > 0){ chestT -= dt; if(chestT <= 0) $('chest').style.display = 'none'; }
+  document.body.classList.toggle('side-open', lvlOpen || chestT > 0);
+}
+$('chest').addEventListener('click', ()=>{ chestT = 0; $('chest').style.display = 'none'; });
 function resumePlay(){
   if(runOver) return;
-  if(chestQueue > 0){ openChest(); return; }
-  if(levelQueue > 0){ showLevelUp(); return; }
   state = 'playing';
   startLoop();
 }
@@ -7923,8 +8013,8 @@ function updateHud(){
   const left = ALL_CAT_DEFS.length - ALL_CAT_DEFS.filter(d=>collected.has(d.key)).length;
   if(left !== lastDiscShown){
     const el = $('disc-label');
-    const here = undiscoveredIn(stage).length;
-    el.innerHTML = left ? `Cats to discover <span>· ${here ? here+' here' : 'none here'}</span>` : 'All cats found!';
+    const all = stageCatKeys(stage).length, here = undiscoveredIn(stage).length;
+    el.innerHTML = here ? `Cats found here <span>· ${all - here} / ${all}</span>` : `All cats found here! <span>· ${all} / ${all}</span>`;
     if(lastDiscShown >= 0){ el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
     lastDiscShown = left;
   }
@@ -7982,6 +8072,7 @@ function startRun(opts){
   speechTimer = rand(9,14);
   updateLighting();
   for(const id of ['menu','results','pauseOverlay','levelup','chest']) $(id).style.display = 'none';
+  hideSidePanels();
   renderBuildIcons(); renderItemBar(); startMissions(); runRequestsDirty = true; renderRunRequests(); updateHud();
   // how many cats this area still hides: silhouettes under the chip, and a callout after the mission intro
   renderDiscStrip();
@@ -8131,6 +8222,7 @@ function endRun(victory, quit){
   if(runOver) return;
   runOver = true;
   state = 'results';
+  hideSidePanels();
   resetPointer();
   const st = save.stats;
   const gold = Math.floor(runGold);
@@ -8199,6 +8291,7 @@ $('intro-go').addEventListener('click', e=>{ e.stopPropagation(); finishIntro();
 $('intro-ui').addEventListener('pointerdown', e=>{ if(e.target.closest('button')) return; introNext(); });
 $('hb-story').addEventListener('click', e=>{ e.stopPropagation(); playIntro(true); });
 $('hb-tut').addEventListener('click', e=>{ e.stopPropagation(); tutReplay(); });
+$('hb-requests').addEventListener('click', e=>{ e.stopPropagation(); if(state === 'harbor' && !hbPanel && !hbTalk) openBuilding('missions'); });
 $('hb-runs').addEventListener('click', e=>{ e.stopPropagation(); showRuns(true); });
 $('caviar-btn').addEventListener('pointerdown', e=>{ e.preventDefault(); e.stopPropagation(); placePlate(); });
 $('roll-btn').addEventListener('pointerdown', e=>{ e.preventDefault(); e.stopPropagation(); startRoll(); });
@@ -8224,7 +8317,8 @@ function drawFisherIcon(cv, ch){
 let selSkill = null;
 function renderMenu(){
   document.querySelectorAll('#menu-tabs button').forEach(b=>b.classList.toggle('on', b.dataset.tab===menuTab));
-  for(const t of ['play','shop','home','look','fish']) $('tab-'+t).hidden = t !== menuTab;
+  for(const t of ['play','shop','home','look','fish','missions']) $('tab-'+t).hidden = t !== menuTab;
+  if(menuTab === 'missions') renderMissionsPanel();
   if(menuTab==='fish') renderFishTab();
   if(menuTab==='look') renderLook();
   if(menuTab==='play') renderBucket();
@@ -9325,6 +9419,7 @@ function randomLook(full){
 function enterHarbor(fromHome){
   hbLoop++;
   for(const id of ['results','pauseOverlay','levelup','chest']) $(id).style.display = 'none';
+  hideSidePanels();
   state = 'harbor';
   resetPointer();
   document.body.classList.remove('home-mode');
@@ -9414,7 +9509,7 @@ function bountyEvent(type, key){
     if(type==='dig' && b.type==='dig') hit = true;
     if(!hit) continue;
     b.prog = Math.min(b.goal, b.prog+1); changed = true;
-    if(b.prog >= b.goal){ b.done = true; showBanner(`📮 Request done! See ${b.giver} at the harbor for ${b.reward} 🪙`, 2200); }
+    if(b.prog >= b.goal){ b.done = true; showBanner(`📮 Mission done! See ${b.giver} at the harbor for ${b.reward} 🪙`, 2200); }
   }
   if(changed){ runRequestsDirty = true; persist(); }
 }
@@ -9426,10 +9521,62 @@ function bountySurviveCheck(){
   }
 }
 let runRequestsDirty = true, runReqT = 0;
+/* ---- Missions (the townsfolk's requests): a row with the giver's face, the job, a progress bar and the reward ---- */
+const npcIconCache = new Map();
+// where a townsperson's head is on their sprite: from the top of their hair down to the chin (where the
+// silhouette narrows into the neck), found once per sprite by scanning its rows
+const headBoxCache = new Map();
+function npcHeadBox(im){
+  if(headBoxCache.has(im)) return headBoxCache.get(im);
+  const W = im.width, H = im.height, c = document.createElement('canvas'); c.width = W; c.height = H;
+  const g = c.getContext('2d', {willReadFrequently:true}); g.drawImage(im, 0, 0); const d = g.getImageData(0, 0, W, H).data;
+  const span = []; let top = -1;
+  for(let y = 0; y < H; y++){ let l = -1, r = -1; for(let x = 0; x < W; x++) if(d[(y*W + x)*4 + 3] > 60){ if(l < 0) l = x; r = x; } span.push(l < 0 ? null : [l, r]); if(top < 0 && l >= 0) top = y; }
+  if(top < 0) top = 0;
+  // the townsfolk are chibi: the head is the top half of the figure (hair to chin)
+  let bot = top; for(let y = H - 1; y > top; y--) if(span[y]){ bot = y; break; }
+  const best = Math.round(top + (bot - top)*0.58);
+  let l = W, r = 0; for(let y = top; y <= best; y++){ const s = span[y]; if(s){ l = Math.min(l, s[0]); r = Math.max(r, s[1]); } }
+  const pad = 4, box = {x:Math.max(0, l - pad), y:Math.max(0, top - pad), w:Math.min(W, r + pad) - Math.max(0, l - pad), h:Math.min(H, best + pad*2) - Math.max(0, top - pad)};
+  headBoxCache.set(im, box); return box;
+}
+// a little round portrait of a townsperson (their head and shoulders), as a data URL
+function npcIconURL(look, name){
+  const key = JSON.stringify(look||{}) + name + (npcReady ? '#npc' : '');   // redrawn once the townsfolk art has loaded
+  if(npcIconCache.has(key)) return npcIconCache.get(key);
+  const S = 96, cv = document.createElement('canvas'); cv.width = cv.height = S;
+  const g = cv.getContext('2d');
+  let ok = false;
+  try{
+    const ni = look ? npcFor(look) : -1;
+    if(ni >= 0 && NPCS[ni]){ const im = NPCS[ni], hb0 = npcHeadBox(im), k = S/Math.max(hb0.w, hb0.h); g.drawImage(im, hb0.x, hb0.y, hb0.w, hb0.h, S/2 - hb0.w*k/2, S - hb0.h*k, hb0.w*k, hb0.h*k); ok = true; }   // the whole head, the same art as in town
+    else if(look && avReady){ const av = composeAvatar(look, 1), k = S*1.7/av.bodyH; g.drawImage(av.cv, S/2 - av.cx*k, S*1.55 - av.footY*k, av.cv.width*k, av.cv.height*k); ok = true; }
+  }catch(e){}
+  const url = ok ? cv.toDataURL() : '';
+  if(ok) npcIconCache.set(key, url);
+  return url;
+}
+function bountyPct(b){ if(b.done) return 1; if(b.type === 'survive') return clamp((b.prog||0)/(b.goal||1), 0, 1); return clamp((b.prog||0)/(b.goal||1), 0, 1); }
+function missionFace(b, cls){ const u = npcIconURL(b.look, b.giver); return `<i class="mface ${cls||''}">${u ? `<img src="${u}" alt="">` : (b.giver||'?')[0]}</i>`; }
+// one mission as a row (compact = the run HUD's panel)
+function missionRow(b, compact){
+  const pct = Math.round(bountyPct(b)*100);
+  return `<div class="mrow${b.done ? ' done' : ''}${compact ? ' compact' : ''}">${missionFace(b)}
+    <div class="mbody"><div class="mtop"><span class="mtext">${bountyText(b)}</span><b class="mreward"><span class="v2coin"></span>${b.reward}</b></div>
+    <div class="mprog"><div class="mbar"><i style="width:${pct}%"></i></div><em>${bountyCount(b)}</em></div>
+    ${compact ? '' : `<small>${b.giver}${b.done ? ' · done! Collect your reward from them at the harbor' : b.type==='royal' ? ' · royal mission' : ' · counts across runs'}</small>`}</div></div>`;
+}
+function renderMissionsPanel(){
+  const el = $('missions-list'); if(!el) return;
+  const bs = activeBounties();
+  el.innerHTML = bs.length ? bs.map(b=>missionRow(b, false)).join('')
+    : `<div class="mempty">No missions yet. Townsfolk with a <b>!</b> over their head have jobs for you: talk to them to take one on.</div>`;
+  $('missions-count').textContent = bs.length+' / 3';
+}
 function renderRunRequests(){
   const el = $('run-requests'); if(!el) return;
   const bs = activeBounties();
-  el.innerHTML = bs.length ? `<div class="rr-head">Requests</div>` + bs.map(b=>`<div class="rr${b.done ? ' done' : ''}"><i class="v2av">${(b.giver||'?')[0]}</i><span class="rr-t">${bountyText(b)}</span> <em>${bountyCount(b)}</em> <span>${b.reward}🪙</span></div>`).join('') : '';
+  el.innerHTML = bs.length ? `<div class="rr-head">Town missions</div>` + bs.map(b=>missionRow(b, true)).join('') : '';
   runRequestsDirty = false;
 }
 
@@ -9525,7 +9672,7 @@ function openBuilding(key){
   if(key==='home'){ exitHarbor(); enterHome(); return; }
   if(key==='boat'){ openFishing(); return; }
   if(key==='gil') hb.haggleShown = true;
-  const map = {tackle:['shop','Tackle & Skills'], shop:['shop','Tackle & Skills'], pet:['home','Pet Store'], gil:['fish',"Old Gil's Fish"], gate:['play','Where to?']};
+  const map = {tackle:['shop','Tackle & Skills'], shop:['shop','Tackle & Skills'], pet:['home','Pet Store'], gil:['fish',"Old Gil's Fish"], gate:['play','Where to?'], missions:['missions','Missions']};
   document.body.classList.toggle('panel-gil', key==='gil');
   $('ph-cathome').style.display = (key==='tackle' || key==='shop') ? '' : 'none';
   const [tab, title] = map[key];
@@ -9580,9 +9727,9 @@ function openTalk(l){
   else if(avReady){ const av = composeAvatar(l.look, l.pay ? 1 : 9), k = 140/av.bodyH; g.drawImage(av.cv, cv.width/2 - av.cx*k, cv.height - 6 - av.footY*k, av.cv.width*k, av.cv.height*k); }
   const b = l.pay ? l.b : l.offer;
   const catCv = (b.cat ? `<canvas class="talk-cat" width="64" height="64"></canvas>` : '');
-  const tag = l.pay ? 'REQUEST DONE' : (l.princess || b.type==='royal') ? 'ROYAL REQUEST' : 'NEW REQUEST';
+  const tag = l.pay ? 'MISSION DONE' : (l.princess || b.type==='royal') ? 'ROYAL MISSION' : 'NEW MISSION';
   let html = `<div class="tk-head"><b class="talk-name">${l.name}</b><span class="sp"></span><span class="tk-tag">${tag}</span></div>`;
-  const reqBox = note=>`<div class="talk-req"><div class="tr-l"><div class="tk-lab">Request</div><div class="tr-t">${catCv}<span>${bountyText(b)}</span></div>${note ? `<small>${note}</small>` : ''}</div>
+  const reqBox = note=>`<div class="talk-req"><div class="tr-l"><div class="tk-lab">Mission</div><div class="tr-t">${catCv}<span>${bountyText(b)}</span></div>${note ? `<small>${note}</small>` : ''}</div>
       <div class="tr-r"><div class="tk-lab">Reward</div><span class="v2pill"><span class="v2coin"></span>Reward ${b.reward}</span></div></div>`;
   if(l.pay){
     html += `<p>“${b.type==='royal' ? 'SEBASTIAN! Oh, my darling, you’re home! Thank you, thank you. The royal treasury insists.' : 'You did it! The whole harbor’s talking about it. Here, as promised!'}”</p>${reqBox('')}<div class="talk-btns"><button class="bigbtn" id="talk-yes">Collect</button></div>`;
@@ -9602,7 +9749,7 @@ function openTalk(l){
     } else {
       b.giver = l.name; b.look = l.look;
       save.bounties = [...activeBounties(), b]; persist();
-      showBanner(`📮 Request accepted: ${bountyText(b)}`, 1800);
+      showBanner(`📮 Mission accepted: ${bountyText(b)}`, 1800);
       l.offer = null; l.state = 'leave'; l.tx = l.x + (l.x < hb.x ? -1200 : 1200);
     }
     closeTalk(); renderHarborUi();
@@ -9628,7 +9775,8 @@ function renderHarborUi(){
   { const all = ALL_CAT_DEFS.length, found = all - undiscoveredTotal(); $('hb-disc').innerHTML = `<span class="v2ic">?</span>Cats to discover ${found}/${all}`; }
   $('hb-fish').innerHTML = `<span class="v2ic teal">🐟</span>Fish ∞ + ${fishSpecial()}`;
   const bs = activeBounties();
-  $('hb-requests').innerHTML = `<div class="rr-head">Requests</div>` + (bs.length ? bs.map(b=>`<div class="rr${b.done ? ' done' : ''}"><i class="v2av">${(b.giver||'?')[0]}</i><span class="rr-t">${bountyText(b)}<small>${b.giver} · ${b.done ? 'done! collect ' : ''}${b.reward} gold</small></span><em>${bountyCount(b)}</em></div>`).join('') : `<div class="rr empty">No requests yet. Locals drop by now and then.</div>`);
+  $('hb-requests').innerHTML = `<div class="rr-head">Missions</div>` + (bs.length ? bs.map(b=>missionRow(b, true)).join('') : `<div class="rr empty">No missions yet. Townsfolk drop by now and then.</div>`);
+  if(hbPanel === 'missions') renderMissionsPanel();
   renderPrompt();
 }
 
@@ -11615,6 +11763,8 @@ if(DEBUG) window.CS = {
   fish:()=>{ if(state==='harbor'){ openFishing(); } },
   onlyFish:(ft, n)=>{ const sp = fishSp(); for(const k in sp) delete sp[k]; save.fishBag = [0,0,0,0,0]; addFish(ft, n || 200); },   // testing: a bucket of one species (not saved until something persists)
   giveItem:k=>gainItem(k || 'yarnball'),
+  headBox:i=>({box:npcHeadBox(NPCS[i]), w:NPCS[i].width, h:NPCS[i].height}),
+  npcSheet:()=>{ const c = document.createElement('div'); c.id = 'npc-sheet'; c.style.cssText = 'position:fixed;inset:0;z-index:99;background:#fff;display:flex;flex-wrap:wrap;gap:6px;padding:6px;overflow:auto'; NPCS.forEach((im, i)=>{ const d = document.createElement('div'); d.style.cssText = 'text-align:center;font:12px sans-serif'; const cv = document.createElement('canvas'); cv.width = 70; cv.height = 110; const k = 104/im.height; cv.getContext('2d').drawImage(im, 35 - im.width*k/2, 3, im.width*k, im.height*k); const ic = new Image(); ic.src = npcIconURL({npc:i}, 'x'+i); ic.width = 48; d.append(cv, document.createElement('br'), ic, document.createElement('br'), i); c.append(d); }); document.body.append(c); return NPCS.length; },
   hbGo:(k, stage)=>{ const t = hb3Targets().find(x=>x.key===k && (!stage || x.stage===stage)); if(t) hbGoTo(t, ()=>{ window._arrived = k; }); return !!t; }, hbPos:()=>hb && [Math.round(hb.x), Math.round(hb.y)], hbDbg:()=>({t:hb.target, st:hb.stuckT, here:hb3Walkable(hb.x, hb.y), r:hb3Walkable(hb.x+5, hb.y), l:hb3Walkable(hb.x-5, hb.y), u:hb3Walkable(hb.x, hb.y-5), dn:hb3Walkable(hb.x, hb.y+5), blocked:!!(hbPanel || hbTalk || hb.reveal), panel:hbPanel, talk:!!hbTalk, rev:hb.reveal}),
   pickupKinds:()=>{ const o = {}; for(const p of pickups) o[p.kind] = (o[p.kind]||0) + 1; return o; },
   catKeys:()=>{ const o = {}; for(const c of cats) if(c.def && !c.dying) o[c.def.key] = (o[c.def.key]||0) + 1; return o; },

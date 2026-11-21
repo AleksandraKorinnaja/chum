@@ -214,13 +214,14 @@ Each card also shows:
   - Jellyfish and Clownfish Cats wobble past in schools. The Narwhal Cat boss cycles hairball rings, a turning spiral and a giant telegraphed slam.
   - Elites are big, gold-glowing versions that drop treasure and a one-time item. The first time you spot a new cat, the banner tells you what it does.
 - **Find every cat:** a cat type you've never fed wears a bouncing **?** tag (plus a banner the first time one appears). The Cat Home shelf and the results screen show silhouettes of the cats you haven't met, with a hint about where and when each one turns up.
-- **Leveling:** fed cats drop XP stars. Each level offers 3 choices (4 with luck): new weapons, weapon levels, or passive items. Every level-up offers at least one upgrade for a weapon you own. Choices that add a projectile glow pink with a **🎯 +PROJECTILE** ribbon.
+- **Leveling:** fed cats drop XP stars. Each level-up slides in a **Level up!** panel on the right side **without pausing the run**: three choices (new weapons, weapon levels or passive items), picked with **1 / 2 / 3** or a click. While it is open, 1 / 2 / 3 pick a buff instead of using items (Q still uses your first item). Further level-ups wait their turn. Every level-up offers at least one upgrade for a weapon you own, and choices that add a projectile say so.
+- **Treasure boxes** open in a card on the right side too, under any level-up choices. The game keeps going; the card lists what you got and closes by itself after a few seconds (a bar shows the time left; click it to close it sooner). Pop-up cards move to the left of the panel while it is open.
 - **Missions:** three missions run at once in the panel at the top left, each worth bonus gold the moment it's done. Each row shows what to do (with the cat's picture for cat missions), a progress bar with the count, and a gold **REWARD** pill. Cats a mission wants wear a gold dashed ring at their feet. A banner introduces the missions at the start of a run and announces each new one; the row bounces when it makes progress. Examples: *Feed 17 Sea Bass Cats*, *Feed 60 cats*, *Grab 4 power-ups*, *Don't get hit for 30 s*, *Reach level 8*, *Dig up a treasure spot*, *Use 2 one-time items*, *Feed a big (elite) cat*. A finished mission is replaced by a slightly harder one; the header tallies missions done and gold earned, and the results screen lists them.
 - **Mission callouts:**
   - **Finishing a mission:** a big *MISSION COMPLETE!* card drops in, showing the mission and its reward, and coins fly into your gold counter.
   - **Cat missions:** feeding a cat a mission wants pops its count (e.g. 📜 5/12) where it was fed.
   - **Almost done:** missions at 75% or more glow and say *almost!*
-- **Cats left to discover:** the HUD chip shows the total and how many are in this area (e.g. ❓ 33 to discover · 5 here), with silhouettes of this area's undiscovered cats underneath.
+- **Cats in this area:** the HUD card (top right) shows every cat in this area, with how many you have found (e.g. *Cats found here · 6 / 13*). Cats you have found show in full colour; the rest are dark silhouettes until you feed one, so you can see how many are left. No frames, just the cat art.
   - **Run start:** a *CATS TO DISCOVER* card lists them.
   - **New cat:** feeding one gives a *NEW CAT DISCOVERED!* card with how many are left.
   - **Elsewhere:** the harbor top bar and the area pop-up's stage list show the counts too.
@@ -284,7 +285,9 @@ Each card also shows:
   - ⛵ **Your boat** at the end of the pier: go fishing (see below).
   - 🗺️ **Out of town** at the far left of the street: a yellow **Areas** sign with arrows on the cobbles. Walk past it (or press **E** by it, or tap **Areas** in the bottom bar) and a pop-up shows every area, your fishers and what is in your fish bucket. Pick and press **Let's go!** to start a run.
   - Your collected cats laze around in front of the shop (tap one to squish it).
-- **Locals with requests.** Now and then a local walks up with a ❗ and asks for something. Requests carry across runs (up to 3 at once) and show in the Requests panel, both in the harbor and during runs: Talking to one opens their **mission brief** in the middle of the screen, in large text: who's asking, what they want, the reward, and Deal! / Not now.
+- **Missions from the townsfolk** (they used to be called requests). Now and then a local walks up with a ❗ and asks for something. Requests carry across runs (up to 3 at once) and show in the Requests panel, both in the harbor and during runs: Talking to one opens their **mission brief** in the middle of the screen, in large text: who's asking, what they want, the reward, and Deal! / Not now.
+  - **Each mission row** shows a headshot of the townsperson who asked (the same art you see in town, no frame), the job, a progress bar with the count, and the reward in bold with a coin. The harbor's **Missions** panel (top left) lists them; in a run the same panel is called **Town missions**, to tell it apart from the run's own bonus missions.
+  - **The Missions button** in the bottom bar (or clicking the Missions panel) opens a side panel with every mission and its details: who gave it, how far along you are, the reward, and whether it's ready to collect.
   - find and feed a specific cat, often one you've never met
   - feed a number of one cat type
   - feed the Narwhal Cat
@@ -370,7 +373,7 @@ The character sheet is **`assets/player/characters.png`** (`.webp` / `.jpg` also
 
 ## UI size
 - **Speech bubble:** sits just above the player's head (following the 3D camera), so it never covers the face.
-- **Cats to discover** (top right in a run) shows the silhouettes of the cats you haven't met yet.
+- **Cats found here** (top right in a run) shows every cat in the area: found cats in colour, the rest as silhouettes.
 - **Bigger HUD and harbor UI:** everything is scaled up by `--ui` (1.25 on big screens, 1.15 on medium, about 1 on phones). Each piece grows from the corner it's anchored to, so nothing moves.
 - **Full-size pop-ups:** the panels (Tackle & Skills, Pet Store, Old Gil, Where to?, dialogue, pause, results) use `--pz`, which is full size on big screens and smaller on small ones.
 - **Text:** nothing in the panels is smaller than 13.5px.
