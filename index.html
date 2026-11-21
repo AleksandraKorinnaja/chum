@@ -1865,10 +1865,67 @@
 </div>
 <div id="rotate-overlay"><div class="spin">🔄</div><div>Rotate your device to portrait<br>to keep feeding the horde</div></div>
 
+<script>document.write('<script src="assets/env/blockouts/blockouts.js?t=' + Date.now() + '"><\/script>');</script>
 <script>
 (function(){
 "use strict";
 const DEBUG = /[?&]debug\b/.test(location.search);
+/* Low-poly block-out sprites: assets/env/blockouts/*.png, rendered by art/blockouts/italian_town/build_town_houses.py
+   (blockouts.js lists each sprite's size, the pixel of its ground anchor, and which camera it was rendered from:
+   'iso' = the harbor's corner-on view, 'front' = the runs' and the Cat Sanctuary's view from the south).
+   S = world units per metre. Each sprite is stretched by 1/cos(camera elevation) so heights read 1:1 like the game's own. */
+const BLK = {S:40, img:{}};
+(function loadBlockouts(){
+  const M = window.BLOCKOUT_SPRITES; if(!M) return;
+  const v = window.BLOCKOUT_VERSION ? '?v=' + window.BLOCKOUT_VERSION : '';      // a rebuild changes this, so browsers fetch the new art
+  for(const k in M){ const im = new Image(); im.onload = ()=>{ BLK.img[k] = im; }; im.src = 'assets/env/blockouts/' + M[k].file + v; }
+})();
+function blkReady(k){ return !!(k && BLK.img[k]); }
+// draw a front-view sprite with its ground anchor at (x, y), `scale` units per metre (BLK.S in the runs)
+function blkFront(k, x, y, scale){
+  if(typeof isoOn === 'function' && isoOn() && BLK.img[k + '_iso']) k += '_iso';     // on the harbor island: the corner-camera version (its shadow falls the same way)
+  const M = window.BLOCKOUT_SPRITES[k], im = BLK.img[k], kx = (scale || BLK.S)/M.ppm, ky = kx/M.cos;
+  ctx.imageSmoothingEnabled = true;
+  ctx.drawImage(im, x - M.ax*kx, y - M.ay*ky, M.w*kx, M.h*ky);
+}
+// the same, sized so the model is `w` wide (for the Cat Sanctuary, which is drawn in screen pixels)
+function blkFit(k, x, y, w){ blkFront(k, x, y, w/window.BLOCKOUT_SPRITES[k].mw); }
+/* Sun shadows for the 2D figures (cats, you, townsfolk, Gil), matching the block-outs' baked shadows:
+   the figure's own silhouette, laid on the ground along the same sun (from the south-west, so it falls
+   back and to the right), in the same cool blue at the same strength. SUN_SHADOW mirrors SUN_DIR and
+   SHADOW_TINT in build_town_houses.py: a point h up lands 0.41h east and 0.705h north of its feet. */
+const SUN_SHADOW = {east:0.41, north:0.705, col:'rgb(112,124,174)', alpha:0.42, contact:'rgba(60,70,130,0.28)', res:0.5};
+const shadowCv = document.createElement('canvas'), shadowG = shadowCv.getContext('2d');
+// per unit of height, where the shadow goes on screen (in the units the figure is drawn in)
+function sunShadowVec(){
+  if(typeof isoOn === 'function' && isoOn()) return [ISO.c*SUN_SHADOW.east + ISO.s*SUN_SHADOW.north, (ISO.s*SUN_SHADOW.east - ISO.c*SUN_SHADOW.north)*ISO.FY];
+  return [SUN_SHADOW.east, -SUN_SHADOW.north*MESH_FLAT];
+}
+// drawFig(g) draws the figure with its feet at (0, 0) into g; (fx, fy) = where its feet touch the ground;
+// w × h = a box (in the current units) that holds the figure above its feet
+const FIGURE_SHADOWS = false;        // cats and characters cast no shadows (true brings the sun shadows back)
+function castShadow(drawFig, fx, fy, w, h, alpha){
+  if(!FIGURE_SHADOWS) return;
+  const lowQ = typeof QUALITY !== 'undefined' && QUALITY.level >= 2;          // (slow machines: a coarser, cheaper silhouette)
+  const T = ctx.getTransform(), sc = Math.hypot(T.a, T.b)*(lowQ ? 0.3 : SUN_SHADOW.res) || 0.5;
+  const pw = Math.ceil(w*sc) + 4, ph = Math.ceil((h + 8)*sc) + 4;
+  if(shadowCv.width < pw || shadowCv.height < ph){ shadowCv.width = Math.max(shadowCv.width, pw); shadowCv.height = Math.max(shadowCv.height, ph); }
+  const g = shadowG;
+  g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1; g.filter = 'none';
+  g.clearRect(0, 0, pw, ph);
+  g.setTransform(sc, 0, 0, sc, pw/2, ph - 2 - 8*sc);
+  g.imageSmoothingEnabled = true;
+  try{ drawFig(g); }catch(e){ return; }
+  g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-in'; g.fillStyle = SUN_SHADOW.col; g.fillRect(0, 0, pw, ph);
+  g.globalCompositeOperation = 'source-over';
+  const [vx, vy] = sunShadowVec();
+  ctx.save(); ctx.translate(fx, fy); ctx.transform(1, 0, -vx, -vy, 0, 0);    // straight up the figure → along the sun on the ground
+  ctx.globalAlpha *= alpha ?? SUN_SHADOW.alpha; ctx.imageSmoothingEnabled = true;
+  ctx.drawImage(shadowCv, 0, 0, pw, ph, -pw/2/sc, -(ph - 2 - 8*sc)/sc, pw/sc, ph/sc);
+  ctx.restore();
+}
+// a small soft contact shadow right under the feet (in the shadows' blue)
+function contactShadow(x, y, rx, ry){ if(!FIGURE_SHADOWS) return; ctx.save(); ctx.fillStyle = SUN_SHADOW.contact; ctx.beginPath(); ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI*2); ctx.fill(); ctx.restore(); }
 document.body.classList.add('ui-v2');            // the UI from the design canvas (see the 'UI v2' styles)
 const $ = id => document.getElementById(id);
 
@@ -3574,11 +3631,17 @@ function buildFloorTile(kind){
       o.fillStyle = '#3e2c1c'; o.fillRect(seam+5, r*26+5, 2, 2); o.fillRect(seam+5, r*26+17, 2, 2);
     }
   } else {
-    // bright storybook grass in the environment sheet's greens, with little tufts (wrapped so it tiles)
-    o.fillStyle = '#8fcb48'; o.fillRect(0,0,T,T);
-    const tuft = (x, y, s, col) => { o.strokeStyle = col; o.lineWidth = 2; o.lineCap = 'round';
-      for(const [dx,dy] of [[0,0],[T,0],[-T,0],[0,T],[0,-T]]){ o.beginPath(); o.moveTo(x+dx-s, y+dy); o.quadraticCurveTo(x+dx-s*0.6, y+dy-s*1.2, x+dx-s*0.2, y+dy-s*1.6); o.moveTo(x+dx, y+dy); o.lineTo(x+dx+s*0.1, y+dy-s*1.9); o.moveTo(x+dx+s, y+dy); o.quadraticCurveTo(x+dx+s*0.6, y+dy-s*1.1, x+dx+s*0.3, y+dy-s*1.5); o.stroke(); } };
-    for(let i=0;i<9;i++) tuft(hash2(i,1,91)*T, hash2(i,2,91)*T, 3+hash2(i,3,91)*3, i%3 ? '#72b236' : '#a8dc5c');
+    // bright storybook grass in the environment sheet's greens, with little tufts (wrapped so it tiles):
+    // flat filled blade shapes, no line art
+    o.fillStyle = '#9cb04a'; o.fillRect(0,0,T,T);
+    const tuft = (x, y, s, col) => { o.fillStyle = col;
+      for(const [dx,dy] of [[0,0],[T,0],[-T,0],[0,T],[0,-T]]){
+        const bx = x + dx, by = y + dy;
+        for(const [ox, tx, ty] of [[-s, -s*0.35, -s*1.6], [0, s*0.1, -s*2], [s, s*0.4, -s*1.5]]){
+          o.beginPath(); o.moveTo(bx + ox - s*0.32, by); o.lineTo(bx + ox + s*0.32, by); o.lineTo(bx + ox + tx, by + ty); o.closePath(); o.fill();
+        }
+      } };
+    for(let i=0;i<9;i++) tuft(hash2(i,1,91)*T, hash2(i,2,91)*T, 3+hash2(i,3,91)*3, i%3 ? '#86983c' : '#b8c160');
     o.fillStyle = 'rgba(255,255,255,0.18)';
     for(let i=0;i<6;i++){ o.beginPath(); o.arc(hash2(i,4,93)*T, hash2(i,5,93)*T, 1.5, 0, Math.PI*2); o.fill(); }
   }
@@ -4717,7 +4780,9 @@ function drawObstacles(t){
     ctx.save(); ctx.globalAlpha = a; ctx.translate(o.x, o.y); ctx.scale(pop, pop);
     ctx.fillStyle = 'rgba(0,0,0,0.22)'; ctx.beginPath(); ctx.ellipse(0, 4, o.r, o.r*0.35, 0, 0, Math.PI*2); ctx.fill();
     ctx.strokeStyle = '#2b1a0c'; ctx.lineWidth = 3; ctx.lineJoin = 'round';
-    if(o.kind==='cone'){
+    const bk = {cone:'traffic_cone', barrier:'road_barrier', crate:'prop_crate'}[o.kind];
+    if(blkReady(bk)) blkFit(bk, 0, 4, o.r*(o.kind==='barrier' ? 2.1 : o.kind==='cone' ? 1.6 : 1.7));
+    else if(o.kind==='cone'){
       ctx.fillStyle = '#ff7a2a'; ctx.beginPath(); ctx.moveTo(-o.r*0.7, 2); ctx.lineTo(0, -o.r*1.9); ctx.lineTo(o.r*0.7, 2); ctx.closePath(); ctx.fill(); ctx.stroke();
       ctx.fillStyle = '#fff'; ctx.fillRect(-o.r*0.42, -o.r*0.95, o.r*0.84, o.r*0.3);
       ctx.fillStyle = '#ff7a2a'; ctx.fillRect(-o.r*0.9, 0, o.r*1.8, 5); ctx.strokeRect(-o.r*0.9, 0, o.r*1.8, 5);
@@ -5582,7 +5647,8 @@ function drawDeco(t){
       const wind = Math.sin(t*1.6 + g.h*6.28)*1.6;
       ctx.transform(1,0,(sw.x+wind)/58,1,0,0);
       ctx.scale(scale, scale*(1-Math.min(0.3, Math.hypot(sw.x,sw.y)/130)));
-      if(grassImg.complete && grassImg.naturalWidth){ ctx.imageSmoothingEnabled = false; ctx.drawImage(grassImg, -17, -32, 34, 34); }
+      if(blkReady('grass_tuft')) blkFit('grass_tuft', 0, 1, 34);           // a flat card of grass (no line art)
+      else if(grassImg.complete && grassImg.naturalWidth){ ctx.imageSmoothingEnabled = false; ctx.drawImage(grassImg, -17, -32, 34, 34); }
     } else if(stage.deco==='town'){
       // Cat Town: manhole covers, puddles, little flower pots and weeds between the cobbles
       if(!TOWN_PROPS || nearPiazza(g.x, g.y) || townZone(g.x, g.y)){ /* plain cobbles (TOWN_PROPS brings the street clutter back) */ }
@@ -5606,7 +5672,9 @@ function drawDeco(t){
       }
     } else if(stage.deco==='beach'){
       // Sunny Beach: starfish, shells, pebbles and ripples in the sand
-      if(g.h < 0.12){
+      const bk = g.h < 0.12 ? 'starfish' : g.h < 0.26 ? (g.h < 0.19 ? 'shell_white' : 'shell_pink') : g.h < 0.36 ? 'pebbles' : null;
+      if(bk && blkReady(bk)) blkFit(bk, 0, 4, bk === 'starfish' ? 24 : bk === 'pebbles' ? 26 : 22);
+      else if(g.h < 0.12){
         ctx.rotate(g.h*20); ctx.fillStyle = '#f08a4b'; ctx.strokeStyle = '#b8562a'; ctx.lineWidth = 1.5;
         ctx.beginPath(); for(let k=0;k<10;k++){ const a = k*Math.PI/5, r = k%2 ? 4 : 11; ctx.lineTo(Math.cos(a)*r, Math.sin(a)*r); } ctx.closePath(); ctx.fill(); ctx.stroke();
         ctx.fillStyle = '#ffd2a8'; for(let k=0;k<5;k++){ const a = k*Math.PI*2/5; ctx.beginPath(); ctx.arc(Math.cos(a)*6, Math.sin(a)*6, 1, 0, Math.PI*2); ctx.fill(); }
@@ -5660,13 +5728,19 @@ function drawPlayer(){
     ctx.strokeStyle = 'rgba(90,176,255,0.75)'; ctx.lineWidth = 5; ctx.lineCap = 'round';
     ctx.beginPath(); ctx.arc(0, 0, 26, -Math.PI/2, -Math.PI/2 + Math.PI*2*clamp(f, 0, 1)); ctx.stroke(); ctx.restore();
   }
+  // your sun shadow (the same figure, laid along the ground) and a soft contact shadow
+  castShadow(g=>{
+    if(useHB(avatarLook())){ g.scale(player.faceX, 1); drawHB(g, avatarLook(), 72, player.walkT, player.moving); }
+    else if(useFisher()) drawFisher(g, 0, 0, PLAYER_H, player.dir, player.walkT, player.moving);
+    else if(avReady){ const av = composeAvatar(avatarLook(), playerFace()), k = 70/av.bodyH; g.scale(player.faceX, 1); g.drawImage(av.cv, -av.cx*k, -av.footY*k, av.cv.width*k, av.cv.height*k); }
+    else { const frames = PLAYER_SPRITES[player.dir] || PLAYER_SPRITES.south, img = playerImages[frames[0]];
+      if(img && img.complete && img.naturalWidth){ const h = 66, w = h*(img.naturalWidth/img.naturalHeight); g.drawImage(img, -w/2, -h + 2, w, h); } }
+  }, player.x, player.y + 22, 110, (typeof PLAYER_H === 'number' ? PLAYER_H : 90) + 20);
+  contactShadow(player.x, player.y + 21, 15, 5);
   ctx.save();
   ctx.translate(player.x, player.y);
   if(player.recoil > 0) ctx.translate(-Math.cos(player.facing)*4*player.recoil, -Math.sin(player.facing)*4*player.recoil);
   if(player.invuln > 0 && player.rollT <= 0 && Math.floor(player.invuln*20)%2===0) ctx.globalAlpha = 0.4;
-  ctx.fillStyle = 'rgba(0,0,0,0.22)';
-  { const hop = 0;
-    ctx.beginPath(); ctx.ellipse(0,20,15*(1 - hop*0.3),5*(1 - hop*0.3),0,0,Math.PI*2); ctx.fill(); }
   // mid-dodge: lean hard into the dash from the feet, and stretch along it on take-off
   if(player.rollT > 0){
     const p = 1 - player.rollT/ROLL.time, st = Math.max(0, 1 - p/0.35), lean = (1 - p*p)*0.38;
@@ -5840,6 +5914,8 @@ function drawCatShape(ctx, def){
   }
 }
 function drawProp(c){
+  { const k = {crate:'prop_crate', basket:'prop_basket', barrel:'prop_barrel'}[c.prop] || 'prop_basket';
+    if(blkReady(k)){ blkFit(k, 0, 15, k === 'prop_basket' ? 38 : 30); return; } }   // (the block-out has its own shadow)
   ctx.fillStyle = 'rgba(0,0,0,0.25)'; ctx.beginPath(); ctx.ellipse(0,14,15,4,0,0,Math.PI*2); ctx.fill();
   if(envReady && envParts.breakable && envParts.breakable.length){
     // flower crate in the meadow, pink pot in the market, teal pot on the pier
@@ -5873,10 +5949,11 @@ function drawCat(c){
     ctx.restore(); return;
   }
   if(c.def && c.def.royal) drawRoyalExtras(c);
-  // mid-leap: a ground shadow that shrinks as the cat rises
-  if(c.z > 1 && !c.dying){
-    const k = clamp(1 - c.z/220, 0.35, 1);
-    ctx.save(); ctx.fillStyle = 'rgba(0,0,0,0.28)'; ctx.beginPath(); ctx.ellipse(c.x, c.y + c.r*0.9, c.r*0.9*k, c.r*0.3*k, 0, 0, Math.PI*2); ctx.fill(); ctx.restore();
+  // its sun shadow on the ground (stays put while it leaps; fades as it rises)
+  if(!c.dying && !c.prop){
+    const s0 = c.r/20, lift = clamp(1 - (c.z||0)/220, 0.35, 1);
+    castShadow(g=>{ g.scale(s0, s0); g.translate(0, -22); drawCatShape(g, c.def); }, c.x, c.y + 22*s0, 130*s0, 110*s0, SUN_SHADOW.alpha*lift);
+    contactShadow(c.x, c.y + 22*s0, 13*s0*lift, 4*s0*lift);
   }
   ctx.save();
   ctx.translate(c.x, c.y - (c.z||0));
@@ -5901,8 +5978,7 @@ function drawCat(c){
     ctx.fillStyle = c.isBoss ? 'rgba(255,80,40,0.25)' : 'rgba(255,205,60,0.35)';
     ctx.beginPath(); ctx.ellipse(0,16,24,8,0,0,Math.PI*2); ctx.fill();
   }
-  ctx.fillStyle = 'rgba(0,0,0,0.25)';
-  ctx.beginPath(); ctx.ellipse(0,22,14,4,0,0,Math.PI*2); ctx.fill();
+  // (its shadow is cast above, before the body)
   // a cat a mission wants gets a gold dashed ring at its feet
   if(missionCats.has(c.def.key)){ ctx.save(); ctx.strokeStyle = '#ffd23c'; ctx.lineWidth = 2.5; ctx.setLineDash([5,4]); ctx.lineDashOffset = -runT*20; ctx.beginPath(); ctx.ellipse(0,22,19,6.5,0,0,Math.PI*2); ctx.stroke(); ctx.restore(); }
   if(c.mode==='wind') ctx.translate(Math.sin(runT*60)*2, 0);
@@ -7348,10 +7424,11 @@ function drawUpright(){
   for(const c of cats) items.push([c.y, c.x, c.y, ()=>drawCat(c)]);
   if(player) items.push([player.y, player.x, player.y, drawPlayer]);
   if(kitReady && stage && stage.roster==='town' && (state==='intro' || TOWN_PROPS)){
-    for(const b of PIAZZA_BOXES){ const fade = townHides(b[1], b[2], b[3], 360); items.push([b[2] - 12, b[1], b[2], ()=>{ if(fade) ctx.globalAlpha = 0.35; drawHouseBox(...b); }]); }   // see-through when someone's behind
+    for(const b of PIAZZA_BOXES){ const fade = townHides(b[1], b[2], b[3], 360); items.push([b[2] - 12, b[1], b[2], ()=>{ if(fade) ctx.globalAlpha = 0.35; drawPiazzaBox(...b); }]); }   // see-through when someone's behind
     for(const [k, x, y, h] of PIAZZA) items.push([y, x, y, ()=>{
       ctx.fillStyle = 'rgba(0,0,0,0.18)'; ctx.beginPath(); ctx.ellipse(x, y + 2, h*0.4, h*0.075, 0, 0, Math.PI*2); ctx.fill();
-      kitSprite(k, x, y, h);
+      if(k === 'lamps' && blkReady('street_lamp')) blkFront('street_lamp', x, y);
+      else kitSprite(k, x, y, h);
     }]);
   }
   townItems(items, runT);
@@ -7472,8 +7549,9 @@ function drawTownGround(t){
    Big warm sandstone paving tiles everywhere, soft green lawns with a raised pale-stone curb, a chunky
    flat-shaded tiered fountain, round puffy bushes, spotted mushrooms, slim lamp posts and wooden benches.
    No black outlines: shapes are told apart by flat light and shade, like low-poly 3D.                 */
-const SQ = {tile:116, tiles:['#e8bd93','#e3b68b','#ebc39b','#dfb085','#e6ba8f'], grout:'rgba(250,226,198,0.9)', groutShadow:'rgba(160,105,65,0.25)',
-  grass:'#8fcd6b', grassLight:'#a6dc80', grassDark:'#79bb58', curb:'#f6e2c9', curbSide:'#d9b591', stone:'#ecb894', stoneLight:'#f6cfae', stoneDark:'#c98e6a',
+// (colours after the sunny-lakeside reference: warm sandstone paving, olive/sage lawns)
+const SQ = {tile:116, tiles:['#dccaa6','#d5c29d','#e0cfad','#cfbb94','#d9c7a2'], grout:'rgba(242,232,208,0.9)', groutShadow:'rgba(120,96,62,0.25)',
+  grass:'#9fb04a', grassLight:'#b6bf5c', grassDark:'#86983c', curb:'#ece0c4', curbSide:'#c4ad86', stone:'#ecb894', stoneLight:'#f6cfae', stoneDark:'#c98e6a',
   water:'#9ad7e3', waterDeep:'#74c1d3'};
 function lpShade(hex, k){ const n = parseInt(hex.slice(1), 16), c = v => Math.max(0, Math.min(255, Math.round(v*k))); return `rgb(${c((n>>16)&255)},${c((n>>8)&255)},${c(n&255)})`; }
 function sqHash(i, j){ let h = (i*73856093) ^ (j*19349663); h = (h ^ (h >>> 13))*1274126177; return ((h ^ (h >>> 16)) >>> 0)/4294967295; }
@@ -7555,7 +7633,16 @@ function drawSquareGround(t){
 }
 // the low-poly tiered fountain
 function drawSquareFountain(o, t){
-  sqShadow(o.x, o.y + 6, 196, 196*MESH_FLAT*1.05, 0.2);
+  if(!blkReady('fountain')) sqShadow(o.x, o.y + 6, 196, 196*MESH_FLAT*1.05, 0.2);   // (the block-outs carry their own shadow)
+  if(blkReady('fountain')){
+    blkFront('fountain', o.x, o.y);
+    // ripples on the basin's water
+    const [wx, wy] = boxPt(o.x, o.y, 30);
+    ctx.strokeStyle = 'rgba(255,255,255,0.7)'; ctx.lineWidth = 2;
+    for(let i=0;i<3;i++){ const k = (t*0.45 + i/3) % 1; ctx.globalAlpha = 1 - k; ctx.beginPath(); ctx.ellipse(wx, wy + 4, 46 + k*90, (46 + k*90)*MESH_FLAT, 0, 0, Math.PI*2); ctx.stroke(); }
+    ctx.globalAlpha = 1;
+    return;
+  }
   const base = lpCyl(o.x, o.y, 178, 30, 0, SQ.stone, {n:16, top:SQ.stoneLight});
   ctx.fillStyle = SQ.waterDeep; ctx.beginPath(); ctx.ellipse(base.tx, base.ty + 2, 152, 152*MESH_FLAT, 0, 0, Math.PI*2); ctx.fill();
   ctx.fillStyle = SQ.water; ctx.beginPath(); ctx.ellipse(base.tx, base.ty + 4, 146, 146*MESH_FLAT - 4, 0, 0, Math.PI*2); ctx.fill();
@@ -7579,11 +7666,16 @@ function drawSquareFountain(o, t){
   }
 }
 function drawSquareBush(o){
-  const s = o.s || 1; sqShadow(o.x, o.y, 58*s, 20*s, 0.22);
+  const s = o.s || 1;
+  const bk = {'#f2d45a':'bush_yellow', '#7cc35c':'bush_green', '#9fd36a':'bush_lime'}[o.c];
+  if(blkReady(bk)){ blkFront(bk, o.x, o.y, BLK.S*s); return; }
+  sqShadow(o.x, o.y, 58*s, 20*s, 0.22);
   const [cx, cy] = boxPt(o.x, o.y, 34*s); lpBlob(cx, cy, 52*s, o.c);
 }
 function drawSquareMush(o){
-  const s = o.s || 1; sqShadow(o.x, o.y, 12*s, 4*s, 0.2);
+  const s = o.s || 1;
+  if(blkReady('mushroom')){ blkFront('mushroom', o.x, o.y, BLK.S*s); return; }
+  sqShadow(o.x, o.y, 12*s, 4*s, 0.2);
   lpCyl(o.x, o.y, 6*s, 14*s, 0, '#f4ead8', {n:6, r2:5*s});
   const [cx, cy] = boxPt(o.x, o.y, 16*s);
   ctx.fillStyle = '#d9473f'; ctx.beginPath(); ctx.ellipse(cx, cy, 15*s, 11*s, 0, Math.PI, 0); ctx.lineTo(cx + 15*s, cy + 2*s); ctx.lineTo(cx - 15*s, cy + 2*s); ctx.closePath(); ctx.fill();
@@ -7591,15 +7683,19 @@ function drawSquareMush(o){
   ctx.fillStyle = '#fff6ea'; for(const [dx, dy, r] of [[-6, -5, 2.6], [4, -7, 2.2], [8, -2, 1.8], [-1, -1, 1.6]]){ ctx.beginPath(); ctx.arc(cx + dx*s, cy + dy*s, r*s, 0, Math.PI*2); ctx.fill(); }
 }
 function drawSquareLamp(o, t){
-  sqShadow(o.x, o.y, 16, 6, 0.22);
-  lpCyl(o.x, o.y, 11, 10, 0, '#4a5f86', {n:6, r2:9});
-  lpCyl(o.x, o.y, 4, 120, 10, '#4a5f86', {n:6});
-  const lamp = lpCyl(o.x, o.y, 8, 24, 130, '#cfe4f2', {n:6, r2:12, top:'#4a5f86'});
-  lpCyl(o.x, o.y, 12, 6, 154, '#4a5f86', {n:6, r2:3});
+  if(blkReady('street_lamp')) blkFront('street_lamp', o.x, o.y);
+  else {
+    sqShadow(o.x, o.y, 16, 6, 0.22);
+    lpCyl(o.x, o.y, 11, 10, 0, '#4a5f86', {n:6, r2:9});
+    lpCyl(o.x, o.y, 4, 120, 10, '#4a5f86', {n:6});
+    lpCyl(o.x, o.y, 8, 24, 130, '#cfe4f2', {n:6, r2:12, top:'#4a5f86'});
+    lpCyl(o.x, o.y, 12, 6, 154, '#4a5f86', {n:6, r2:3});
+  }
   const [lx, ly] = boxPt(o.x, o.y, 142);
   const g = ctx.createRadialGradient(lx, ly, 2, lx, ly, 40); g.addColorStop(0, 'rgba(255,240,190,0.55)'); g.addColorStop(1, 'rgba(255,240,190,0)'); ctx.fillStyle = g; ctx.fillRect(lx - 40, ly - 40, 80, 80);
 }
 function drawSquareBench(o){
+  if(blkReady('park_bench') && !isoOn()){ blkFront('park_bench', o.x, o.y); return; }   // (the harbor's corner-on camera keeps the drawn bench)
   sqShadow(o.x, o.y, 54, 12, 0.2);
   const wood = '#c98a5c', leg = '#5b6b8f', P = boxPt, slat = (y, z, d) => meshPolyFlat([P(o.x - 48, y - d, z), P(o.x + 48, y - d, z), P(o.x + 48, y, z), P(o.x - 48, y, z)], lpShade(wood, z > 30 ? 0.92 : 1.05));
   for(const dx of [-40, 40]) lpCyl(o.x + dx, o.y - 6, 3.5, 20, 0, leg, {n:4});
@@ -8532,9 +8628,12 @@ function drawDecor(L, which){
   if(which==='wall'){
     if(own.fireplace){
       const p = D.fireplace;
+      if(blkReady('fireplace')) blkFit('fireplace', p.x, p.y + 6, 104);
+      else {
       ctx.fillStyle = '#9a6a52'; ctx.fillRect(p.x-44, p.y-70, 88, 70); ctx.strokeRect(p.x-44, p.y-70, 88, 70);
       ctx.fillStyle = '#5a3a2a'; ctx.fillRect(p.x-52, p.y-78, 104, 10);
       ctx.fillStyle = '#2b1d16'; ctx.beginPath(); ctx.moveTo(p.x-28,p.y); ctx.lineTo(p.x-28,p.y-34); ctx.quadraticCurveTo(p.x,p.y-56,p.x+28,p.y-34); ctx.lineTo(p.x+28,p.y); ctx.closePath(); ctx.fill();
+      }
       for(let i=0;i<3;i++){ const fl = Math.sin(t*9+i*2)*4; ctx.fillStyle = i===1 ? '#ffd23c' : '#ff7a1e';
         ctx.beginPath(); ctx.ellipse(p.x-12+i*12, p.y-12-fl/2, 7, 14+fl, 0, 0, Math.PI*2); ctx.fill(); }
       const g = ctx.createRadialGradient(p.x, p.y, 4, p.x, p.y, 120); g.addColorStop(0,'rgba(255,170,80,0.28)'); g.addColorStop(1,'rgba(255,170,80,0)');
@@ -8544,14 +8643,20 @@ function drawDecor(L, which){
       const p = D.lamp, glow = 0.25 + 0.08*Math.sin(t*2);
       const g = ctx.createRadialGradient(p.x, p.y, 2, p.x, p.y, 60); g.addColorStop(0,`rgba(255,240,170,${glow})`); g.addColorStop(1,'rgba(255,240,170,0)');
       ctx.fillStyle = g; ctx.beginPath(); ctx.arc(p.x, p.y, 60, 0, Math.PI*2); ctx.fill();
+      if(blkReady('wall_lamp')) blkFit('wall_lamp', p.x, p.y, 40);
+      else {
       ctx.fillStyle = '#fff4c0'; ctx.beginPath(); ctx.arc(p.x, p.y, 18, 0, Math.PI*2); ctx.fill(); ctx.stroke();
       ctx.fillStyle = '#ecd8b6'; ctx.beginPath(); ctx.arc(p.x+8, p.y-5, 15, 0, Math.PI*2); ctx.fill();
+      }
     }
     if(own.fishtank){
       const p = D.fishtank;
+      if(blkReady('fishtank')) blkFit('fishtank', p.x, p.y + 38, 82);
+      else {
       ctx.fillStyle = '#6b4a2e'; ctx.fillRect(p.x-40, p.y+4, 80, 34); ctx.strokeRect(p.x-40, p.y+4, 80, 34);
       ctx.fillStyle = 'rgba(120,200,240,0.85)'; ctx.fillRect(p.x-36, p.y-46, 72, 50); ctx.strokeRect(p.x-36, p.y-46, 72, 50);
       ctx.fillStyle = '#e8c070'; ctx.fillRect(p.x-35, p.y-4, 70, 7);
+      }
       ctx.font = '13px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.save(); ctx.beginPath(); ctx.rect(p.x-36, p.y-46, 72, 50); ctx.clip();
       for(let i=0;i<3;i++){ const fx = p.x + Math.sin(t*0.8 + i*2.1)*26, fy = p.y-30 + i*10; ctx.save(); ctx.translate(fx, fy); if(Math.cos(t*0.8 + i*2.1) < 0) ctx.scale(-1,1); ctx.fillText(i===1?'🐡':'🐟', 0, 0); ctx.restore(); }
@@ -8559,24 +8664,30 @@ function drawDecor(L, which){
     }
     if(own.hammock){
       const p = D.hammock;
+      if(blkReady('hammock')) blkFit('hammock', p.x, p.y - 4, 124);
+      else {
       ctx.strokeStyle = '#8a5a32'; ctx.lineWidth = 3;
       ctx.beginPath(); ctx.moveTo(p.x-60, p.y-24); ctx.lineTo(p.x-44, p.y); ctx.moveTo(p.x+60, p.y-24); ctx.lineTo(p.x+44, p.y); ctx.stroke();
       ctx.fillStyle = '#f2b84b'; ctx.strokeStyle = '#2b1d12'; ctx.lineWidth = 2.5;
       ctx.beginPath(); ctx.moveTo(p.x-46, p.y); ctx.quadraticCurveTo(p.x, p.y+30, p.x+46, p.y); ctx.lineTo(p.x+46, p.y-2); ctx.quadraticCurveTo(p.x, p.y+18, p.x-46, p.y-2); ctx.closePath(); ctx.fill(); ctx.stroke();
+      }
     }
   } else {
-    if(own.catgrass){
+    if(own.catgrass && blkReady('cat_grass_pot')) blkFit('cat_grass_pot', D.catgrass.x, D.catgrass.y + 10, 32);
+    else if(own.catgrass){
       const p = D.catgrass;
       ctx.fillStyle = '#c4632b'; ctx.beginPath(); ctx.moveTo(p.x-14,p.y-12); ctx.lineTo(p.x+14,p.y-12); ctx.lineTo(p.x+10,p.y+10); ctx.lineTo(p.x-10,p.y+10); ctx.closePath(); ctx.fill(); ctx.stroke();
       ctx.strokeStyle = '#5ea83a'; ctx.lineWidth = 3;
       for(let i=-3;i<=3;i++){ const sw = Math.sin(t*2+i)*3; ctx.beginPath(); ctx.moveTo(p.x+i*3, p.y-12); ctx.quadraticCurveTo(p.x+i*5+sw, p.y-26, p.x+i*7+sw, p.y-38-Math.abs(i)*-2); ctx.stroke(); }
     }
-    if(own.cushion){
+    if(own.cushion && blkReady('floor_cushion')) blkFit('floor_cushion', D.cushion.x, D.cushion.y + 12, 64);
+    else if(own.cushion){
       const p = D.cushion;
       ctx.fillStyle = '#b58ad8'; ctx.beginPath(); ctx.ellipse(p.x, p.y, 30, 14, 0, 0, Math.PI*2); ctx.fill(); ctx.stroke();
       ctx.fillStyle = '#d6b6f0'; ctx.beginPath(); ctx.ellipse(p.x, p.y-3, 20, 7, 0, 0, Math.PI*2); ctx.fill();
     }
-    if(own.tower){
+    if(own.tower && blkReady('cat_tower')) blkFit('cat_tower', D.tower.x, D.tower.y + 22, 60);
+    else if(own.tower){
       const p = D.tower;
       ctx.fillStyle = '#b48a5a'; ctx.fillRect(p.x-30, p.y+10, 60, 12); ctx.strokeRect(p.x-30, p.y+10, 60, 12);
       ctx.fillStyle = '#d8b98a'; ctx.fillRect(p.x-7, p.y-80, 14, 92); ctx.strokeRect(p.x-7, p.y-80, 14, 92);
@@ -8587,8 +8698,11 @@ function drawDecor(L, which){
     }
     if(own.fountain){
       const p = D.fountain;
+      if(blkReady('pet_fountain')) blkFit('pet_fountain', p.x, p.y + 8, 48);
+      else {
       ctx.fillStyle = '#d9e4ec'; ctx.beginPath(); ctx.ellipse(p.x, p.y, 22, 9, 0, 0, Math.PI*2); ctx.fill(); ctx.stroke();
       ctx.fillStyle = '#6fc3ee'; ctx.beginPath(); ctx.ellipse(p.x, p.y-2, 16, 5, 0, 0, Math.PI*2); ctx.fill();
+      }
       ctx.strokeStyle = 'rgba(140,210,255,0.9)'; ctx.lineWidth = 2;
       for(let i=0;i<3;i++){ const k = (t*1.5 + i/3) % 1; ctx.beginPath(); ctx.moveTo(p.x, p.y-4); ctx.quadraticCurveTo(p.x + (i-1)*8, p.y-26*(1-k*0.3), p.x + (i-1)*14, p.y-4); ctx.stroke(); }
     }
@@ -8907,21 +9021,32 @@ function drawRoom(){
   // scratching post
   const p = L.post;
   ctx.fillStyle = 'rgba(0,0,0,0.18)'; ctx.beginPath(); ctx.ellipse(p.x, p.y+48, 26, 7, 0, 0, Math.PI*2); ctx.fill();
+  if(blkReady('scratch_post')) blkFit('scratch_post', p.x, p.y+50, 48);
+  else {
   ctx.fillStyle = '#b48a5a'; ctx.fillRect(p.x-24, p.y+38, 48, 12);
   ctx.fillStyle = '#d8b98a'; ctx.fillRect(p.x-8, p.y-40, 16, 80);
   ctx.strokeStyle = '#a07a48'; ctx.lineWidth = 2;
   for(let y=p.y-36; y<p.y+38; y+=6){ ctx.beginPath(); ctx.moveTo(p.x-8, y); ctx.lineTo(p.x+8, y+3); ctx.stroke(); }
   ctx.fillStyle = '#b48a5a'; ctx.fillRect(p.x-22, p.y-48, 44, 10);
+  }
   // bed
   const b = L.bed;
   ctx.fillStyle = 'rgba(0,0,0,0.18)'; ctx.beginPath(); ctx.ellipse(b.x, b.y+12, 52, 16, 0, 0, Math.PI*2); ctx.fill();
+  if(blkReady('cat_bed')) blkFit('cat_bed', b.x, b.y+14, 104);
+  else {
   ctx.fillStyle = '#5a7ec4'; ctx.beginPath(); ctx.ellipse(b.x, b.y, 50, 22, 0, 0, Math.PI*2); ctx.fill();
   ctx.fillStyle = '#efe4ff'; ctx.beginPath(); ctx.ellipse(b.x, b.y+2, 38, 14, 0, 0, Math.PI*2); ctx.fill();
+  }
   drawDecor(L, 'floor');
 }
 function drawBowl(){
   const b = homeL.bowl;
   ctx.fillStyle = 'rgba(0,0,0,0.2)'; ctx.beginPath(); ctx.ellipse(b.x, b.y+8, 26, 7, 0, 0, Math.PI*2); ctx.fill();
+  if(blkReady('food_bowl')){
+    blkFit('food_bowl', b.x, b.y+6, 50);
+    if(bowl.food > 0){ ctx.fillStyle = '#b5683f'; const n = Math.ceil(bowl.food*9); for(let i=0;i<n;i++) ctx.fillRect(b.x-15+((i*13)%30), b.y-9+((i*7)%6), 6, 4); }
+    return;
+  }
   ctx.fillStyle = '#3d6ea5'; ctx.beginPath(); ctx.ellipse(b.x, b.y, 24, 10, 0, 0, Math.PI); ctx.fill();
   ctx.fillRect(b.x-24, b.y-6, 48, 6);
   ctx.fillStyle = '#5f8fc8'; ctx.beginPath(); ctx.ellipse(b.x, b.y-6, 24, 7, 0, 0, Math.PI*2); ctx.fill();
@@ -8942,8 +9067,10 @@ function drawHomeCat(c){
     ctx.beginPath(); ctx.ellipse(0, 0, 24*sc+6, 8*sc+3, 0, 0, Math.PI*2); ctx.stroke(); ctx.setLineDash([]);
   }
   const lift = c.mode==='held' ? 34 : c.z;
-  ctx.fillStyle = 'rgba(0,0,0,0.24)';
-  ctx.beginPath(); ctx.ellipse(0, 0, 15*sc*(1-Math.min(0.5, lift/160)), 4.5*sc, 0, 0, Math.PI*2); ctx.fill();
+  // sun shadow + contact shadow in the scene's blue (the cat Sanctuary is seen like the runs, from the front)
+  castShadow(g=>{ g.scale(sc*c.face, sc); g.translate(0, -22); drawCatShape(g, c.def); }, 0, 0, 130*sc, 110*sc, SUN_SHADOW.alpha*(1 - Math.min(0.6, lift/120)));
+  if(FIGURE_SHADOWS){ ctx.fillStyle = SUN_SHADOW.contact;
+    ctx.beginPath(); ctx.ellipse(0, 0, 15*sc*(1-Math.min(0.5, lift/160)), 4.5*sc, 0, 0, Math.PI*2); ctx.fill(); }
   ctx.translate(0, -lift);
   {
     // jelly squash & stretch around the feet; volume roughly preserved
@@ -10205,17 +10332,18 @@ function drawGate(b, gy, near){
 }
 
 /* ---- drawing ---- */
-function hbAvatar(look, face, x, y, h, flip, walkT, moving){
-  { const ni = npcFor(look); if(ni >= 0){ drawPersonSprite(ctx, NPCS[ni], x, y, h, flip, walkT, moving); return; } }
-  if(useHB(look)){ ctx.save(); ctx.translate(x, y); ctx.scale(flip, 1); drawHB(ctx, look, h, walkT, moving); ctx.restore(); return; }
+function hbAvatar(look, face, x, y, h, flip, walkT, moving, g){
+  g = g || ctx;                                   // (g: draw somewhere else, e.g. into a shadow silhouette)
+  { const ni = npcFor(look); if(ni >= 0){ drawPersonSprite(g, NPCS[ni], x, y, h, flip, walkT, moving); return; } }
+  if(useHB(look)){ g.save(); g.translate(x, y); g.scale(flip, 1); drawHB(g, look, h, walkT, moving); g.restore(); return; }
   if(!avReady) return;
   const av = composeAvatar(look, face), k = h/av.bodyH;
   const bob = moving ? Math.sin(walkT*14) : 0;
-  ctx.save(); ctx.translate(x, y - Math.abs(bob)*5);
-  ctx.scale(flip*(1+bob*0.05), 1-bob*0.05); ctx.rotate(moving ? bob*0.05 : 0);
-  ctx.imageSmoothingEnabled = true;
-  ctx.drawImage(av.cv, -av.cx*k, -av.footY*k, av.cv.width*k, av.cv.height*k);
-  ctx.restore();
+  g.save(); g.translate(x, y - Math.abs(bob)*5);
+  g.scale(flip*(1+bob*0.05), 1-bob*0.05); g.rotate(moving ? bob*0.05 : 0);
+  g.imageSmoothingEnabled = true;
+  g.drawImage(av.cv, -av.cx*k, -av.footY*k, av.cv.width*k, av.cv.height*k);
+  g.restore();
 }
 function hbBubble(x, y, txt, col){
   const bob = Math.sin(hb.t*5)*4;
@@ -10342,6 +10470,24 @@ function drawBoat(b, gy, hi){
   ctx.restore();
   drawSign(x - 40, y - 290, b.name, b.ic);
 }
+// the island's Old Gil's stall as a block-out sprite: the stall, Gil behind the counter, then the counter in front of him
+function hb3GilStall(s, hi){
+  const cy = s.y - 30;                                    // the stall's centre on the ground
+  if(hi){ ctx.shadowColor = 'rgba(255,230,140,0.95)'; ctx.shadowBlur = 24; }
+  blkDraw('gil_stall', s.x, s.y, s.x, cy);
+  ctx.shadowBlur = 0;
+  const [gx, gy] = isoOff(0, -36);
+  castShadow(g=>hbAvatar(GIL_LOOK, 0, 0, 0, HB3_PERSON_H, hb.x < s.x ? -1 : 1, 0, false, g), s.x + gx, s.y + gy, 110, HB3_PERSON_H + 20);
+  hbAvatar(GIL_LOOK, Math.sin(hb.t*0.7) > 0.8 ? 8 : 0, s.x + gx, s.y + gy, HB3_PERSON_H, hb.x < s.x ? -1 : 1, 0, false);
+  if(blkOn('gil_stall_front')) blkDraw('gil_stall_front', s.x, s.y, s.x, cy);
+}
+// your boat as a block-out sprite, moored along the pier and bobbing at its waterline
+function hb3Boat(s, hi){
+  foamRing(s.x, s.y + 4, 118, 24, Math.atan2(ISO.c*ISO.FY, -ISO.s));     // foam where the hull sits in the water (along the pier)
+  if(hi){ ctx.shadowColor = 'rgba(255,230,140,0.95)'; ctx.shadowBlur = 26; }
+  blkDraw('chum_storm_boat', s.x, s.y, s.x, s.y, Math.sin(hb.t*Math.PI*2/(SEA_LOOP/2))*3);   // bobs in time with the water's loop
+  ctx.shadowBlur = 0;
+}
 /* ---- the harbor's isometric 3/4 camera ----
    The island is seen from a corner, 45° around and looking down at an angle: ground is rotated and foreshortened
    (tiles become diamonds), buildings are boxes showing two faces, and people, cats and props stand upright as 2D
@@ -10397,7 +10543,7 @@ function isoCliffs(){
   // the pier's posts and edge
   const Pr = HB3_PIER; ctx.globalAlpha = 1;
   quad([Pr.x0, Pr.y1], [Pr.x1, Pr.y1], 0, 16, '#8a5a34'); quad([Pr.x1, Pr.y1], [Pr.x1, Pr.y0], 0, 16, '#6e4426');
-  for(let y = Pr.y0 + 120; y < Pr.y1; y += 140) for(const x of [Pr.x0 + 6, Pr.x1 - 6]){ const [px, py] = P(x, y, 0); ctx.fillStyle = '#6e4426'; ctx.fillRect(px - 5, py, 10, 60*viewZoom()); }
+  for(let y = Pr.y0 + 120; y < Pr.y1; y += 140) for(const x of [Pr.x0 + 6, Pr.x1 - 6]){ const [px, py] = P(x, y, 0), Z = viewZoom(); ctx.fillStyle = '#6e4426'; ctx.fillRect(px - 5, py, 10, 60*Z); foamRing(px, py + 60*Z, 11*Z, 4*Z, 0); }
   ctx.restore();
 }
 // the locked land's label, upright (not rotated with the ground)
@@ -10429,13 +10575,25 @@ const HB3_LAND = [
   {key:'pier', stage:'pier', name:'Sunny Beach', ground:'sand', rects:[{x0:900, x1:1800, y0:-560, y1:430}], edge:'sand'},
 ];
 const HB3_PIER = {x0:420, x1:580, y0:380, y1:1080};        // overlaps the quay a little so you can step onto it
-// buildings (front edge at y, w wide, d deep, the kit art on the front); key = the building to open
+// buildings (front edge at y, w wide, d deep, the kit art on the front); key = the building to open.
+// blk = the low-poly block-out sprite drawn instead (w/d match its footprint at BLK.S units per metre).
 const HB3_HOUSES = [
-  {kit:'houses', x:-650, y:-300, w:230, d:170},
-  {kit:'fishShop', x:-200, y:-300, w:320, d:190, key:'shop'},
-  {kit:'gelato', x:250, y:-300, w:230, d:170, key:'pet'},
-  {kit:'trattoria', x:660, y:-300, w:240, d:170},
+  {kit:'houses', blk:'townhouse_yellow', x:-650, y:-300, w:184, d:184},
+  {kit:'fishShop', blk:'big_fish_shop', x:-200, y:-300, w:360, d:240, key:'shop'},
+  {kit:'gelato', blk:'gelateria', x:250, y:-300, w:200, d:180, key:'pet'},
+  {kit:'trattoria', blk:'trattoria', x:660, y:-300, w:320, d:220},
 ];
+function blkOn(k){ return !!(k && isoOn() && BLK.img[k]); }
+// how far a ground offset (dx, dy) moves on screen, in billboard units
+function isoOff(dx, dy){ return [ISO.c*dx - ISO.s*dy, (ISO.s*dx + ISO.c*dy)*ISO.FY]; }
+// draw sprite k with its anchor on the ground at (gx, gy); billboard() must already be anchored at (bx, by); lift = up, in world units
+function blkDraw(k, bx, by, gx, gy, lift){
+  const M = window.BLOCKOUT_SPRITES[k], im = BLK.img[k], kx = BLK.S/M.ppm, ky = kx/M.cos, [ox, oy] = isoOff(gx - bx, gy - by);
+  ctx.imageSmoothingEnabled = true;
+  ctx.drawImage(im, bx + ox - M.ax*kx, by + oy - (lift||0) - M.ay*ky, M.w*kx, M.h*ky);
+}
+// how tall a building or spot stands (for the bouncing marker / tutorial arrow over it)
+function blkTop(k, fallback){ const M = window.BLOCKOUT_SPRITES; return blkOn(k) && M[k] ? M[k].top*BLK.S + 30 : fallback; }
 // everything else you can walk up to: Old Gil's stall, the boat, and one signpost per area
 const HB3_SPOTS = [
   {key:'gil', x:250, y:330, name:"Old Gil's Fish", ic:'🐠', verb:'Barter for fish', stall:true, w:230},
@@ -10454,6 +10612,9 @@ const HB3_PROPS = [
   ['tree', -1350, -1240, 'market', '#73b24f', 1.1], ['tree', -1100, -900, 'market', '#5f9a42', 1.25], ['tree', -300, -1250, 'market', '#73b24f', 1],
   ['tree', 60, -900, 'market', '#8cc65a', 1.15], ['tree', -800, -700, 'market', '#5f9a42', 0.9], ['bush', -500, -800, 'market', '#f2d45a', 0.9],
   ['bush', -1300, -680, 'market', '#9fd36a', 0.8], ['bench', -330, -770, 'market'], ['mush', -200, -700, 'market', '', 1], ['mush', -180, -686, 'market', '', 0.8],
+  // block-out sprites: ['blk', x, y, land, sprite, size] (tall pale pampas along the quay, poplars in the park)
+  ['blk', -660, 400, 'harbor', 'pampas', 1.1], ['blk', -170, 405, 'harbor', 'pampas', 0.9], ['blk', 690, 400, 'harbor', 'pampas', 1.15],
+  ['blk', -880, -620, 'market', 'tree_poplar', 0.9], ['blk', -420, -1150, 'market', 'pampas', 1.2], ['blk', -880, -1120, 'market', 'pampas', 1],
   ['palm', 1050, -460, 'pier'], ['palm', 1700, -460, 'pier'], ['palm', 1450, 330, 'pier'], ['umbrella', 1200, 0, 'pier', '#E5404B'], ['umbrella', 1450, -250, 'pier', '#2BB5A5'],
 ];
 const HB3_POND = {x:-650, y:-1020, rx:200, ry:110, land:'market'};
@@ -10466,7 +10627,7 @@ function hb3Walkable(x, y){
   const m = 22, R = hb3Rects(), inAny = (px, py) => R.some(r=>px > r.x0 && px < r.x1 && py > r.y0 && py < r.y1);
   if(!(inAny(x - m, y) && inAny(x + m, y) && inAny(x, y - m) && inAny(x, y + 6))) return false;     // pieces of land join seamlessly
   for(const h of HB3_HOUSES) if(x > h.x - h.w/2 - 16 && x < h.x + h.w/2 + 16 && y > h.y - h.d - 10 && y < h.y + 14) return false;
-  { const g = HB3_SPOTS[0]; if(Math.hypot((x - g.x)/130, (y - g.y + 10)/40) < 1) return false; }   // Gil's counter
+  { const g = HB3_SPOTS[0]; if(Math.hypot((x - g.x)/130, (y - g.y + 30)/60) < 1) return false; }   // Gil's stall
   if(hb3Alpha('market') >= 1 && Math.hypot((x - HB3_POND.x)/(HB3_POND.rx + 10), (y - HB3_POND.y)/(HB3_POND.ry + 10)) < 1) return false;
   return true;
 }
@@ -10656,10 +10817,11 @@ function hb3Ground(part){
   const v = getViewBounds(60);
   if(part !== 'top'){
   // the sea all around, with soft waves
-  const sea = ctx.createLinearGradient(0, v.top, 0, v.bottom); sea.addColorStop(0, '#8fd3e8'); sea.addColorStop(1, '#5fb6d8');
+  const sea = ctx.createLinearGradient(0, v.top, 0, v.bottom); sea.addColorStop(0, '#2cb0e2'); sea.addColorStop(1, '#1f8fd2');   // stylised turquoise water
   ctx.fillStyle = sea; ctx.fillRect(v.left, v.top, v.right - v.left, v.bottom - v.top);
-  ctx.strokeStyle = 'rgba(255,255,255,0.45)'; ctx.lineWidth = 3; ctx.lineCap = 'round';
-  for(let y = Math.floor(v.top/70)*70; y < v.bottom; y += 70) for(let x = Math.floor(v.left/180)*180; x < v.right; x += 180){
+  if(isoOn()){ if(part === 'sea') return; }      // (the island's camera paints its water shimmer in screen space: hbSeaShimmer)
+  else { ctx.strokeStyle = 'rgba(255,255,255,0.45)'; ctx.lineWidth = 3; ctx.lineCap = 'round'; }
+  if(!isoOn()) for(let y = Math.floor(v.top/70)*70; y < v.bottom; y += 70) for(let x = Math.floor(v.left/180)*180; x < v.right; x += 180){
     const ox = ((y*37) % 180) + Math.sin(hb.t*1.2 + y*0.03)*14; ctx.beginPath(); ctx.moveTo(x + ox, y); ctx.quadraticCurveTo(x + ox + 14, y - 7, x + ox + 28, y); ctx.stroke();
   }
   if(part === 'sea') return;
@@ -10690,7 +10852,59 @@ function hb3Ground(part){
     ctx.restore();
   }
 }
-const HB3_GROUND = {pave:{top:null, side:['#e2c3a0','#c59a72','#a77a55']}, grass:{top:'#8fcd6b', side:['#79bb58','#b07a52','#8a5a3a']}, sand:{top:'#f3dcaa', side:['#e6c78e','#c9a46c','#a98456']}};
+/* The water around the island, after the stylised low-poly water shader reference: bright turquoise,
+   lighter shallows wherever it meets land, a crisp white foam line at the waterline (and around the pier
+   posts and the boat), and little foam flecks drifting across. Painted in screen space over the base
+   colour; everything moves on one SEA_LOOP-second cycle, so the animation loops seamlessly.        */
+const SEA_LOOP = 6;
+const SEA = {cell:70, shallows:[[150, 'rgba(64,196,236,0.45)'], [90, 'rgba(96,214,242,0.55)'], [42, 'rgba(150,234,246,0.7)']],
+  foam:'255,255,255', deep:'rgba(10,70,150,0.22)'};
+function seaPhase(){ return (hb.t % SEA_LOOP)/SEA_LOOP; }
+function hbSeaShimmer(){
+  const Z = viewZoom(), u = seaPhase(), ph = u*Math.PI*2, TAU = Math.PI*2, Hc = ISO.cliff;
+  // deeper toward you, a touch lighter far away
+  const gr = ctx.createLinearGradient(0, 0, 0, H);
+  gr.addColorStop(0, 'rgba(150,230,250,0.22)'); gr.addColorStop(0.5, 'rgba(150,230,250,0)'); gr.addColorStop(1, SEA.deep);
+  ctx.fillStyle = gr; ctx.fillRect(0, 0, W, H);
+  // shallows and foam hug each piece of land at its waterline (the foot of the cliffs); one path per ring
+  // so neighbouring pieces merge instead of doubling up (whatever falls under the land is covered by it)
+  const rects = []; for(const L of HB3_LAND){ if(hb3Alpha(L.key) > 0) for(const r of L.rects) rects.push(r); }
+  const ring = (e) => { ctx.beginPath(); for(const r of rects){ const p = [isoP(r.x0 - e, r.y0 - e, -Hc), isoP(r.x1 + e, r.y0 - e, -Hc), isoP(r.x1 + e, r.y1 + e, -Hc), isoP(r.x0 - e, r.y1 + e, -Hc)];
+    ctx.moveTo(p[0][0], p[0][1]); for(let k = 1; k < 4; k++) ctx.lineTo(p[k][0], p[k][1]); ctx.closePath(); } };
+  ctx.lineJoin = 'round';
+  for(const [e, col] of SEA.shallows){ ring(e + Math.sin(ph)*6); ctx.fillStyle = col; ctx.fill('nonzero'); }
+  // the foam line: a solid band right at the waterline that swells and settles, and a broken outer line drifting along
+  ring(6 + 4*(0.5 + 0.5*Math.sin(ph))); ctx.strokeStyle = `rgba(${SEA.foam},0.95)`; ctx.lineWidth = (7 + 2*Math.sin(ph))*Z; ctx.stroke();
+  ring(26 + 10*(0.5 + 0.5*Math.sin(ph + 1.3))); ctx.setLineDash([22*Z, 16*Z]); ctx.lineDashOffset = -u*38*Z;
+  ctx.strokeStyle = `rgba(${SEA.foam},${(0.45 + 0.25*Math.sin(ph + 1.3)).toFixed(3)})`; ctx.lineWidth = 3.5*Z; ctx.stroke(); ctx.setLineDash([]);
+  // drifting foam flecks, pinned to the water so they pan with it; each fades in, drifts, fades out (loops)
+  const B = isoBounds(120), C = SEA.cell;
+  for(let j = Math.floor(B.top/C); j <= Math.ceil(B.bottom/C); j++) for(let i = Math.floor(B.left/C); i <= Math.ceil(B.right/C); i++){
+    const h1 = sqHash(i, j); if(h1 > 0.34) continue;
+    const h2 = sqHash(j*3 + 1, i*7 + 2), h3 = sqHash(i*5 + 3, j*11 + 4), uu = (u + h2) % 1;
+    const wx = i*C + h3*C + uu*46, wy = j*C + h2*C + uu*14;
+    const [sx, sy] = isoP(wx, wy, -Hc);
+    if(sx < -40 || sx > W + 40 || sy < -20 || sy > H + 20) continue;
+    const a = Math.sin(Math.PI*uu)*(h1 < 0.05 ? 1 : 0.8);
+    ctx.fillStyle = `rgba(${SEA.foam},${a.toFixed(3)})`;
+    const s = (h1 < 0.05 ? 1.6 : 1)*Z;
+    ctx.beginPath(); ctx.ellipse(sx, sy, (5 + 6*h3)*s, (2 + 1.5*h3)*s, 0, 0, TAU); ctx.fill();
+    if(h3 > 0.45){ ctx.beginPath(); ctx.ellipse(sx + 9*s, sy + 3*s, 3*s, 1.4*s, 0, 0, TAU); ctx.fill(); }
+  }
+}
+// a foam ring where something stands in the water (screen space): ellipse rx × ry, rotated `rot`
+function foamRing(x, y, rx, ry, rot){
+  const u = seaPhase(), ph = u*Math.PI*2, k = 1 + 0.12*Math.sin(ph);
+  ctx.save();
+  ctx.fillStyle = 'rgba(150,234,246,0.55)'; ctx.beginPath(); ctx.ellipse(x, y, rx*1.5*k, ry*1.6*k, rot, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle = `rgba(${SEA.foam},0.95)`; ctx.lineWidth = Math.max(2, ry*0.45);
+  ctx.beginPath(); ctx.ellipse(x, y, rx*k, ry*k, rot, 0, Math.PI*2); ctx.stroke();
+  ctx.setLineDash([ry*1.6, ry*1.2]); ctx.lineDashOffset = -u*ry*5.6; ctx.lineWidth = Math.max(1.5, ry*0.25);
+  ctx.strokeStyle = `rgba(${SEA.foam},${(0.5 + 0.3*Math.sin(ph + 1)).toFixed(3)})`;
+  ctx.beginPath(); ctx.ellipse(x, y, rx*1.35*k, ry*1.45*k, rot, 0, Math.PI*2); ctx.stroke();
+  ctx.restore();
+}
+const HB3_GROUND = {pave:{top:null, side:['#d6c4a2','#b39a76','#8c775a']}, grass:{top:'#9fb04a', side:['#86983c','#9a7350','#765a3e']}, sand:{top:'#efd9a8', side:['#e2c48c','#c4a06a','#a07e54']}};
 function hb3Slab(r, L){
   const G = HB3_GROUND[L.ground], w = r.x1 - r.x0, h = r.y1 - r.y0;
   // the cliff below the south edge: three bands (top lip, earth, deep earth) (the isometric camera draws its cliffs separately)
@@ -10733,7 +10947,10 @@ function hb3Speckle(x0, y0, w, h, kind, seed){
     else { ctx.fillStyle = r < 0.78 ? '#ffffff' : r < 0.9 ? '#9cc7f2' : '#ffd96a'; for(let p=0;p<5;p++){ const a = p/5*Math.PI*2; ctx.beginPath(); ctx.arc(fx + Math.cos(a)*3, fy + Math.sin(a)*2.3, 2.3, 0, Math.PI*2); ctx.fill(); } }
   }
 }
-function hb3Tree(o){ const s = o.s || 1; sqShadow(o.x, o.y, 54*s, 18*s, 0.22); lpCyl(o.x, o.y, 10*s, 70*s, 0, '#8a5a32', {n:6, r2:8*s}); const [cx, cy] = boxPt(o.x, o.y, 112*s); lpBlob(cx, cy, 58*s, o.c || '#73b24f'); }
+function hb3Tree(o){ const s = o.s || 1;
+  { const k = (Math.round(o.x/100) % 3 === 0) ? 'tree_poplar' : 'tree_round';     // the block-out trees (they carry their own shadow)
+    if(blkReady(k)){ blkFront(k, o.x, o.y, BLK.S*s*0.8); return; } }
+  sqShadow(o.x, o.y, 54*s, 18*s, 0.22); lpCyl(o.x, o.y, 10*s, 70*s, 0, '#8a5a32', {n:6, r2:8*s}); const [cx, cy] = boxPt(o.x, o.y, 112*s); lpBlob(cx, cy, 58*s, o.c || '#73b24f'); }
 function hb3Palm(o){
   sqShadow(o.x, o.y, 44, 14, 0.2);
   for(let i=0;i<6;i++) lpCyl(o.x + i*3, o.y, 9 - i*0.6, 26, i*26, i%2 ? '#b98a56' : '#a6784a', {n:6, r2:8.5 - i*0.6});
@@ -10773,7 +10990,7 @@ function harborRender3(){
   if(isoOn()){
     ctx.restore(); $('glc').style.visibility = 'hidden';
     const isoWorld = ()=>{ ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.translate(W/2, H/2); ctx.scale(viewZoom(), viewZoom()*ISO.FY); ctx.rotate(Math.PI/4); ctx.translate(-camera.x, -camera.y); };
-    isoWorld(); hb3Ground('sea'); isoCliffs(); isoWorld(); hb3Ground('top'); ctx.setTransform(1, 0, 0, 1, 0, 0); isoLockLabels();
+    isoWorld(); hb3Ground('sea'); ctx.setTransform(1, 0, 0, 1, 0, 0); hbSeaShimmer(); isoCliffs(); isoWorld(); hb3Ground('top'); ctx.setTransform(1, 0, 0, 1, 0, 0); isoLockLabels();
   } else {
   const Z = viewZoom();
   const FY = viewSquash();
@@ -10784,13 +11001,18 @@ function harborRender3(){
   }
   // everything standing up, back to front
   const items = [], near = hb.near && hb.near.b ? hb.near.b : null, nearKey = near ? near.key + (near.stage||'') : '';
-  for(const h of HB3_HOUSES) items.push([h.y - 12, h.x, h.y, ()=>{ if(isoOn()) drawIsoHouse(h); else drawHouseBox(h.kit, h.x, h.y, h.w, h.d); if(h.key && nearKey === h.key) hb3Marker(h.x, h.w*0.9, h.y); }, isoDepth(h.x - h.w/2, h.y) - 1]);     // (a block is behind anything south or east of its front-left corner)
+  for(const h of HB3_HOUSES) items.push([h.y - 12, h.x, h.y, ()=>{
+    if(blkOn(h.blk)) blkDraw(h.blk, h.x, h.y, h.x, h.y); else if(isoOn()) drawIsoHouse(h); else drawHouseBox(h.kit, h.x, h.y, h.w, h.d);
+    if(h.key && nearKey === h.key) hb3Marker(h.x, blkTop(h.blk, h.w*0.9), h.y);
+  }, isoDepth(h.x - h.w/2, h.y) - 1]);     // (a block is behind anything south or east of its front-left corner)
   for(const s of HB3_SPOTS){
     const a = s.land ? hb3Alpha(s.land) : 1; if(a <= 0) continue;
     const hi = nearKey === s.key + (s.stage||'');
     items.push([s.y, s.x, s.y, ()=>{
       ctx.globalAlpha = a;
-      if(s.stall) drawGilStall({x:s.x, w:s.w, name:s.name, ic:s.ic}, s.y + 40, hi);
+      if(s.stall && blkOn('gil_stall')) hb3GilStall(s, hi);
+      else if(s.boat && blkOn('chum_storm_boat')) hb3Boat(s, hi);
+      else if(s.stall) drawGilStall({x:s.x, w:s.w, name:s.name, ic:s.ic}, s.y + 40, hi);
       else if(s.boat){ ctx.save(); ctx.scale(0.8, 0.8); ctx.translate(s.x*0.25, s.y*0.25); drawBoat({x:s.x, name:s.name, ic:s.ic}, s.y - 28 + Math.sin(hb.t*1.6)*3, hi); ctx.restore(); }
       else if(s.gate) hb3Gate(s, hi);
     }]);
@@ -10801,17 +11023,21 @@ function harborRender3(){
       ctx.globalAlpha = a; const o = {x, y, c:a1, s:a2};
       if(t === 'lamp') drawSquareLamp(o, hb.t); else if(t === 'bush') drawSquareBush(o); else if(t === 'bench') drawSquareBench(o); else if(t === 'mush') drawSquareMush(o);
       else if(t === 'tree') hb3Tree(o); else if(t === 'palm') hb3Palm(o); else if(t === 'umbrella') hb3Umbrella(o);
+      else if(t === 'blk'){ if(blkReady(a1)) blkFront(a1, x, y, BLK.S*(a2 || 1)); }
       else if(t === 'kit'){ sqShadow(x, y, a2*0.4, a2*0.1, 0.18); kitSprite(a1, x, y, a2); }
     }]);
   }
   for(const c of hb.cats) items.push([c.y, c.x, c.y, ()=>{
-    ctx.fillStyle = 'rgba(80,50,30,0.2)'; ctx.beginPath(); ctx.ellipse(c.x, c.y + 3, 24, 7, 0, 0, Math.PI*2); ctx.fill();
+    const s = c.def.ai==='boss' ? 0.75 : 1.2;
+    castShadow(g=>{ g.scale(s*c.face, s); g.translate(0, -21); drawCatShape(g, c.def); }, c.x, c.y, 130*s, 110*s, SUN_SHADOW.alpha*clamp(1 - (c.z||0)/200, 0.35, 1));
+    contactShadow(c.x, c.y + 2, 18, 5.5);
     ctx.translate(c.x, c.y - c.z);
-    const walk = c.mode==='walk' ? Math.sin(hb.t*12 + c.x)*0.06 : Math.sin(hb.t*2 + c.x)*0.03, s = c.def.ai==='boss' ? 0.75 : 1.2, sq = clamp(c.sq, -0.5, 0.5) + walk;
+    const walk = c.mode==='walk' ? Math.sin(hb.t*12 + c.x)*0.06 : Math.sin(hb.t*2 + c.x)*0.03, sq = clamp(c.sq, -0.5, 0.5) + walk;
     ctx.scale(s*c.face*(1 + sq*0.8), s*(1 - sq)); ctx.translate(0, -21); drawCatShape(ctx, c.def);
   }]);
   for(const l of hb.locals) items.push([l.y, l.x, l.y, ()=>{
-    ctx.fillStyle = 'rgba(80,50,30,0.2)'; ctx.beginPath(); ctx.ellipse(l.x, l.y + 4, 22, 7, 0, 0, Math.PI*2); ctx.fill();
+    castShadow(g=>hbAvatar(l.look, l.pay ? 1 : 9, 0, 0, HB3_PERSON_H, l.face, l.walkT, l.state!=='wait', g), l.x, l.y + 6, 110, HB3_PERSON_H + 20);
+    contactShadow(l.x, l.y + 5, 18, 5.5);
     hbAvatar(l.look, l.pay ? 1 : 9, l.x, l.y + 6, HB3_PERSON_H, l.face, l.walkT, l.state!=='wait');
     if(l.princess) drawCrown(l.x, l.y + 6 - HB3_PERSON_H + 4, 1);
     if(l.state==='wait') hbBubble(l.x, l.y - HB3_PERSON_H - 28, l.pay ? '🪙' : '!', l.pay ? '#c9922c' : '#e8402a');
@@ -10819,10 +11045,11 @@ function harborRender3(){
     if(hb.near && hb.near.local === l) hb3Marker(l.x, HB3_PERSON_H + 70, l.y);
   }]);
   items.push([hb.y, hb.x, hb.y, ()=>{
-    ctx.fillStyle = 'rgba(80,50,30,0.24)'; ctx.beginPath(); ctx.ellipse(hb.x, hb.y + 4, 22, 7, 0, 0, Math.PI*2); ctx.fill();
+    castShadow(g=>hbPlayer(0, 0, HB3_PERSON_H, hb.face, hb.walkT, hb.moving, g), hb.x, hb.y + 6, 110, HB3_PERSON_H + 20);
+    contactShadow(hb.x, hb.y + 5, 18, 5.5);
     hbPlayer(hb.x, hb.y + 6, HB3_PERSON_H, hb.face, hb.walkT, hb.moving);
   }]);
-  if(near && !near.kit) items.push([near.y + 1, near.x, near.y, ()=>hb3Marker(near.x, near.boat ? 260 : near.stall ? 290 : 230, near.y)]);
+  if(near && !near.kit) items.push([near.y + 1, near.x, near.y, ()=>hb3Marker(near.x, near.boat ? blkTop('chum_storm_boat', 260) : near.stall ? blkTop('gil_stall', 290) : 230, near.y)]);
   if(typeof tutHarborArrow3 === 'function') tutHarborArrow3(items);
   if(isoOn()) for(const it of items) it[0] = it[4] != null ? it[4] : isoDepth(it[1], it[2]) + (it[0] - it[2]);
   items.sort((a, b)=>a[0] - b[0]);
@@ -10840,7 +11067,8 @@ function harborRender3(){
 function tutHarborArrow3(items){
   const st = tutStep(); if(!st || !st.target || !tut || tut.part !== 'harbor' || tut.doneT) return;
   const t = hb3Targets().find(x=>x.key === st.target); if(!t) return;
-  const z = t.kit ? t.w*0.9 + 70 : t.boat ? 330 : t.stall ? 350 : 290;
+  const h3 = t.kit && HB3_HOUSES.find(h=>h.key === t.key);
+  const z = t.kit ? blkTop(h3 && h3.blk, t.w*0.9) + 70 : t.boat ? blkTop('chum_storm_boat', 260) + 70 : t.stall ? blkTop('gil_stall', 280) + 70 : 290;
   items.push([t.y + 2, t.x, t.y, ()=>{
     const [mx, my] = boxPt(t.x, t.y, z), y = my - Math.abs(Math.sin(hb.t*4))*14;
     ctx.fillStyle = '#E2582C'; ctx.strokeStyle = '#FFFFFF'; ctx.lineWidth = 5; ctx.lineJoin = 'round';
@@ -11370,9 +11598,10 @@ function drawFisher(g, x, y, h, dir, walkT, moving, plain){
   g.drawImage(chibiBuf, 0, 0, bw, bh, x - bw/2, y - bh + foot, bw, bh);
   g.restore();
 }// the player in the harbor and the story (side view walking, front view standing)
-function hbPlayer(x, y, h, face, walkT, moving){
-  if(useFisher()){ drawFisher(ctx, x, y, h, moving ? (face > 0 ? 'east' : 'west') : 'south', walkT, moving); return; }
-  if(avReady) hbAvatar(Object.assign(avatarLook(), {self:true}), avatarLook().face, x, y, h, face, walkT, moving);
+function hbPlayer(x, y, h, face, walkT, moving, g){
+  g = g || ctx;
+  if(useFisher()){ drawFisher(g, x, y, h, moving ? (face > 0 ? 'east' : 'west') : 'south', walkT, moving); return; }
+  if(avReady) hbAvatar(Object.assign(avatarLook(), {self:true}), avatarLook().face, x, y, h, face, walkT, moving, g);
 }
 // Cat Town keeps its own clean look (cobbles, manholes, puddles, pots). The only kit pieces there are the
 // row of shops where every run (and the story) starts: the trattoria, your fish shop and the gelato shop.
@@ -11450,10 +11679,17 @@ function drawHouseBox(k, x, y, w, d){
 // the piazza's buildings as boxes: [kit art, x, front y, width, depth]
 const PIAZZA_BOXES = [['trattoria', -330, -200, 250, 150], ['fishShop', 0, -200, 230, 150], ['gelato', 320, -200, 175, 150]];
 const PIAZZA_FRONT = -200;
+// the story square's shops: the low-poly block-outs seen from the front (the kit-art boxes if they haven't loaded)
+const PIAZZA_BLK = {trattoria:'trattoria_front', fishShop:'fish_shop_front', gelato:'gelateria_front'};
+function drawPiazzaBox(k, x, y, w, d){
+  const b = PIAZZA_BLK[k];
+  if(blkReady(b)){ sqShadow(x + w*0.1, y - 4, w*0.6, w*0.12, 0.18); blkFront(b, x, y, w/window.BLOCKOUT_SPRITES[b].W); return; }
+  drawHouseBox(k, x, y, w, d);
+}
 function drawPiazzaBoxes(){
   if(!kitReady || !stage || stage.roster!=='town') return;
   const v = getViewBounds(300); if(!(v.top < -150 && v.bottom > -600 && v.left < 720 && v.right > -720)) return;
-  for(const [k, x, y, w, d] of PIAZZA_BOXES) drawHouseBox(k, x, y, w, d);
+  for(const [k, x, y, w, d] of PIAZZA_BOXES) drawPiazzaBox(k, x, y, w, d);
 }
 // ?debug#cats: every cat as the game draws it, with its name (for checking the sheet cuts)
 if(DEBUG && location.hash==='#cats') setTimeout(()=>{
