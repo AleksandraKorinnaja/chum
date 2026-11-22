@@ -74,6 +74,8 @@ PALETTE = {
     "barrel_wood": "8A5A32", "barrel_band": "3D3D44",
     "cone_orange": "FF7A2A", "barrier_yellow": "FFD23C", "barrier_black": "2B2320", "barrier_leg": "666666",
     "grass_a": "7E9538", "grass_b": "A3B04E",
+    "yarn": "B06EEB", "yarn_light": "D9A8F7", "cuke": "4F9A34", "cuke_light": "8CC85A", "cuke_dark": "2F6B22",
+    "tempura": "F2A93E", "shrimp_tail": "F0603A", "caviar": "1E1A24", "lemon": "F7D84A",
     "star": "F08A4B", "star_dot": "FFD2A8", "shell_white": "FFF0E6", "shell_pink": "FFD0D8",
     "pebble_a": "B9ADA0", "pebble_b": "9C9086", "pebble_c": "D6CCC0",
     "post_base": "B48A5A", "rope": "D8B98A", "bed_blue": "5A7EC4", "bed_cushion": "EFE4FF",
@@ -1013,6 +1015,59 @@ def pampas():
     return p.join("pampas")
 
 
+# ---------------------------------------------------------------- one-time items (placed / thrown in runs)
+def yarn_ball():
+    """The Yarn Ball item: a wound purple ball with a loose strand trailing on the ground."""
+    p = Parts()
+    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=0.42, location=(0, 0, 0.42))
+    p._add(bpy.context.active_object, "yarn")
+    for rx, ry, rz in [(0.3, 0.2, 0), (1.2, 0.4, 0.6), (-0.5, 1.1, 1.3), (0.9, -0.7, 2.2)]:
+        p.torus("yarn_light", 0.4, 0.035, (0, 0, 0.42), rot=(rx, ry, rz))
+    for i in range(5):   # the loose end
+        p.boxc("yarn_light", (0.26, 0.05, 0.05), (0.35 + i * 0.22, -0.1 + math.sin(i * 1.3) * 0.12, 0.03), rot=(0, 0, math.sin(i * 1.3 + 0.6) * 0.6))
+    return p.join("yarn_ball")
+
+
+def cucumber():
+    """The Cucumber item: a bumpy green cucumber lying on the ground, ends a little paler."""
+    p = Parts()
+    rnd = random.Random(3)
+    p.blob("cuke", 0.3, (0, 0, 0.27), scale=(2.3, 1, 0.95))
+    for s in (-1, 1):
+        p.blob("cuke_light", 0.2, (s * 0.6, 0, 0.27), scale=(0.7, 1.1, 1.1))
+    for i in range(14):
+        x = rnd.uniform(-0.55, 0.55)
+        a = rnd.uniform(0.2, math.pi - 0.2)
+        p.blob("cuke_dark", 0.05, (x, -math.cos(a) * 0.29, 0.27 + math.sin(a) * 0.27))
+    p.cone("trunk", 0.05, 0.03, 0.12, (-0.74, 0, 0.3), rot=(0, math.pi / 2, 0), verts=5)
+    return p.join("cucumber")
+
+
+def party_treats():
+    """Party Treats: a little dish of golden fried shrimp."""
+    p = Parts()
+    p.cone("trim_white", 0.36, 0.52, 0.14, (0, 0, 0.07), verts=14)
+    p.cyl("plaster_cream", 0.42, 0.02, (0, 0, 0.14), verts=14)
+    for i, (x, y, a) in enumerate([(-0.18, 0.05, 0.4), (0.12, 0.1, -0.5), (0.0, -0.14, 0.1)]):
+        p.blob("tempura", 0.13, (x, y, 0.26), scale=(2.1, 0.9, 0.9))
+        p.cone("shrimp_tail", 0.1, 0.0, 0.18, (x + math.cos(a) * 0.3, y + math.sin(a) * 0.05, 0.3), rot=(0, math.pi / 2, a), verts=4, scale=(1, 0.5, 1))
+    return p.join("party_treats")
+
+
+def caviar_plate():
+    """Princess Rosalind's caviar plate (the bait for Sebastian)."""
+    p = Parts()
+    p.cone("steel", 0.6, 0.72, 0.08, (0, 0, 0.04), verts=16)
+    p.cyl("trim_white", 0.6, 0.02, (0, 0, 0.09), verts=16)
+    rnd = random.Random(4)
+    for i in range(30):
+        a, r = rnd.uniform(0, 2 * math.pi), rnd.uniform(0, 0.3) ** 0.7
+        p.blob("caviar", 0.05, (math.cos(a) * r, math.sin(a) * r, 0.14))
+    p.blob("lemon", 0.1, (0.38, -0.1, 0.13), scale=(1.4, 0.5, 0.6))
+    p.blob("foliage", 0.07, (-0.38, 0.12, 0.13), scale=(1.4, 0.9, 0.5))
+    return p.join("caviar_plate")
+
+
 def grass_tuft():
     """Willow Park's grass: a flat card of blades (no line art), rendered straight on with alpha."""
     p = Parts()
@@ -1172,7 +1227,7 @@ GROUPS = [
     ("harbor", [big_fish_shop, gil_stall, chum_storm_boat]),
     ("combat", [fountain, bush_yellow, bush_green, bush_lime, mushroom, street_lamp, park_bench,
                 prop_crate, prop_basket, prop_barrel, traffic_cone, road_barrier, grass_tuft,
-                tree_round, tree_poplar, pampas,
+                tree_round, tree_poplar, pampas, yarn_ball, cucumber, party_treats, caviar_plate,
                 starfish, shell_white, shell_pink, pebbles]),
     ("sanctuary", [scratch_post, cat_bed, food_bowl, cat_grass_pot, floor_cushion, cat_tower, pet_fountain,
                    fireplace, wall_lamp, fishtank, hammock]),
