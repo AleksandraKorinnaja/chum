@@ -75,6 +75,17 @@ PALETTE = {
     "cone_orange": "FF7A2A", "barrier_yellow": "FFD23C", "barrier_black": "2B2320", "barrier_leg": "666666",
     "grass_a": "7E9538", "grass_b": "A3B04E",
     "yarn": "B06EEB", "yarn_light": "D9A8F7", "cuke": "4F9A34", "cuke_light": "8CC85A", "cuke_dark": "2F6B22",
+    # the Cat Sanctuary diorama: soft pastels
+    "room_base": "B98A6A", "room_floor": "D4A27A", "room_floor_dark": "B4825C",
+    "room_skirt": "F6EDE4", "room_trim": "F6EDE4",
+    "room_wall_n_rose": "F4CFC6", "room_wall_w_rose": "F7DAD2", "room_wainscot_rose": "E8A9A0", "room_cap_rose": "E9B9AE",
+    "room_wall_n_mint": "D3EDE2", "room_wall_w_mint": "DFF3EA", "room_wainscot_mint": "9FD3BE", "room_cap_mint": "B8DCCB",
+    "room_wall_n_cream": "F3E7CF", "room_wall_w_cream": "F7EEDC", "room_wainscot_cream": "D8C3A0", "room_cap_cream": "E3D3B4",
+    "room_wall_n_all": "F4CFC6", "room_wall_w_all": "F7DAD2", "room_wainscot_all": "E8A9A0", "room_cap_all": "E9B9AE",
+    "floor_tile_a": "F2E2C6", "floor_tile_b": "C9B396", "floor_grout": "8E9AA8",
+    "floor_stone_a": "B9C3CE", "floor_stone_b": "A9B5C2", "floor_stone_c": "C8D0D8", "room_sky": "9CD3F0", "room_cloud": "FFFFFF", "room_curtain": "7FB7A4",
+    "room_poster_a": "FCE8C8", "room_poster_b": "BFE0D6", "room_cushion": "E98AA6",
+    "rug_a": "E9B44C", "rug_b": "7FB7A4", "rug_c": "EE8E8E", "rug_d": "8FA8D8",
     "tempura": "F2A93E", "shrimp_tail": "F0603A", "caviar": "1E1A24", "lemon": "F7D84A",
     "star": "F08A4B", "star_dot": "FFD2A8", "shell_white": "FFF0E6", "shell_pink": "FFD0D8",
     "pebble_a": "B9ADA0", "pebble_b": "9C9086", "pebble_c": "D6CCC0",
@@ -1222,6 +1233,123 @@ def hammock():
     return p.join("hammock")
 
 
+def cat_room(part="all", fstyle="wood", wstyle="rose", name="cat_room"):
+    """The Cat Sanctuary as a cosy cutaway diorama (after a pastel isometric room reference): a thick
+    floor slab with wood planks, two back walls (north + west) seen from the south-east corner, a big
+    window, posters, shelves, wall steps for climbing, plants and a patchwork rug. Game room space maps
+    1:1 at 40 units/m: game (x, y) = Blender (X, -Y); the floor spans X 0..RW, Y 0..-RD; origin = the
+    north-west corner. Furniture you buy is drawn separately, so cats can walk in front of / behind it."""
+    p = Parts()
+    RW, RD, WH, T = 16.0, 12.0, 4.6, 0.35
+    F, Wl = part in ("all", "floor"), part in ("all", "walls")
+    wk = lambda k: k + "_" + wstyle      # wall-style colour keys (room_wall_n_rose, ...)
+    rnd = random.Random(12)
+    # floor slab and its surface: wood planks, checker tiles or stone flags
+    if F:
+        p.box("room_base", (RW + T, RD + T, 0.9), (RW / 2 - T / 2, -RD / 2 + T / 2, -0.9))
+        if fstyle == "wood":
+            p.box("room_floor", (RW, RD, 0.06), (RW / 2, -RD / 2, -0.06))
+            for i in range(1, 16):
+                y = -i * RD / 16
+                p.box("room_floor_dark", (RW, 0.04, 0.02), (RW / 2, y, -0.01))
+                for k in range(3):
+                    x = (i * 2.9 + k * 4.1) % RW
+                    p.box("room_floor_dark", (0.04, RD / 16, 0.02), (x, y + RD / 32, -0.01))
+        elif fstyle == "tiles":
+            n = 16
+            for i in range(n):
+                for j in range(12):
+                    p.box("floor_tile_a" if (i + j) % 2 else "floor_tile_b", (RW / n, RD / 12, 0.06), ((i + 0.5) * RW / n, -(j + 0.5) * RD / 12, -0.06))
+        else:   # stone flags (like the reference's cool blue-grey stone)
+            p.box("floor_grout", (RW, RD, 0.05), (RW / 2, -RD / 2, -0.06))
+            frnd = random.Random(31)
+            y = 0.0
+            while y < RD - 0.05:
+                h = min(frnd.uniform(0.9, 1.5), RD - y)
+                x = 0.0
+                while x < RW - 0.05:
+                    w = min(frnd.uniform(1.0, 1.9), RW - x)
+                    p.box(frnd.choice(["floor_stone_a", "floor_stone_b", "floor_stone_c"]), (w - 0.09, h - 0.09, 0.07), (x + w / 2, -(y + h / 2), -0.06))
+                    x += w
+                y += h
+    if Wl:
+        # walls (north at Y=0, west at X=0), with wainscot, skirting and a top cap (the cutaway edge)
+        p.box(wk("room_wall_n"), (RW + T, T, WH), (RW / 2 - T / 2, T / 2, 0))
+        p.box(wk("room_wall_w"), (T, RD, WH), (-T / 2, -RD / 2, 0))
+        p.box(wk("room_wainscot"), (RW, 0.06, 1.2), (RW / 2, 0.0, 0))
+        p.box(wk("room_wainscot"), (0.06, RD, 1.2), (0.0, -RD / 2, 0))
+        p.box("room_skirt", (RW, 0.1, 0.18), (RW / 2, -0.03, 0))
+        p.box("room_skirt", (0.1, RD, 0.18), (0.03, -RD / 2, 0))
+        p.box("room_trim", (RW, 0.12, 0.08), (RW / 2, -0.03, 1.2))
+        p.box("room_trim", (0.12, RD, 0.08), (0.03, -RD / 2, 1.2))
+        p.box(wk("room_cap"), (RW + T, T + 0.06, 0.12), (RW / 2 - T / 2, T / 2, WH))
+        p.box(wk("room_cap"), (T + 0.06, RD, 0.12), (-T / 2, -RD / 2, WH))
+        # the big window on the north wall: sky, frame, sill, curtains
+        wx, wz, ww, wh = 8.0, 2.6, 3.2, 2.0
+        p.boxc("trim_white", (ww + 0.3, 0.14, wh + 0.3), (wx, -0.02, wz))
+        p.boxc("room_sky", (ww, 0.16, wh), (wx, -0.03, wz))
+        p.boxc("room_cloud", (0.9, 0.18, 0.25), (wx - 0.6, -0.04, wz + 0.45))
+        p.boxc("room_cloud", (0.5, 0.18, 0.18), (wx + 0.7, -0.04, wz + 0.1))
+        p.boxc("trim_white", (0.08, 0.2, wh), (wx, -0.05, wz))
+        p.boxc("trim_white", (ww, 0.2, 0.08), (wx, -0.05, wz))
+        p.box("trim_white", (ww + 0.6, 0.45, 0.1), (wx, -0.2, wz - wh / 2 - 0.15))
+        for s in (-1, 1):
+            p.box("room_curtain", (0.55, 0.12, wh + 0.5), (wx + s * (ww / 2 + 0.25), -0.12, wz - wh / 2 - 0.35))
+        p.boxc("door_brown", (ww + 1.6, 0.1, 0.08), (wx, -0.12, wz + wh / 2 + 0.3))
+        # posters on the north wall: a fish and a cat
+        for x, key, art in ((3.2, "room_poster_a", "fish"), (12.6, "room_poster_b", "cat")):
+            p.boxc("wood", (1.3, 0.08, 1.6), (x, -0.04, 3.0))
+            p.boxc(key, (1.1, 0.1, 1.4), (x, -0.05, 3.0))
+            if art == "fish":
+                p.blob("awning_blue", 0.28, (x - 0.05, -0.12, 3.0), scale=(1.6, 0.25, 0.8))
+                p.cone("awning_blue", 0.22, 0.0, 0.3, (x + 0.42, -0.12, 3.0), rot=(0, -math.pi / 2, 0), verts=4, scale=(1, 0.25, 1))
+            else:
+                p.blob("plaster_yellow", 0.32, (x, -0.12, 2.9), scale=(1, 0.25, 0.9))
+                for s in (-1, 1):
+                    p.cone("plaster_yellow", 0.14, 0.0, 0.3, (x + s * 0.2, -0.12, 3.25), verts=4, scale=(1, 0.3, 1))
+        # a wall shelf with books and a plant (north wall), and climbing steps for cats (west wall)
+        p.box("wood", (2.0, 0.45, 0.1), (12.6, -0.25, 1.7))
+        for i in range(6):
+            p.box(rnd.choice(["awning_red", "awning_blue", "plaster_yellow", "awning_green", "trim_white"]), (0.16, 0.32, rnd.uniform(0.35, 0.5)), (11.85 + i * 0.2, -0.22, 1.8))
+        p.cone("pot", 0.14, 0.18, 0.25, (13.3, -0.25, 1.92), verts=8)
+        p.blob("foliage", 0.22, (13.3, -0.25, 2.2), scale=(1, 1, 0.9))
+        for i, (y, z) in enumerate([(-9.0, 1.0), (-7.6, 1.8), (-6.0, 2.6), (-4.4, 3.4)]):
+            p.box("wood", (0.75, 1.1, 0.12), (0.4, y, z))
+            p.box("room_cushion", (0.65, 0.9, 0.08), (0.4, y, z + 0.12))
+        # a door in the west wall, a framed photo, a little wall lamp glow spot
+        p.box("door_brown", (0.1, 1.6, 3.0), (0.05, -10.8 + 0.8, 0))
+        p.boxc("gold", (0.14, 0.12, 0.12), (0.12, -10.4, 1.5))
+        # corner plants
+        for x, y, h in ((0.8, -0.7, 1.0), (15.2, -0.8, 0.8)):
+            p.cone("pot", 0.3, 0.42, 0.6, (x, y, 0.3), verts=8)
+            for k in range(5):
+                a = k * 2 * math.pi / 5
+                p.blob("foliage" if k % 2 else "ivy", 0.42, (x + math.cos(a) * 0.25, y + math.sin(a) * 0.25, 0.75 + h * 0.5 + (k % 2) * 0.25), scale=(1, 1, 1.2))
+    # a patchwork rug in the middle of the floor
+    if F:
+        cols = ["rug_a", "rug_b", "rug_c", "rug_d"]
+        for i in range(3):
+            for j in range(2):
+                p.box(cols[(i + j * 2) % 4], (1.4, 1.3, 0.04), (6.6 + i * 1.4, -5.4 - j * 1.3, 0))
+        p.box("trim_white", (4.4, 2.8, 0.02), (8.0, -6.05, 0))
+    return p.join(name)
+
+
+# the room in layers, so the floor and the walls can be restyled separately in the game's decorate mode
+ROOM_FLOORS = ("wood", "tiles", "stone")
+ROOM_WALLS = ("rose", "mint", "cream")
+
+
+def _room_layer(part, style):
+    def build():
+        return cat_room(part, fstyle=style, wstyle=style, name="room_%s_%s" % ("floor" if part == "floor" else "walls", style))
+    build.__name__ = "room_%s_%s" % ("floor" if part == "floor" else "walls", style)
+    return build
+
+
+ROOM_LAYERS = [_room_layer("floor", s) for s in ROOM_FLOORS] + [_room_layer("walls", s) for s in ROOM_WALLS]
+
+
 GROUPS = [
     ("town", [trattoria, gelateria, fish_shop, chapel, townhouse_yellow, townhouse_white, townhouse_small]),
     ("harbor", [big_fish_shop, gil_stall, chum_storm_boat]),
@@ -1231,6 +1359,7 @@ GROUPS = [
                 starfish, shell_white, shell_pink, pebbles]),
     ("sanctuary", [scratch_post, cat_bed, food_bowl, cat_grass_pot, floor_cushion, cat_tower, pet_fountain,
                    fireplace, wall_lamp, fishtank, hammock]),
+    ("room", ROOM_LAYERS),
 ]
 # groups seen by the run / Cat Sanctuary camera (straight from the south) instead of the harbor's corner-on one
 FRONT_GROUPS = {"combat", "sanctuary"}
@@ -1302,7 +1431,9 @@ REPO = os.path.normpath(os.path.join(HERE, "..", "..", ".."))
 OUT_SPRITES = os.path.join(REPO, "assets", "env", "blockouts")
 # quick look: BLK_ONLY=trattoria,fountain BLK_OUT=<folder> renders just those sprites there (nothing else is written)
 ONLY = set(filter(None, os.environ.get("BLK_ONLY", "").split(",")))
-if ONLY:
+# add BLK_MERGE=1 to render those straight into the game's sprites and update just their manifest entries
+MERGE = bool(ONLY and os.environ.get("BLK_MERGE"))
+if ONLY and not MERGE:
     OUT_SPRITES = os.environ.get("BLK_OUT") or os.path.join(HERE, "_test")
 # footprint (body width x depth, metres) of the buildings; their sprites anchor at the front-centre
 FOOTPRINT = {
@@ -1324,7 +1455,8 @@ SUN_DIR = Vector((0.32, 0.55, -0.78)).normalized()     # the direction the light
 SUN_COLOR, SUN_STRENGTH = (1.0, 0.82, 0.18), 1.12
 SKY_COLOR, SKY_STRENGTH = (0.5, 0.58, 0.95), 0.85
 SHADOW_TINT = (0.16, 0.2, 0.42)                       # colour of cast shadows on the ground
-NO_GROUND_SHADOW = {"chum_storm_boat", "grass_tuft", "wall_lamp", "hammock", "fireplace", "fishtank",
+NO_GROUND_SHADOW = {"chum_storm_boat", "grass_tuft", "wall_lamp", "hammock", "fireplace", "fishtank", "cat_room",
+                    "room_floor_wood", "room_floor_tiles", "room_floor_stone", "room_walls_rose", "room_walls_mint", "room_walls_cream",
                     "starfish", "shell_white", "shell_pink", "pebbles"}
 
 
@@ -1509,7 +1641,10 @@ FRONT_ELEV = math.atan(MESH_FLAT)
 FLAT_CARDS = {"grass_tuft"}   # flat alpha cards, rendered straight on (no tilt, no stretch)
 ALSO_FRONT = {"trattoria", "fish_shop", "gelateria"}   # also rendered from the front as <name>_front
 # run props that also stand on the harbor island: also rendered from the harbor's corner camera as <name>_iso
-ALSO_ISO = {"street_lamp", "bush_yellow", "bush_green", "bush_lime", "mushroom", "tree_round", "tree_poplar", "pampas"}
+ALSO_ISO = {"street_lamp", "bush_yellow", "bush_green", "bush_lime", "mushroom", "tree_round", "tree_poplar", "pampas",
+            # the Cat Sanctuary's furniture, for the 3/4 room
+            "scratch_post", "cat_bed", "food_bowl", "cat_grass_pot", "floor_cushion", "cat_tower", "pet_fountain",
+            "fireplace", "wall_lamp", "fishtank", "hammock"}
 
 
 def render_sprite(scene, objs_on, frame_objs, anchor, path, elev=ISO_ELEV, azim=45, catcher=None):
@@ -1613,6 +1748,14 @@ def render_sprites(scene, built, front=()):
                     top=round(ob.dimensions.z, 2), mw=round(ob.dimensions.x, 3))
         manifest[name] = info
         ob.location = saved
+    if MERGE:   # keep every other sprite's entry
+        try:
+            old = open(os.path.join(OUT_SPRITES, "blockouts.js"), encoding="utf-8").read()
+            old = json.loads(old.split("window.BLOCKOUT_SPRITES = ", 1)[1].rsplit(";", 1)[0])
+            old.update(manifest)
+            manifest = old
+        except (OSError, IndexError, ValueError):
+            pass
     js = ("// Generated by art/blockouts/italian_town/build_town_houses.py: do not edit by hand.\n"
           "// Isometric sprites of the low-poly block-outs; w/h/ax/ay in pixels, ppm = pixels per metre,\n"
           "// cos = cos(camera elevation) (stretch the sprite by 1/cos vertically), top/W/D in metres.\n"

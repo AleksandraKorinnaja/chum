@@ -1679,7 +1679,56 @@
   .mrow.compact .mbar{height:8px;}
   .mrow.compact .mprog em{font-size:12px;}
   body.ui-v2 #hb-requests, body.ui-v2 #run-requests{width:330px !important;}
-  body.ui-v2 #hb-requests{pointer-events:auto;cursor:pointer;}</style>
+  body.ui-v2 #hb-requests{pointer-events:auto;cursor:pointer;}
+  /* ---- Cat Sanctuary: decorate mode, the catalog in the right-side window ---- */
+  .deco-panel{position:absolute;top:calc(64px + var(--sat));bottom:calc(16px + var(--sab));right:16px;width:min(420px, 42vw);display:none;pointer-events:auto;z-index:3;}
+  body.deco-mode .deco-panel{display:flex;}
+  body.deco-mode .home-tools, body.deco-mode .home-card-pop{display:none !important;}
+  .deco-tabs{display:flex;flex-direction:column;gap:8px;padding-top:58px;margin-right:-6px;z-index:1;}
+  .deco-tabs button{width:52px;height:52px;border:0;border-radius:16px 0 0 16px;background:#f5d6e2;font-size:24px;cursor:pointer;box-shadow:-2px 3px 0 rgba(59,46,42,.12);}
+  .deco-tabs button.on{background:#fff;width:58px;}
+  .deco-body{flex:1;min-width:0;background:#fff;border-radius:26px;box-shadow:0 10px 30px rgba(46,58,63,.25);display:flex;flex-direction:column;overflow:hidden;}
+  .deco-head{background:#ef9dbb;color:#fff;padding:12px 18px;display:flex;align-items:center;justify-content:space-between;font-size:22px;font-weight:900;font-family:Fredoka, Nunito, sans-serif;}
+  .deco-gold{display:inline-flex;align-items:center;gap:6px;background:#fff;color:var(--v2-ink, #3b2e2a);border-radius:999px;padding:3px 12px 3px 5px;font-size:14px;font-weight:900;}
+  .deco-grid{flex:1;display:grid;grid-template-columns:repeat(3, 1fr);grid-auto-rows:minmax(0, 1fr);gap:12px;padding:16px;background:#fdf0f4;min-height:0;}
+  .deco-card{position:relative;border:0;border-radius:18px;background:#f7c9d8;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px 6px;cursor:pointer;
+    box-shadow:0 4px 0 #e7a9c0;font:inherit;color:#3b2e2a;min-height:0;}
+  .deco-card:active{transform:translateY(2px);box-shadow:0 2px 0 #e7a9c0;}
+  .deco-card img{width:100%;height:62%;object-fit:contain;pointer-events:none;}
+  .deco-card .sw{width:74%;height:52%;border-radius:12px;box-shadow:inset 0 -6px 0 rgba(0,0,0,.08);}
+  .deco-card b{font-size:12px;font-weight:900;line-height:1.1;text-align:center;}
+  .deco-card .tag{font-size:11px;font-weight:900;border-radius:999px;padding:1px 8px;background:#fff;}
+  .deco-card .tag.price{display:inline-flex;align-items:center;gap:4px;}
+  .deco-card .tag.price.poor{opacity:.55;}
+  .deco-card .dot{position:absolute;top:8px;right:8px;width:12px;height:12px;border-radius:50%;background:#7fcf6a;box-shadow:0 0 0 2px #fff;}
+  .deco-card.held, .deco-card.sel{outline:4px solid #ffd23c;}
+  .deco-card.cur{outline:4px solid #7fcf6a;}
+  .deco-pages{display:flex;align-items:center;justify-content:center;gap:16px;padding:8px;background:#fdf0f4;}
+  .deco-pages button{border:0;background:none;color:#f2b84b;font-size:24px;cursor:pointer;}
+  .deco-pages span{background:#f7c9d8;border-radius:999px;padding:3px 22px;font-weight:900;color:#3b2e2a;}
+  .deco-hint{font-size:12.5px;font-weight:800;color:#8a6a72;text-align:center;padding:6px 14px;}
+  .deco-actions{display:flex;justify-content:flex-end;gap:12px;padding:10px 16px 16px;}
+  .deco-actions button{border:0;border-radius:999px;font:inherit;font-weight:900;cursor:pointer;box-shadow:0 4px 0 rgba(59,46,42,.18);}
+  #deco-clear{background:#f5a6c4;color:#fff;padding:10px 16px;font-size:18px;display:flex;align-items:center;gap:6px;}
+  #deco-clear span{font-size:13px;}
+  #deco-ok{background:#8fd47a;color:#fff;font-size:20px;width:84px;height:52px;}
+  .deco-sel{position:absolute;display:none;gap:6px;transform:translate(-50%, -100%);pointer-events:auto;z-index:4;}
+  body.deco-mode .deco-sel.show{display:flex;}
+  .deco-sel button{border:0;background:#fff;border-radius:14px;padding:6px 10px;font:inherit;font-weight:900;font-size:16px;cursor:pointer;display:flex;flex-direction:column;align-items:center;box-shadow:0 4px 0 rgba(59,46,42,.18);color:#3b2e2a;}
+  .deco-sel button span{font-size:10.5px;}
+  @media (max-width: 760px){ .deco-panel{top:auto;height:56dvh;width:calc(100vw - 32px);} }
+  /* ---- the cat's status (affection + run bonus): a tall window centred on the right ---- */
+  body.ui-v2 .home-card-pop{left:auto !important;right:28px !important;top:50% !important;bottom:auto !important;transform:translate(24px, -50%) !important;
+    width:min(320px, calc(100vw - 32px)) !important;flex-direction:column !important;align-items:stretch !important;gap:14px !important;padding:22px 20px 24px !important;}
+  body.ui-v2 .home-card-pop.show{transform:translate(0, -50%) !important;}
+  body.ui-v2 .home-card-pop canvas{width:150px !important;height:150px !important;align-self:center;border-radius:22px !important;}
+  body.ui-v2 .home-card-pop .hc-body{text-align:center;display:flex;flex-direction:column;gap:10px;}
+  body.ui-v2 .home-card-pop #home-name{text-align:center;font-size:22px;}
+  body.ui-v2 .home-card-pop .hc-hearts{font-size:24px;}
+  body.ui-v2 .home-card-pop .hc-bar{height:10px;}
+  body.ui-v2 .home-card-pop .hc-line{font-size:14px;line-height:1.35;}
+  body.ui-v2 .home-card-pop .hc-perk{background:#fdf0f4;border-radius:14px;padding:10px 12px;font-weight:800;}
+  body.ui-v2 .home-card-pop .home-x{position:absolute;top:10px;right:12px;}</style>
 </head>
 <body>
 <div id="wrap">
@@ -1844,7 +1893,24 @@
       <button data-tool="laser">🔴<span>Laser</span></button>
       <button data-tool="yarn">🧶<span>Yarn</span></button>
       <button id="home-treat">🐟<span>Treats · 🪙5</span></button>
+      <button id="home-deco">🛠️<span>Decorate</span></button>
     </div>
+    <!-- decorate mode: the catalog in the right-side window (furniture / floors / walls), and a toolbar on the picked piece -->
+    <div id="deco-panel" class="deco-panel">
+      <div class="deco-tabs">
+        <button data-cat="furniture" class="on" title="Furniture">🛋️</button>
+        <button data-cat="floors" title="Floors">🟫</button>
+        <button data-cat="walls" title="Walls">🧱</button>
+      </div>
+      <div class="deco-body">
+        <div class="deco-head"><b id="deco-title">Furniture</b><span class="deco-gold"><span class="v2coin"></span><span id="deco-gold">0</span></span></div>
+        <div id="deco-grid" class="deco-grid"></div>
+        <div class="deco-pages"><button id="deco-prev" aria-label="Previous page">◀</button><span id="deco-page">1/1</span><button id="deco-next" aria-label="Next page">▶</button></div>
+        <div class="deco-hint" id="deco-hint">Pick something, then tap the floor to place it. Drag pieces to move them.</div>
+        <div class="deco-actions"><button id="deco-clear" title="Put everything away">🧹<span>Store all</span></button><button id="deco-ok">OK</button></div>
+      </div>
+    </div>
+    <div id="deco-sel" class="deco-sel"><button data-act="flip">↔<span>Flip</span></button><button data-act="store">📦<span>Store</span></button><button data-act="done">✓<span>Done</span></button></div>
   </div>
 
   <div class="overlay" id="pauseOverlay" style="display:none;">
@@ -8765,29 +8831,254 @@ let homeCats = [], homeToys = [], homeParts = [], homeTool = 'hand', homeSel = n
 let laser = null, press = null, homeL = null, homeDirty = false, homeSaveT = 0, homeCardT = 0;
 const bowl = {food:0, fill:0};
 
+/* The Cat Sanctuary is a cosy 3/4 diorama (assets/env/blockouts/cat_room.png + the furniture's '_iso' renders),
+   seen from the same corner camera as the harbor. Everything here lives in ROOM floor space: x runs west→east
+   along the north wall, y north→south along the west wall, 40 units = 1 m (the Blender room is 16 × 12 m).
+   homeP() projects a floor point (and a height) to the screen; homeInv() goes back, for taps and drags. */
+const ROOM = {W:640, D:480, wallZ:184, slab:36, catK:0.75};
+let homeV = {Z:1, ox:0, oy:0};
+function homeView(){
+  const c = ISO.c, s = ISO.s, FY = ISO.FY, pts = [];
+  for(const x of [-14, ROOM.W]) for(const y of [-14, ROOM.D]) for(const z of [-ROOM.slab, ROOM.wallZ + 6]) pts.push([c*x - s*y, (s*x + c*y)*FY - z]);
+  const u0 = Math.min(...pts.map(p=>p[0])), u1 = Math.max(...pts.map(p=>p[0])), v0 = Math.min(...pts.map(p=>p[1])), v1 = Math.max(...pts.map(p=>p[1]));
+  // in decorate mode the catalog takes the right side (or the bottom, on a narrow screen): fit the room beside it
+  let left = 0, right = W, top = 64, bottom = H - 118;
+  if(document.body.classList.contains('deco-mode')){
+    const pr = $('deco-panel').getBoundingClientRect(), cr = canvas.getBoundingClientRect();
+    if(pr.width && pr.top - cr.top > H*0.3) bottom = pr.top - cr.top - 10; else if(pr.width) right = pr.left - cr.left - 70;
+    if(bottom > H - 40) bottom = H - 40;
+  }
+  const Z = Math.min((right - left)*0.96/(u1 - u0), (bottom - top)/(v1 - v0));
+  return {Z, ox:(left + right)/2 - (u0 + u1)/2*Z, oy:(top + bottom)/2 - (v0 + v1)/2*Z};
+}
+function homeP(x, y, z){ const V = homeV; return [V.ox + (ISO.c*x - ISO.s*y)*V.Z, V.oy + (ISO.s*x + ISO.c*y)*ISO.FY*V.Z - (z||0)*V.Z]; }
+function homeInv(px, py){ const V = homeV, u = (px - V.ox)/V.Z, v = (py - V.oy)/(V.Z*ISO.FY); return {x:ISO.c*u + ISO.s*v, y:-ISO.s*u + ISO.c*v}; }
+// draw a corner-camera block-out at a floor point (z = lift), sized by the room's zoom
+// (flip mirrors it on screen, which in this view turns it a quarter: a north-wall piece then sits on the west wall)
+function homeSprite(k, x, y, z, mul, flip){
+  const key = BLK.img[k + '_iso'] ? k + '_iso' : k, M = window.BLOCKOUT_SPRITES && window.BLOCKOUT_SPRITES[key], im = BLK.img[key];
+  if(!M || !im) return false;
+  const kx = homeV.Z*BLK.S*(mul || 1)/M.ppm, ky = kx/M.cos, [sx, sy] = homeP(x, y, z);
+  ctx.imageSmoothingEnabled = true;
+  if(flip){ ctx.save(); ctx.translate(sx, 0); ctx.scale(-1, 1); ctx.drawImage(im, -M.ax*kx, sy - M.ay*ky, M.w*kx, M.h*ky); ctx.restore(); }
+  else ctx.drawImage(im, sx - M.ax*kx, sy - M.ay*ky, M.w*kx, M.h*ky);
+  return true;
+}
+// the screen box a piece covers (for tapping it in decorate mode)
+function homeSpriteRect(k, x, y, z, flip){
+  const key = BLK.img[k + '_iso'] ? k + '_iso' : k, M = window.BLOCKOUT_SPRITES && window.BLOCKOUT_SPRITES[key];
+  if(!M) return null;
+  const kx = homeV.Z*BLK.S/M.ppm, ky = kx/M.cos, [sx, sy] = homeP(x, y, z);
+  const x0 = flip ? sx - (M.w - M.ax)*kx : sx - M.ax*kx;
+  return {x0, y0:sy - M.ay*ky, x1:x0 + M.w*kx, y1:sy - M.ay*ky + M.h*ky, sx, sy};
+}
+// the live bits on some pieces: food in the bowl, flames, swimming fish, lamp glow, fountain water
+function itemExtras(k, p){
+  const Z = homeV.Z, ox = (dx, dy) => p.flip ? [dy, dx] : [dx, dy];
+  if(k === 'bowl' && bowl.food > 0){
+    homeBillboard(p.x, p.y); ctx.fillStyle = '#b5683f'; const n = Math.ceil(bowl.food*9);
+    for(let i=0;i<n;i++) ctx.fillRect(p.x-15+((i*13)%30), p.y-14+((i*7)%6), 6, 4);
+    ctx.setTransform(1,0,0,1,0,0);
+  } else if(k === 'fireplace'){
+    const [dx, dy] = ox(0, -6), [fx, fy] = homeP(p.x + dx, p.y + dy, 14);
+    for(let i=0;i<3;i++){ const fl = Math.sin(homeT*9 + i*2)*4; ctx.fillStyle = i===1 ? '#ffd23c' : '#ff7a1e'; ctx.beginPath(); ctx.ellipse(fx + (-10 + i*10)*Z*0.7, fy - fl*Z/2, 6*Z, (12 + fl)*Z, 0, 0, Math.PI*2); ctx.fill(); }
+    vfxGlow(fx, fy, 70*Z, '255,160,70', 0.5 + 0.1*Math.sin(homeT*6));
+  } else if(k === 'fishtank'){
+    const [tx, ty] = homeP(p.x, p.y, 46);
+    ctx.font = Math.round(13*Z) + 'px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    for(let i=0;i<3;i++){ const fx = tx + Math.sin(homeT*0.8 + i*2.1)*20*Z, fy = ty + (i - 1)*9*Z; ctx.save(); ctx.translate(fx, fy); if(Math.cos(homeT*0.8 + i*2.1) < 0) ctx.scale(-1, 1); ctx.fillText(i===1 ? '🐡' : '🐟', 0, 0); ctx.restore(); }
+  } else if(k === 'lamp'){
+    const [dx, dy] = ox(0, 8), [lx, ly] = homeP(p.x + dx, p.y + dy, ROOM_ITEMS.lamp.z);
+    vfxGlow(lx, ly, 60*Z, '255,236,170', 0.45 + 0.08*Math.sin(homeT*2));
+  } else if(k === 'fountain'){
+    homeBillboard(p.x, p.y); const q = {x:p.x, y:p.y - 14};
+    ctx.strokeStyle = 'rgba(140,210,255,0.9)'; ctx.lineWidth = 2;
+    for(let i=0;i<3;i++){ const kk = (homeT*1.5 + i/3) % 1; ctx.beginPath(); ctx.moveTo(q.x, q.y-4); ctx.quadraticCurveTo(q.x + (i-1)*8, q.y-26*(1-kk*0.3), q.x + (i-1)*14, q.y-4); ctx.stroke(); }
+    ctx.setTransform(1,0,0,1,0,0);
+  }
+}
+
+/* ---- Decorate mode: the catalog in the right-side window; pick a piece, place it on the floor, drag it about,
+   flip it (wall pieces hop between the north and west walls) or store it; floors and walls restyle the room. ---- */
+const homeDeco = {on:false, cat:'furniture', page:0, held:null, at:null, sel:null, drag:null};
+const DECO_PER_PAGE = 9;
+function decoList(){
+  if(homeDeco.cat === 'floors') return ROOM_FLOORS.map(f=>({kind:'floor', ...f}));
+  if(homeDeco.cat === 'walls') return ROOM_WALLS.map(f=>({kind:'wall', ...f}));
+  return Object.keys(ROOM_ITEMS).map(k=>({kind:'item', key:k, ...ROOM_ITEMS[k]}));
+}
+// keep a piece inside the room; wall pieces stick to their wall; snap to a 10-unit grid
+function decoClamp(k, x, y, flip){
+  const it = ROOM_ITEMS[k], snap = v => Math.round(v/10)*10, L = homeL;
+  if(it.wall) return flip ? {x:18, y:clamp(snap(y), 50, ROOM.D - 50), flip} : {x:clamp(snap(x), 50, ROOM.W - 50), y:18, flip};
+  return {x:clamp(snap(x), L.left + 10, L.right - 10), y:clamp(snap(y), L.top + 10, L.bottom), flip};
+}
+function decoSetPos(k, p){ roomSave().pos[k] = {x:p.x, y:p.y, flip:!!p.flip}; homeDirty = true; }
+function enterDecorate(){
+  homeDeco.on = true; homeDeco.held = null; homeDeco.sel = null; homeDeco.page = 0;
+  hideHomeCard(); laser = null; press = null;
+  document.body.classList.add('deco-mode');
+  homeL = homeLayout(); renderDecoPanel();
+}
+function exitDecorate(){
+  homeDeco.on = false; homeDeco.held = null; homeDeco.sel = null; homeDeco.drag = null;
+  document.body.classList.remove('deco-mode'); $('deco-sel').classList.remove('show');
+  homeL = homeLayout(); persist();
+}
+function renderDecoPanel(){
+  const list = decoList(), pages = Math.max(1, Math.ceil(list.length/DECO_PER_PAGE)), R = roomSave();
+  homeDeco.page = clamp(homeDeco.page, 0, pages - 1);
+  $('deco-title').textContent = {furniture:'Furniture', floors:'Floors', walls:'Walls'}[homeDeco.cat];
+  $('deco-gold').textContent = save.gold.toLocaleString();
+  $('deco-page').textContent = `${homeDeco.page + 1}/${pages}`;
+  document.querySelectorAll('.deco-tabs [data-cat]').forEach(b=>b.classList.toggle('on', b.dataset.cat === homeDeco.cat));
+  const g = $('deco-grid'); g.innerHTML = '';
+  for(const e of list.slice(homeDeco.page*DECO_PER_PAGE, (homeDeco.page + 1)*DECO_PER_PAGE)){
+    const b = document.createElement('button'); b.className = 'deco-card';
+    let pic, tag;
+    if(e.kind === 'item'){
+      const key = BLK.img[e.spr + '_iso'] ? e.spr + '_iso' : e.spr, own = itemOwned(e.key), placed = !!itemPos(e.key);
+      pic = BLK.img[key] ? `<img src="${BLK.img[key].src}" alt="">` : `<span style="font-size:34px">${e.ic || '🪑'}</span>`;
+      tag = !own ? `<span class="tag price${save.gold < e.cost ? ' poor' : ''}"><span class="v2coin"></span>${e.cost.toLocaleString()}</span>` : placed ? '' : `<span class="tag">In storage</span>`;
+      if(own && placed) b.insertAdjacentHTML('beforeend', '<i class="dot"></i>');
+      if(homeDeco.held === e.key) b.classList.add('held'); else if(homeDeco.sel === e.key) b.classList.add('sel');
+      b.onclick = ()=>decoPick(e.key);
+    } else {
+      const owned = e.kind === 'floor' ? R.floors[e.key] : R.walls[e.key], cur = (e.kind === 'floor' ? R.floor : R.wall) === e.key;
+      pic = `<span class="sw" style="background:${e.sw}"></span>`;
+      tag = cur ? `<span class="tag">In use</span>` : owned ? `<span class="tag">Owned</span>` : `<span class="tag price${save.gold < e.cost ? ' poor' : ''}"><span class="v2coin"></span>${e.cost.toLocaleString()}</span>`;
+      if(cur) b.classList.add('cur');
+      b.onclick = ()=>decoStyle(e);
+    }
+    b.insertAdjacentHTML('beforeend', `${pic}<b>${e.name}</b>${tag}`);
+    g.appendChild(b);
+  }
+}
+// tap a furniture card: buy it if you must, then pick it up to place (or select it if it's already standing)
+function decoPick(k){
+  const it = ROOM_ITEMS[k];
+  if(!itemOwned(k)){
+    if(save.gold < it.cost){ homeToast('Not enough gold — earn some in a run'); return; }
+    save.gold -= it.cost; save.decor[k] = true; roomSave().pos[k] = {stored:true}; persist(); updateHomeGold(); vibrate([15,30,15]);
+    homeToast(`🛋️ ${it.name} is yours! Tap the floor to place it.`);
+  }
+  if(itemPos(k)){ homeDeco.sel = k; homeDeco.held = null; }
+  else { homeDeco.held = k; homeDeco.sel = null; homeDeco.at = decoClamp(k, ROOM.W/2, ROOM.D/2, false); }
+  renderDecoPanel();
+}
+function decoStyle(e){
+  const R = roomSave(), owned = e.kind === 'floor' ? R.floors : R.walls;
+  if(!owned[e.key]){
+    if(save.gold < e.cost){ homeToast('Not enough gold — earn some in a run'); return; }
+    save.gold -= e.cost; owned[e.key] = true; updateHomeGold(); vibrate([15,30,15]);
+  }
+  if(e.kind === 'floor') R.floor = e.key; else R.wall = e.key;
+  persist(); renderDecoPanel();
+}
+function decoAct(act){
+  const k = homeDeco.sel; if(!k && act !== 'done') return;
+  if(act === 'flip'){ const p = itemPos(k); decoSetPos(k, decoClamp(k, p.flip && ROOM_ITEMS[k].wall ? p.y : p.x, p.flip && ROOM_ITEMS[k].wall ? p.x : p.y, !p.flip)); }
+  else if(act === 'store'){
+    if(ROOM_ITEMS[k].base){ homeToast('The cats need that one!'); return; }
+    roomSave().pos[k] = {stored:true}; homeDeco.sel = null; homeDirty = true;
+  } else homeDeco.sel = null;
+  homeL = homeLayout(); renderDecoPanel();
+}
+// which placed piece is under a screen point (front-most first)
+function decoItemAt(sx, sy){
+  let best = null, bd = -Infinity;
+  for(const k in ROOM_ITEMS){
+    const p = itemPos(k); if(!p) continue;
+    const r = homeSpriteRect(ROOM_ITEMS[k].spr, p.x, p.y, ROOM_ITEMS[k].z || 0, p.flip);
+    if(!r || sx < r.x0 || sx > r.x1 || sy < r.y0 || sy > r.y1) continue;
+    // ignore the faint shadow area off to the right/top of the body: favour points near the anchor column
+    const d = p.x*ISO.s + p.y*ISO.c - Math.abs(sx - r.sx)*0.02;
+    if(d > bd){ bd = d; best = k; }
+  }
+  return best;
+}
+function decoPointerDown(e){
+  const s = homePt(e), p = homeInv(s.x, s.y);
+  if(homeDeco.held){                                         // drop the piece you're holding here
+    const k = homeDeco.held; decoSetPos(k, decoClamp(k, p.x, p.y, false));
+    homeDeco.held = null; homeDeco.sel = k; homeL = homeLayout(); renderDecoPanel(); return;
+  }
+  const k = decoItemAt(s.x, s.y);
+  homeDeco.sel = k;
+  if(k){ const q = itemPos(k); homeDeco.drag = {k, dx:q.x - p.x, dy:q.y - p.y}; }
+  renderDecoPanel();
+}
+function decoPointerMove(e){
+  const s = homePt(e), p = homeInv(s.x, s.y);
+  if(homeDeco.held){ homeDeco.at = decoClamp(homeDeco.held, p.x, p.y, false); return; }
+  const d = homeDeco.drag; if(!d) return;
+  const q = itemPos(d.k); decoSetPos(d.k, decoClamp(d.k, p.x + d.dx, p.y + d.dy, q.flip));
+}
+function decoPointerUp(){ if(homeDeco.drag){ homeDeco.drag = null; homeL = homeLayout(); persist(); } }
+// keep the little Flip / Store / Done toolbar over the picked piece
+function decoToolbar(){
+  const el = $('deco-sel'), k = homeDeco.sel;
+  if(!homeDeco.on || !k || !itemPos(k)){ el.classList.remove('show'); return; }
+  const p = itemPos(k), r = homeSpriteRect(ROOM_ITEMS[k].spr, p.x, p.y, ROOM_ITEMS[k].z || 0, p.flip);
+  if(!r) return;
+  const cr = canvas.getBoundingClientRect(), wr = $('home-ui').getBoundingClientRect();
+  el.style.left = (cr.left - wr.left + r.sx) + 'px'; el.style.top = (cr.top - wr.top + Math.max(70, r.y0 + 10)) + 'px';
+  el.classList.add('show');
+}
+// set the canvas so things drawn at (x, y) in room units stand upright at that floor point
+function homeBillboard(x, y){ const [sx, sy] = homeP(x, y, 0), Z = homeV.Z; ctx.setTransform(Z, 0, 0, Z, sx - x*Z, sy - y*Z); }
+/* Everything that can stand in the room. base = you always have it (bed, post, bowl); the rest are DECOR you buy.
+   spr = its block-out; def = where it starts; sit = where a lounging cat settles, relative to it; wall pieces
+   hang on a wall (north wall, or the west wall when flipped) at height z. Positions are saved in save.room.pos. */
+const ROOM_ITEMS = {
+  bed:      {name:'Cat Bed',        spr:'cat_bed',       base:true, def:{x:110, y:400}},
+  post:     {name:'Scratching Post',spr:'scratch_post',  base:true, def:{x:596, y:150}},
+  bowl:     {name:'Food Bowl',      spr:'food_bowl',     base:true, def:{x:430, y:432}},
+  catgrass: {spr:'cat_grass_pot', def:{x:40, y:36},   sit:[26, 26]},
+  cushion:  {spr:'floor_cushion', def:{x:300, y:300}, sit:[0, 4]},
+  lamp:     {spr:'wall_lamp',     def:{x:200, y:8},   wall:true, z:110},
+  fishtank: {spr:'fishtank',      def:{x:540, y:18},  wall:true, sit:[0, 44]},
+  tower:    {spr:'cat_tower',     def:{x:60, y:220},  sit:[26, 20]},
+  fountain: {spr:'pet_fountain',  def:{x:540, y:400}, sit:[0, 10]},
+  fireplace:{spr:'fireplace',     def:{x:140, y:22},  wall:true, sit:[0, 42]},
+  hammock:  {spr:'hammock',       def:{x:400, y:110}, z:52, sit:[0, 6]},
+};
+for(const d of DECOR) if(ROOM_ITEMS[d.key]) Object.assign(ROOM_ITEMS[d.key], {name:d.name, cost:d.cost, comfort:d.comfort, ic:d.ic});
+const ROOM_FLOORS = [{key:'wood', name:'Oak Planks', cost:0, sw:'linear-gradient(90deg,#d4a27a 0 48%,#b4825c 48% 52%,#d4a27a 52%)'},
+  {key:'tiles', name:'Checker Tiles', cost:600, sw:'repeating-conic-gradient(#f2e2c6 0 25%,#c9b396 0 50%) 0 0/50% 50%'},
+  {key:'stone', name:'Stone Flags', cost:900, sw:'linear-gradient(135deg,#b9c3ce,#a9b5c2 60%,#c8d0d8)'}];
+const ROOM_WALLS = [{key:'rose', name:'Rose', cost:0, sw:'linear-gradient(#f4cfc6 0 62%,#e8a9a0 62%)'},
+  {key:'mint', name:'Mint', cost:500, sw:'linear-gradient(#d3ede2 0 62%,#9fd3be 62%)'},
+  {key:'cream', name:'Cream', cost:500, sw:'linear-gradient(#f3e7cf 0 62%,#d8c3a0 62%)'}];
+function roomSave(){
+  if(!save.room) save.room = {floor:'wood', wall:'rose', floors:{wood:true}, walls:{rose:true}, pos:{}};
+  return save.room;
+}
+function itemOwned(k){ return !!(ROOM_ITEMS[k].base || (save.decor && save.decor[k])); }
+// where a piece stands ({x, y, flip}), or null if it's not owned or put away in storage
+function itemPos(k){
+  if(!itemOwned(k)) return null;
+  const p = roomSave().pos[k];
+  if(p && p.stored) return null;
+  return p || Object.assign({flip:false}, ROOM_ITEMS[k].def);
+}
 function homeLayout(){
-  const wallH = clamp(H*0.24, 120, 230);
+  homeV = homeView();
+  const at = k => itemPos(k) || ROOM_ITEMS[k].def, decor = {};
+  for(const k in ROOM_ITEMS){
+    const it = ROOM_ITEMS[k]; if(it.base) continue;
+    const p = itemPos(k); if(!p) continue;
+    const sit = it.sit ? (p.flip && it.wall ? [it.sit[1], it.sit[0]] : it.sit) : null;
+    decor[k] = Object.assign({x:p.x, y:p.y, z:it.z, flip:p.flip}, sit ? {sx:p.x + sit[0], sy:p.y + sit[1]} : {});
+  }
   return {
-    wallH, left:26, right:W-26, top:wallH+34, bottom:H-112,
-    win:{x:W/2, y:wallH*0.5, w:Math.min(200, W*0.42), h:wallH*0.56},
-    bed:{x:Math.max(72, W*0.2), y:H-176},
-    bowl:{x:Math.min(W-62, W*0.8), y:H-150},
-    post:{x:Math.min(W-38, W*0.9), y:wallH+58},
-    rug:{x:W/2, y:(wallH+H-112)/2+12, rx:Math.min(W*0.33, 250), ry:Math.min(H*0.1, 90)},
-    // furniture anchor points (x,y) and where a lounging cat sits (sx,sy)
-    decor:{
-      catgrass:{x:46, y:wallH+40, sx:72, sy:wallH+56},
-      cushion: {x:W/2-Math.min(W*0.33,250)*0.45, y:(wallH+H-112)/2+16, sx:W/2-Math.min(W*0.33,250)*0.45, sy:(wallH+H-112)/2+20},
-      lamp:    {x:Math.max(40, W*0.1), y:wallH*0.35},
-      fishtank:{x:Math.min(W-110, W*0.7), y:wallH+8, sx:Math.min(W-110, W*0.7), sy:wallH+64},
-      tower:   {x:Math.max(60, W*0.14), y:wallH+90, sx:Math.max(60, W*0.14)+34, sy:wallH+110},
-      fountain:{x:Math.min(W-62, W*0.8)-70, y:H-150, sx:Math.min(W-62, W*0.8)-70, sy:H-140},
-      fireplace:{x:Math.max(70, W/2-Math.min(200,W*0.42)/2-80), y:wallH, sx:Math.max(70, W/2-Math.min(200,W*0.42)/2-80), sy:wallH+50},
-      hammock: {x:W/2, y:wallH+14, sx:W/2, sy:wallH+40},
-    },
+    left:34, right:ROOM.W - 30, top:44, bottom:ROOM.D - 26,
+    bed:at('bed'), bowl:at('bowl'), post:at('post'),
+    decor,       // placed pieces: anchor (x, y), height z, and where a lounging cat sits (sx, sy)
   };
 }
-function ownedDecor(){ return DECOR.filter(d=>save.decor[d.key]).map(d=>d.key); }
+// owned *and* standing in the room (stored pieces can't be lounged on)
+function ownedDecor(){ return DECOR.filter(d=>save.decor[d.key] && itemPos(d.key)).map(d=>d.key); }
 function drawDecor(L, which){
   // which: 'wall' items drawn with the room, 'floor' items drawn before cats
   const own = save.decor, D = L.decor, t = homeT;
@@ -8878,7 +9169,7 @@ function drawDecor(L, which){
 }
 function makeHomeCat(key){
   const L = homeL, def = ENEMIES[key];
-  return { key, def, sc:def.ai==='boss' ? 0.62 : def.r/20,
+  return { key, def, sc:(def.ai==='boss' ? 0.62 : def.r/20)*ROOM.catK,       // (scaled up for the 3/4 room)
     x:rand(L.left+20, L.right-20), y:rand(L.top, L.bottom), tx:0, ty:0, z:0, vz:0,
     mode:'idle', t:rand(0.3,2.5), face:Math.random()<0.5 ? -1 : 1, walkT:0,
     petCd:0, playCd:0, ask:0, ate:-1, wake:true, gain:{pet:0, play:0, comfort:0}, dec:null, sq:0, sqv:0, wob:0, wobv:0, pressed:false, squishes:0 };
@@ -8945,7 +9236,7 @@ function addAff(c, amt, source){
   const after = affLevel(hd.aff);
   if(after > before){
     homeToast(`💕 ${hd.name} now has ${after} ${after===1?'heart':'hearts'}! ${perkText(c.key, after)}`);
-    for(let i=0;i<14;i++){ const a = Math.random()*Math.PI*2; homeParts.push({type:'heart', x:c.x, y:c.y-40*c.sc, vx:Math.cos(a)*rand(60,140), vy:Math.sin(a)*rand(60,140)-60, life:rand(0.8,1.3), sz:rand(14,22)}); }
+    for(let i=0;i<14;i++){ const a = Math.random()*Math.PI*2; homeParts.push({gy:c.y, type:'heart', x:c.x, y:c.y-40*c.sc, vx:Math.cos(a)*rand(60,140), vy:Math.sin(a)*rand(60,140)-60, life:rand(0.8,1.3), sz:rand(14,22)}); }
     vibrate([15,30,15]);
   }
   return true;
@@ -8971,22 +9262,22 @@ function releaseSquish(c){
   c.wobv += (Math.random()<0.5 ? -1 : 1)*(3 + held*4);
   if(held > 0.35){
     c.vz = Math.min(320, 120 + held*200);               // a big squish makes the cat pop off the floor
-    homeParts.push({type:'text', x:c.x, y:c.y-64*c.sc, vy:-30, life:1, txt:SQUISH_LINES[Math.floor(Math.random()*SQUISH_LINES.length)]});
-    for(let i=0;i<6;i++){ const a = -Math.PI/2 + rand(-1.2,1.2); homeParts.push({type:'heart', x:c.x, y:c.y-30*c.sc, vx:Math.cos(a)*rand(60,120), vy:Math.sin(a)*rand(60,120), life:rand(0.6,0.9), sz:rand(12,18)}); }
+    homeParts.push({gy:c.y, type:'text', x:c.x, y:c.y-64*c.sc, vy:-30, life:1, txt:SQUISH_LINES[Math.floor(Math.random()*SQUISH_LINES.length)]});
+    for(let i=0;i<6;i++){ const a = -Math.PI/2 + rand(-1.2,1.2); homeParts.push({gy:c.y, type:'heart', x:c.x, y:c.y-30*c.sc, vx:Math.cos(a)*rand(60,120), vy:Math.sin(a)*rand(60,120), life:rand(0.6,0.9), sz:rand(12,18)}); }
     vibrate(18);
   }
 }
 function petCat(c){
-  if(c.mode==='sleep') homeParts.push({type:'text', x:c.x, y:c.y-60*c.sc, vy:-20, life:1, txt:'*yawn*'});
+  if(c.mode==='sleep') homeParts.push({gy:c.y, type:'text', x:c.x, y:c.y-60*c.sc, vy:-20, life:1, txt:'*yawn*'});
   c.mode = 'purr'; c.t = 1.6; c.vz = 0;
   c.wobv += (Math.random()<0.5 ? -1 : 1)*5;
-  for(let i=0;i<4;i++) homeParts.push({type:'heart', x:c.x+rand(-12,12), y:c.y-45*c.sc, vx:rand(-30,30), vy:rand(-90,-50), life:rand(0.7,1.1), sz:rand(14,20)});
+  for(let i=0;i<4;i++) homeParts.push({gy:c.y, type:'heart', x:c.x+rand(-12,12), y:c.y-45*c.sc, vx:rand(-30,30), vy:rand(-90,-50), life:rand(0.7,1.1), sz:rand(14,20)});
   vibrate(10);
   if(c.petCd > 0) return;
   c.petCd = 1.4;
   const bonus = c.ask > 0 ? 1 : 0;
   c.ask = 0;
-  if(!addAff(c, 1+bonus, 'pet')) homeParts.push({type:'text', x:c.x, y:c.y-70*c.sc, vy:-24, life:1.1, txt:'content 😌'});
+  if(!addAff(c, 1+bonus, 'pet')) homeParts.push({gy:c.y, type:'text', x:c.x, y:c.y-70*c.sc, vy:-24, life:1.1, txt:'content 😌'});
 }
 
 /* ---------- simulation ---------- */
@@ -9028,7 +9319,7 @@ function homeCatUpdate(c, idx, dt){
     if(c.z <= 0){
       c.z = 0;
       c.sqv -= Math.min(9, Math.abs(c.vz)/70);
-      if(c.vz < -260){ c.vz = -c.vz*0.25; for(let i=0;i<5;i++) homeParts.push({type:'poof', x:c.x+rand(-14,14), y:c.y, vx:rand(-50,50), vy:rand(-30,-5), life:0.35}); }
+      if(c.vz < -260){ c.vz = -c.vz*0.25; for(let i=0;i<5;i++) homeParts.push({gy:c.y, type:'poof', x:c.x+rand(-14,14), y:c.y, vx:rand(-50,50), vy:rand(-30,-5), life:0.35}); }
       else c.vz = 0;
     }
     if(c.mode!=='chase' && c.mode!=='play') return;
@@ -9055,10 +9346,10 @@ function homeCatUpdate(c, idx, dt){
     } else {
       c.t -= dt;
       bowl.food = Math.max(0.05, bowl.food - dt*0.03);
-      if(Math.random() < dt*3) homeParts.push({type:'crumb', x:L.bowl.x+rand(-14,14), y:L.bowl.y-6, vx:rand(-40,40), vy:rand(-80,-40), life:0.45});
+      if(Math.random() < dt*3) homeParts.push({gy:c.y, type:'crumb', x:L.bowl.x+rand(-14,14), y:L.bowl.y-6, vx:rand(-40,40), vy:rand(-80,-40), life:0.45});
       if(c.t <= 0){
         c.ate = bowl.fill; addAff(c, 3);
-        homeParts.push({type:'text', x:c.x, y:c.y-60*c.sc, vy:-24, life:1.1, txt:'yum! 😋'});
+        homeParts.push({gy:c.y, type:'text', x:c.x, y:c.y-60*c.sc, vy:-24, life:1.1, txt:'yum! 😋'});
         c.mode = 'groom'; c.t = rand(2,3.5);
         if(homeCats.every(k=>k.ate===bowl.fill)) bowl.food = 0;
       }
@@ -9097,11 +9388,11 @@ function homeCatUpdate(c, idx, dt){
       if(moveTo(c, c.tx, c.ty, 60, dt) < 5){ c.mode = 'lounge'; c.t = rand(5,9); }
       break;
     case 'lounge':
-      if(Math.random() < dt*0.8) homeParts.push({type:'heart', x:c.x+rand(-8,8), y:c.y-44*c.sc, vx:rand(-10,10), vy:-40, life:0.9, sz:12});
+      if(Math.random() < dt*0.8) homeParts.push({gy:c.y, type:'heart', x:c.x+rand(-8,8), y:c.y-44*c.sc, vx:rand(-10,10), vy:-40, life:0.9, sz:12});
       if(c.t <= 0){ addAff(c, 0.5, 'comfort'); c.mode = 'idle'; c.t = rand(1,2); c.dec = null; }
       break;
     case 'sleep':
-      if(Math.random() < dt*0.9) homeParts.push({type:'zzz', x:c.x+10*c.face, y:c.y-38*c.sc, vx:rand(4,14), vy:-22, life:1.6});
+      if(Math.random() < dt*0.9) homeParts.push({gy:c.y, type:'zzz', x:c.x+10*c.face, y:c.y-38*c.sc, vx:rand(4,14), vy:-22, life:1.6});
       if(c.t <= 0){ c.mode = 'idle'; c.t = 1; }
       break;
     default:
@@ -9274,7 +9565,67 @@ function drawHomeCat(c){
     ctx.fillStyle = '#fff'; ctx.fillText(name, c.x, headY-25);
   }
 }
+// the 3/4 room: backdrop diorama, then furniture, toys and cats sorted back to front, then the laser and particles
 function homeRender(){
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.imageSmoothingEnabled = true;
+  const bg = ctx.createLinearGradient(0, 0, 0, H); bg.addColorStop(0, '#bfe3e6'); bg.addColorStop(1, '#8fc6d2');
+  ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+  const L = homeL, R = roomSave();
+  // the room: its floor, then its walls, in the styles you picked (the single baked room if the layers haven't loaded)
+  const floorOk = homeSprite('room_floor_' + R.floor, 0, 0, 0), wallOk = floorOk && homeSprite('room_walls_' + R.wall, 0, 0, 0);
+  if(!floorOk && !homeSprite('cat_room', 0, 0, 0)){
+    // (until the room art loads: a plain floor diamond)
+    ctx.fillStyle = '#d4a27a'; ctx.beginPath(); [[0,0],[ROOM.W,0],[ROOM.W,ROOM.D],[0,ROOM.D]].forEach(([x,y],i)=>{ const [px,py] = homeP(x,y,0); i ? ctx.lineTo(px,py) : ctx.moveTo(px,py); }); ctx.closePath(); ctx.fill();
+  }
+  const items = [];                                         // [depth, draw]
+  const put = (x, y, fn) => items.push([x*ISO.s + y*ISO.c, fn]);
+  // every piece standing in the room (and the one you're holding, in decorate mode), each with its little live details
+  for(const k in ROOM_ITEMS){
+    const it = ROOM_ITEMS[k], held = homeDeco.held === k;
+    const p = held ? homeDeco.at : itemPos(k); if(!p) continue;
+    put(p.x, p.y, ()=>{
+      if(homeDeco.on && (held || homeDeco.sel === k)){        // a glowing ring under the piece you're moving
+        const [rx, ry] = homeP(p.x, p.y, 0), Z = homeV.Z;
+        vfxRing(rx, ry, 44*Z, ISO.FY, held ? '255,210,60' : '120,220,140', 0.9, 4);
+      }
+      if(held) ctx.globalAlpha = 0.75;
+      homeSprite(it.spr, p.x, p.y, it.z || 0, 1, p.flip);
+      itemExtras(k, p);
+    });
+  }
+  for(const y of homeToys) put(y.x, y.y, ()=>{
+    homeBillboard(y.x, y.y);
+    ctx.fillStyle = 'rgba(0,0,0,0.2)'; ctx.beginPath(); ctx.ellipse(y.x, y.y+9, 10*(1-y.z/220), 3, 0, 0, Math.PI*2); ctx.fill();
+    ctx.translate(y.x, y.y - y.z); ctx.rotate(y.spin);
+    if(blkReady('yarn_ball')){ ctx.rotate(-y.spin); blkFit('yarn_ball', 0, 12, 30); }
+    else { ctx.fillStyle = '#bd5f91'; ctx.beginPath(); ctx.arc(0, 0, 10, 0, Math.PI*2); ctx.fill(); }
+    ctx.setTransform(1,0,0,1,0,0);
+  });
+  for(const c of homeCats) items.push([c.mode==='held' ? 1e9 : c.x*ISO.s + c.y*ISO.c, ()=>{ homeBillboard(c.x, c.y); drawHomeCat(c); ctx.setTransform(1,0,0,1,0,0); }]);
+  items.sort((a, b)=>a[0] - b[0]);
+  for(const [, fn] of items){ ctx.save(); fn(); ctx.restore(); }
+  ctx.setTransform(1,0,0,1,0,0);
+  if(laser){
+    const [lx, ly] = homeP(laser.x, laser.y, 0);
+    const g = ctx.createRadialGradient(lx, ly, 0, lx, ly, 14);
+    g.addColorStop(0, 'rgba(255,40,40,1)'); g.addColorStop(0.35, 'rgba(255,40,40,0.8)'); g.addColorStop(1, 'rgba(255,40,40,0)');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(lx, ly, 14, 0, Math.PI*2); ctx.fill();
+  }
+  // particles rise straight up from the floor spot they came from (gy)
+  for(const p of homeParts){
+    const gy = p.gy ?? p.y, [sx, sy] = homeP(p.x, gy, 0), Z = homeV.Z;
+    ctx.save(); ctx.setTransform(Z, 0, 0, Z, sx - p.x*Z, sy - gy*Z);
+    if(p.type==='heart'){ ctx.globalAlpha = Math.min(1, p.life*1.5); ctx.fillStyle = '#ff6b8a'; ctx.font = (p.sz||16)+'px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('❤', p.x, p.y); }
+    else if(p.type==='zzz'){ ctx.globalAlpha = Math.min(1, p.life); ctx.fillStyle = '#4b5b8a'; ctx.font = '900 '+Math.round(12+(1.6-p.life)*6)+'px sans-serif'; ctx.fillText('z', p.x, p.y); }
+    else if(p.type==='text'){ ctx.globalAlpha = Math.min(1, p.life*1.5); ctx.font = '800 13px Nunito, system-ui, sans-serif'; ctx.textAlign = 'center'; ctx.lineWidth = 3; ctx.strokeStyle = '#fff'; ctx.strokeText(p.txt, p.x, p.y); ctx.fillStyle = '#241933'; ctx.fillText(p.txt, p.x, p.y); }
+    else if(p.type==='crumb'){ ctx.fillStyle = '#b5683f'; ctx.fillRect(p.x, p.y, 3, 3); }
+    else { ctx.globalAlpha = Math.max(0, p.life/0.35); vfxPuff(p.x, p.y, 5, '#f1e4c8', '#fffaf0', '#cdb791', p.x*0.01); }
+    ctx.restore();
+  }
+  decoToolbar();
+}
+function homeRenderFlat(){
   ctx.setTransform(1,0,0,1,0,0);
   ctx.imageSmoothingEnabled = false;
   drawRoom();
@@ -9340,37 +9691,42 @@ $('home-card-close').addEventListener('click', hideHomeCard);
 
 /* ---------- input ---------- */
 function homePt(e){ const r = canvas.getBoundingClientRect(); return {x:e.clientX-r.left, y:e.clientY-r.top}; }
-function catAt(x, y){
-  const order = [...homeCats].sort((a,b)=>b.y-a.y);
+// which cat is under a screen point (front-most first; cats stand upright on their floor spot)
+function catAt(sx, sy){
+  const Z = homeV.Z, order = [...homeCats].sort((a,b)=>(b.x*ISO.s + b.y*ISO.c) - (a.x*ISO.s + a.y*ISO.c));
   for(const c of order){
-    const top = c.y - c.z - 50*c.sc, half = 24*c.sc + 6;
-    if(Math.abs(x-c.x) < half && y > top && y < c.y + 10) return c;
+    const [cx, cy] = homeP(c.x, c.y, 0), top = cy - (c.z + 50*c.sc)*Z, half = (24*c.sc + 6)*Z;
+    if(Math.abs(sx - cx) < half && sy > top && sy < cy + 10*Z) return c;
   }
   return null;
 }
 function tossYarn(x, y){
   const L = homeL;
   if(homeToys.length >= 3) homeToys.shift();
-  homeToys.push({x:W/2, y:H-80, sx:W/2, sy:H-80, tx:clamp(x, L.left, L.right), ty:clamp(y, L.top, L.bottom), z:0, vx:0, vy:0, flyT:0.5, flyMax:0.5, life:25, spin:0});
+  homeToys.push({x:ROOM.W/2, y:ROOM.D, sx:ROOM.W/2, sy:ROOM.D, tx:clamp(x, L.left, L.right), ty:clamp(y, L.top, L.bottom), z:0, vx:0, vy:0, flyT:0.5, flyMax:0.5, life:25, spin:0});
 }
+// a pointer event → the room floor point under it
+function homeFloorPt(e){ const s = homePt(e); return homeInv(s.x, s.y); }
 canvas.addEventListener('pointerdown', e=>{
   if(state!=='home') return;
   e.preventDefault();
   try{ canvas.setPointerCapture(e.pointerId); }catch(err){}
-  const p = homePt(e);
+  if(homeDeco.on){ decoPointerDown(e); return; }
+  const s = homePt(e), p = homeInv(s.x, s.y);
   if(homeTool==='laser'){
     laser = {x:p.x, y:p.y};
     for(const c of homeCats) c.wake = c.mode!=='sleep' || Math.random() < 0.5;
     return;
   }
   if(homeTool==='yarn'){ tossYarn(p.x, p.y); return; }
-  press = {x:p.x, y:p.y, sx:p.x, sy:p.y, cat:catAt(p.x, p.y), moved:false};
+  press = {x:p.x, y:p.y, sx:p.x, sy:p.y, cat:catAt(s.x, s.y), moved:false};
   if(press.cat) press.cat.pressed = true;
 });
 canvas.addEventListener('pointermove', e=>{
   if(state!=='home') return;
-  const p = homePt(e);
-  if(laser){ laser.x = p.x; laser.y = clamp(p.y, homeL.top-20, homeL.bottom+10); }
+  if(homeDeco.on){ decoPointerMove(e); return; }
+  const p = homeFloorPt(e);
+  if(laser){ laser.x = clamp(p.x, homeL.left - 10, homeL.right + 10); laser.y = clamp(p.y, homeL.top - 20, homeL.bottom + 10); }
   if(!press) return;
   press.x = p.x; press.y = p.y;
   const c = press.cat;
@@ -9378,10 +9734,11 @@ canvas.addEventListener('pointermove', e=>{
     press.moved = true; c.pressed = false; c.pressT = 0; c.mode = 'held'; c.vz = 0; c.z = 0; c.sqv += 5;
     selectHomeCat(c);
   }
-  if(c && press.moved){ c.x = p.x; c.y = p.y + 30; if(Math.abs(e.movementX||0) > 1) c.face = e.movementX > 0 ? 1 : -1; }
+  if(c && press.moved){ c.x = p.x; c.y = p.y + 16; if(Math.abs(e.movementX||0) > 1) c.face = e.movementX > 0 ? 1 : -1; }
 });
 function homePointerUp(){
   if(state!=='home') return;
+  if(homeDeco.on){ decoPointerUp(); return; }
   laser = null;
   if(!press) return;
   const c = press.cat;
@@ -9390,7 +9747,7 @@ function homePointerUp(){
       const L = homeL, ny = clamp(c.y, L.top, L.bottom);
       c.z = Math.max(0, 34 + (ny - c.y)); c.y = ny; c.x = clamp(c.x, L.left, L.right);
       c.vz = 0; c.mode = 'idle'; c.t = rand(1,2); c.wobv += 6;
-      homeParts.push({type:'text', x:c.x, y:c.y-c.z-60*c.sc, vy:-24, life:0.9, txt:'mrrp!'});
+      homeParts.push({gy:c.y, type:'text', x:c.x, y:c.y-c.z-60*c.sc, vy:-24, life:0.9, txt:'mrrp!'});
     } else { releaseSquish(c); petCat(c); selectHomeCat(c); }
   } else if(!press.moved) hideHomeCard();
   press = null;
@@ -9406,9 +9763,20 @@ $('home-treat').addEventListener('click', ()=>{
   bowl.food = 1; bowl.fill++;
   homeToast("🐟 Treats are served!");
 });
-$('home-back').addEventListener('click', leaveHome);
+$('home-back').addEventListener('click', ()=>{ if(homeDeco.on) exitDecorate(); leaveHome(); });
+// decorate mode's buttons
+$('home-deco').addEventListener('click', enterDecorate);
+$('deco-ok').addEventListener('click', exitDecorate);
+$('deco-clear').addEventListener('click', ()=>{
+  for(const k in ROOM_ITEMS) if(!ROOM_ITEMS[k].base && itemOwned(k)) roomSave().pos[k] = {stored:true};
+  homeDeco.sel = null; homeDeco.held = null; homeL = homeLayout(); persist(); renderDecoPanel(); homeToast('🧹 Everything is in storage');
+});
+document.querySelectorAll('.deco-tabs [data-cat]').forEach(b=>b.addEventListener('click', ()=>{ homeDeco.cat = b.dataset.cat; homeDeco.page = 0; renderDecoPanel(); }));
+$('deco-prev').addEventListener('click', ()=>{ homeDeco.page--; renderDecoPanel(); });
+$('deco-next').addEventListener('click', ()=>{ homeDeco.page++; renderDecoPanel(); });
+document.querySelectorAll('#deco-sel [data-act]').forEach(b=>b.addEventListener('click', ()=>decoAct(b.dataset.act)));
 $('btn-visit-home').addEventListener('click', enterHome);
-addEventListener('keydown', e=>{ if(state==='home' && e.key==='Escape') leaveHome(); });
+addEventListener('keydown', e=>{ if(state==='home' && e.key==='Escape'){ if(homeDeco.on) exitDecorate(); else leaveHome(); } });
 addEventListener('resize', ()=>{
   if(state!=='home') return;
   homeL = homeLayout();
