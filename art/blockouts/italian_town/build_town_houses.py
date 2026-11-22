@@ -86,6 +86,9 @@ PALETTE = {
     "floor_stone_a": "B9C3CE", "floor_stone_b": "A9B5C2", "floor_stone_c": "C8D0D8", "room_sky": "9CD3F0", "room_cloud": "FFFFFF", "room_curtain": "7FB7A4",
     "room_poster_a": "FCE8C8", "room_poster_b": "BFE0D6", "room_cushion": "E98AA6",
     "rug_a": "E9B44C", "rug_b": "7FB7A4", "rug_c": "EE8E8E", "rug_d": "8FA8D8",
+    "catnip_bag": "E9D9B4", "catnip_string": "C0472F", "catnip_leaf": "6FB84A",
+    "cardboard": "C99A62", "cardboard_dark": "A77B48", "cardboard_light": "DDB27A", "cardboard_tape": "E8D7AE",
+    "squirt_blue": "5ABEFF", "squirt_head": "F26B5B", "salmon": "F59A6E", "nori": "2E3A2C",
     "tempura": "F2A93E", "shrimp_tail": "F0603A", "caviar": "1E1A24", "lemon": "F7D84A",
     "star": "F08A4B", "star_dot": "FFD2A8", "shell_white": "FFF0E6", "shell_pink": "FFD0D8",
     "pebble_a": "B9ADA0", "pebble_b": "9C9086", "pebble_c": "D6CCC0",
@@ -1065,6 +1068,62 @@ def party_treats():
     return p.join("party_treats")
 
 
+def catnip_bomb():
+    """Catnip Bomb: a little cloth pouch tied with string, leaves poking out."""
+    p = Parts()
+    p.blob("catnip_bag", 0.32, (0, 0, 0.3), scale=(1, 1, 1.05))
+    p.cone("catnip_bag", 0.18, 0.08, 0.2, (0, 0, 0.6), verts=8)
+    p.torus("catnip_string", 0.14, 0.03, (0, 0, 0.56))
+    for i in range(5):
+        a = i * 2 * math.pi / 5
+        p.blob("catnip_leaf", 0.1, (math.cos(a) * 0.1, math.sin(a) * 0.1, 0.76), scale=(1.4, 0.6, 0.5))
+    p.blob("catnip_leaf", 0.08, (0.24, -0.2, 0.34), scale=(1.4, 0.5, 0.5))
+    return p.join("catnip_bomb")
+
+
+def cardboard_box():
+    """Cardboard Box: an open box with its flaps folded out (if it fits, it sits)."""
+    p = Parts()
+    w, d, h = 1.4, 1.0, 0.65
+    p.box("cardboard", (w, d, 0.06), (0, 0, 0))
+    for s in (-1, 1):
+        p.box("cardboard", (w, 0.06, h), (0, s * (d / 2 - 0.03), 0))
+        p.box("cardboard_dark", (0.06, d, h), (s * (w / 2 - 0.03), 0, 0))
+        p.boxc("cardboard_light", (w, 0.42, 0.05), (0, s * (d / 2 + 0.18), h + 0.06), rot=(s * -0.5, 0, 0))
+        p.boxc("cardboard_light", (0.38, d, 0.05), (s * (w / 2 + 0.16), 0, h + 0.06), rot=(0, s * 0.5, 0))
+    p.box("cardboard_tape", (0.18, d + 0.02, 0.02), (0, 0, h - 0.02))
+    return p.join("cardboard_box")
+
+
+def squirt_bottle():
+    """Squirt Bottle: a blue spray bottle with a trigger nozzle."""
+    p = Parts()
+    p.cone("squirt_blue", 0.22, 0.2, 0.7, (0, 0, 0.35), verts=10)
+    p.cyl("trim_white", 0.205, 0.18, (0, 0, 0.5), verts=10)
+    p.cone("squirt_head", 0.14, 0.1, 0.18, (0, 0, 0.79), verts=8)
+    p.box("squirt_head", (0.34, 0.12, 0.12), (0.12, 0, 0.84))
+    p.boxc("squirt_head", (0.08, 0.1, 0.24), (0.12, 0, 0.78), rot=(0, 0.35, 0))
+    p.blob("water_blue", 0.05, (0.31, 0, 0.9))
+    return p.join("squirt_bottle")
+
+
+def sushi_platter():
+    """Sushi Platter: a wooden board with nigiri and maki."""
+    p = Parts()
+    p.box("wood", (1.3, 0.7, 0.08), (0, 0, 0.05))
+    for s in (-1, 1):
+        p.box("door_brown", (0.12, 0.7, 0.05), (s * 0.45, 0, 0))
+    for i, x in enumerate((-0.38, -0.08)):
+        p.blob("trim_white", 0.12, (x, -0.1, 0.2), scale=(1.5, 0.9, 0.6))
+        p.blob("salmon", 0.12, (x, -0.1, 0.27), scale=(1.6, 0.95, 0.35))
+    for x in (0.22, 0.45):
+        p.cyl("nori", 0.11, 0.16, (x, 0.08, 0.21), verts=10)
+        p.cyl("trim_white", 0.08, 0.17, (x, 0.08, 0.21), verts=10)
+        p.blob("salmon", 0.04, (x, 0.08, 0.3))
+    p.blob("foliage", 0.06, (0.3, -0.2, 0.15), scale=(1.4, 0.8, 0.6))
+    return p.join("sushi_platter")
+
+
 def caviar_plate():
     """Princess Rosalind's caviar plate (the bait for Sebastian)."""
     p = Parts()
@@ -1356,6 +1415,7 @@ GROUPS = [
     ("combat", [fountain, bush_yellow, bush_green, bush_lime, mushroom, street_lamp, park_bench,
                 prop_crate, prop_basket, prop_barrel, traffic_cone, road_barrier, grass_tuft,
                 tree_round, tree_poplar, pampas, yarn_ball, cucumber, party_treats, caviar_plate,
+                catnip_bomb, cardboard_box, squirt_bottle, sushi_platter,
                 starfish, shell_white, shell_pink, pebbles]),
     ("sanctuary", [scratch_post, cat_bed, food_bowl, cat_grass_pot, floor_cushion, cat_tower, pet_fountain,
                    fireplace, wall_lamp, fishtank, hammock]),

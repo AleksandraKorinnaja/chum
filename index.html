@@ -3884,7 +3884,10 @@ function showNextNewCat(){
 }
 
 /* ============== PLAYER & STATS ============== */
-function xpNeeded(level){ return level < 20 ? 5 + (level-1)*8 : 157 + (level-20)*14; }
+/* XP to go from `level` to the next. The early game is unchanged (5, 13, 21, …); from level 10 a quadratic term
+   takes over, because the cats' XP keeps climbing all run. Measured with CS.levelCurve (an active player in Cat
+   Town): about level 11 at 3 min, 20 at 6, 29 at 10 and 38 at 15 (was 13 / 29 / 49 / 76).                      */
+function xpNeeded(level){ return Math.round(5 + (level-1)*8 + 3.3*Math.max(0, level-9)**2); }
 function newPlayer(){
   return { x:0, y:0, r:20, hp:100, maxHp:100, speed:230, magnet:72, xp:0, level:1, xpToNext:xpNeeded(1),
     invuln:0, facing:0, faceX:1, dir:'south', walkT:0, moving:false, recoil:0, knock:{x:0,y:0}, hitBounce:0,
@@ -4058,6 +4061,7 @@ function damageCat(c, dmg, ang, w, knock=1){
   if(c.def && c.def.royal && !c.fed){ if(Math.random() < 0.02) spawnBigText(c.x, c.y - 40, 'Only caviar!', '#9fd0ff'); return; }   // Sebastian ignores your weapons
   if(c.dying) return;
   if(c.prop){ breakProp(c); return; }
+  if(c.dazeT > 0) dmg *= 1.5;                                   // blissed out on catnip: easy pickings
   const dealt = Math.min(dmg, c.hp);
   c.hp -= dmg;
   if(w) w.dmgDealt += dealt;
@@ -4098,6 +4102,7 @@ function killCat(c, ang){
     else { addShake(6, 0.25); addHitstop(0.05); }
   } else {
     orbs.push({x:c.x, y:c.y, groundY:c.y, value:def.xp*catXpMul(def)*(treatT > 0 ? 2 : 1), vx:rand(-55,55), vy:rand(-200,-150), bounces:0, settled:false, ph:Math.random()*6});
+    if(DEBUG) window._xpDropped = (window._xpDropped || 0) + orbs[orbs.length - 1].value;
     const dr = Math.random(), L = player.stats.luck*(stage.lootMul||1);   // ordinary cats drop things too (more often in the tougher areas)
     if(dr < 0.012*L) pickups.push({x:c.x, y:c.y, kind:'chest', bob:0, pop:0.55, tier:rollTier(1)});
     else if(dr < 0.07*L) pickups.push({x:c.x, y:c.y, kind:randomPowerupKind(), bob:Math.random()*6, pop:0.55});
@@ -5408,12 +5413,12 @@ const ARTIFACTS = {
 };
 let chestTiers = [], huntT = 20, spottedNew = new Set();
 function rollTier(boost){ const r = Math.random(), L = player.stats.luck*boost; return r < 0.05*L ? 5 : r < 0.22*L ? 3 : 1; }
-// Power-up odds shift over a run: early on it's mostly magnets (to hoover up XP),
-// projectile pickups only start showing up from minute 4 and stay rare.
+// Power-up odds shift over a run: magnets are a little more likely early on (to hoover up XP) but stay
+// uncommon; projectile pickups only start showing up from minute 4 and stay rare.
 function randomPowerupKind(){
   const m = runT/60, L = player.stats.luck;
   const w = {
-    lure:    m < 5 ? 36 : 16,
+    lure:    m < 5 ? 12 : 6,
     sardine: 22,
     bag:     m < 5 ? 14 : 20,
     frenzy:  m < 3 ? 0 : 9,
@@ -6127,15 +6132,16 @@ function drawCat(c){
     ctx.restore();
   }
   // what an item is doing to this cat: ! = scared, yarn = distracted, heart = treats
-  if(!c.dying && (c.scareT > 0 || c.lured || (treatT > 0 && !c.isBoss))){
+  if(!c.dying && (c.scareT > 0 || c.lured || c.soakT > 0 || (treatT > 0 && !c.isBoss))){
     const y = c.y - c.r*1.5 - 10;
     ctx.save(); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    if(c.scareT > 0){
+    if(c.soakT > 0 && !c.lured && !(c.scareT > 0)){ ctx.font = '13px sans-serif'; ctx.fillText('💧', c.x + Math.sin(runT*5 + c.seed)*3, y - Math.abs(Math.sin(runT*6 + c.seed))*3); }   // soaked by the squirt bottle
+    else if(c.scareT > 0){
       ctx.font = '900 20px sans-serif'; ctx.lineWidth = 4; ctx.strokeStyle = '#1c1420'; ctx.fillStyle = '#9be66e';
       const yy = y - Math.abs(Math.sin(runT*14 + c.seed))*5;
       ctx.strokeText('!', c.x, yy); ctx.fillText('!', c.x, yy);
     } else if(c.lured){
-      ctx.font = '13px sans-serif'; ctx.fillText('🧶', c.x + Math.sin(runT*6 + c.seed)*4, y);
+      ctx.font = '13px sans-serif'; ctx.fillText(c.boxed ? '📦' : c.dazeT > 0 ? '💫' : '🧶', c.x + Math.sin(runT*6 + c.seed)*4, y);
     } else {
       ctx.font = '900 14px sans-serif'; ctx.fillStyle = '#ff78aa'; ctx.fillText('❤', c.x, y - Math.abs(Math.sin(runT*8 + c.seed))*4);
     }
@@ -6634,10 +6640,17 @@ const ITEMS = {
   treat:   {ic:'🍤', name:'Party Treats', desc:'Every cat rushes at you for 6 s, and cats fed meanwhile give double XP. Pair it with big area weapons!', col:'255,120,170', hex:'#ff78aa', label:'PARTY TREATS'},
   yarnball:{ic:'🧶', name:'Yarn Ball',    desc:'Place it: every cat in its circle races to it and plays for 7 s instead of biting you.', col:'176,110,235', hex:'#b06eeb', label:'YARN BALL'},
   cucumber:{ic:'🥒', name:'Cucumber',     desc:'Place it: cats are terrified of it and keep clear of its circle for 7 s. No damage, just a safe spot.', col:'110,200,90', hex:'#6ec85a', label:'CUCUMBER'},
+  catnip:  {ic:'🌿', name:'Catnip Bomb',  desc:'Throw it: cats in the cloud roll around blissed-out for 6 s. They don’t bite and take +50% damage.', col:'150,220,90', hex:'#96dc5a', label:'CATNIP BOMB'},
+  box:     {ic:'📦', name:'Cardboard Box', desc:'Throw it: up to 8 nearby cats simply have to sit in it, and stay put for 6 s. Big cats ignore it.', col:'210,160,100', hex:'#d2a064', label:'CARDBOARD BOX'},
+  squirt:  {ic:'💦', name:'Squirt Bottle', desc:'Use it: a burst of water knocks every nearby cat back and soaks them (half speed for 4 s).', col:'90,190,255', hex:'#5abeff', label:'SQUIRT BOTTLE'},
+  sushi:   {ic:'🍣', name:'Sushi Platter', desc:'Use it: heals 35% of your HP and pulls every gem and coin on screen to you.', col:'255,150,110', hex:'#ff966e', label:'SUSHI PLATTER'},
 };
+// instant items (used on the spot) vs ones you aim and throw
+const ITEM_INSTANT = {treat:true, squirt:true, sushi:true};
 for(const k in ITEMS) POWERUPS[k] = {ic:ITEMS[k].ic, col:ITEMS[k].col, hex:ITEMS[k].hex, label:ITEMS[k].label, shape:'item'};
 // the items as 3D block-outs (emoji until they load); w = how wide to draw it, feet at (x, y)
-const ITEM_BLK = {treat:'party_treats', yarnball:'yarn_ball', cucumber:'cucumber'}, ITEM_W = {treat:60, yarnball:58, cucumber:76};
+const ITEM_BLK = {treat:'party_treats', yarnball:'yarn_ball', cucumber:'cucumber', catnip:'catnip_bomb', box:'cardboard_box', squirt:'squirt_bottle', sushi:'sushi_platter'},
+  ITEM_W = {treat:60, yarnball:58, cucumber:76, catnip:56, box:96, squirt:44, sushi:66};
 function drawItemModel(k, x, y, scale){
   const b = ITEM_BLK[k], w = (ITEM_W[k] || 36)*(scale || 1);
   if(blkReady(b)){ blkFit(b, x, y, w); return; }
@@ -6645,12 +6658,19 @@ function drawItemModel(k, x, y, scale){
   ctx.fillText(ITEMS[k].ic, x, y - w*0.35); ctx.restore();
 }
 function itemIconHTML(k){ const b = ITEM_BLK[k]; return blkReady(b) ? `<img class="item-3d" src="${BLK.img[b].src}" alt="">` : ITEMS[k].ic; }
-const ITEM_R = {yarnball:440, cucumber:210};
+const ITEM_R = {yarnball:440, cucumber:210, catnip:230, box:300};
 const ITEM_RANGE = 480;                          // how far from you an item can be placed
-let yarns = [], cucumbers = [], thrown = [], treatT = 0, placing = null;
+let yarns = [], cucumbers = [], nips = [], boxes = [], thrown = [], treatT = 0, placing = null;
 let mouseX = 0, mouseY = 0, mouseSeen = false;
 addEventListener('mousemove', e=>{ mouseX = e.clientX; mouseY = e.clientY; mouseSeen = true; });
-function randomItem(){ const r = Math.random(); return r < 0.3 ? 'treat' : r < 0.65 ? 'yarnball' : 'cucumber'; }
+// what one-time item drops: weights (the crowd controllers a bit more often than the panic buttons)
+const ITEM_WEIGHTS = {treat:16, yarnball:18, cucumber:15, catnip:14, box:13, squirt:12, sushi:12};
+function randomItem(){
+  const total = Object.values(ITEM_WEIGHTS).reduce((a, b)=>a + b, 0);
+  let r = Math.random()*total;
+  for(const k in ITEM_WEIGHTS){ r -= ITEM_WEIGHTS[k]; if(r <= 0) return k; }
+  return 'yarnball';
+}
 function gainItem(k){
   player.items.push(k); renderItemBar();
   const it = ITEMS[k];
@@ -6724,7 +6744,7 @@ function useItem(slot, viaKey, ptype){
   if(state !== 'playing' || !player) return;
   const k = player.items[slot]; if(!k) return;
   hideItemHint(true);
-  if(k==='treat'){ cancelPlacing(); consumeItem(slot); startTreat(); return; }
+  if(ITEM_INSTANT[k]){ cancelPlacing(); consumeItem(slot); ({treat:startTreat, squirt:startSquirt, sushi:startSushi})[k](); return; }
   if(placing && placing.slot === slot){
     if(viaKey){ throwItemAt(aimPoint()); return; }      // same key again: throw at the circle
     cancelPlacing(); return;                             // tapping the slot again cancels
@@ -6775,7 +6795,53 @@ function startTreat(){
   flash('255,120,170', 0.3); addShake(5, 0.3); setPlayerFace(1, 1.5);
   for(let i=0;i<4;i++) addP({x:player.x, y:player.y, life:0.9, max:0.9, type:'implode', r:420+i*90, delay:i*0.12, col:'#ff78aa', follow:true});
 }
+// 💦 Squirt Bottle: a water burst knocks every nearby cat back and soaks it (half speed for a while)
+function startSquirt(){
+  const R = 290;
+  for(const c of cats){
+    if(c.prop || c.dying || c.def.royal) continue;
+    const dx = c.x - player.x, dy = c.y - player.y, d = Math.hypot(dx, dy) || 1;
+    if(d > R + c.r) continue;
+    const k = c.isBoss ? 0.15 : c.elite ? 0.5 : 1;
+    c.knock.x += dx/d*900*k; c.knock.y += dy/d*900*k;
+    c.slowT = 4; c.slowMul = c.isBoss ? 0.75 : 0.5; c.soakT = 4;
+    c.contactCd = Math.max(c.contactCd, 0.8);
+  }
+  for(let i=0;i<3;i++) addP({x:player.x, y:player.y, life:0.75, max:0.75, type:'wave', r:30, sp:700 + i*120, col:'#5abeff', delay:i*0.07});
+  for(let i=0;i<26;i++){ const a = Math.random()*Math.PI*2, sp = rand(260, 520); addP({x:player.x, y:player.y - 10, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp*0.6, life:0.45, max:0.45, type:'wsplash'}); }
+  showBanner('💦 SPLASH! Everybody back!', 1300); addShake(6, 0.25); flash('120,200,255', 0.2);
+}
+// 🍣 Sushi Platter: heal and gather every gem and coin on screen
+function startSushi(){
+  const heal = Math.round(player.maxHp*0.35);
+  player.hp = Math.min(player.maxHp, player.hp + heal);
+  for(const o of orbs) o.homing = true;
+  for(const q of pickups) if(q.kind==='coin') q.homing = true;
+  lureT = Math.max(lureT, 1.6);
+  spawnBigText(player.x, player.y - 50, '+' + heal + ' ❤', '#5ad76e');
+  for(let i=0;i<12;i++){ const a = Math.random()*Math.PI*2, sp = rand(60, 160); addP({x:player.x, y:player.y - 20, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp - 60, life:rand(0.5, 0.8), type:'plus', col:'#5ad76e', sz:6}); }
+  showBanner('🍣 Sushi time! Healed and every gem is coming to you', 1500); setPlayerFace(1, 1.5);
+}
 function landItem(th){
+  if(th.k==='catnip'){
+    nips.push({x:th.x, y:th.y, life:6, max:6, R:ITEM_R.catnip});
+    for(let i=0;i<14;i++){ const a = Math.random()*Math.PI*2, sp = rand(80, 200); addP({x:th.x, y:th.y, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp*0.5 - 30, life:0.6, max:0.6, type:'smoke', r:9, gr:24}); }
+    spawnBigText(th.x, th.y-30, 'Mmm, catnip…', '#b8f07a');
+    showBanner('🌿 Catnip! The cats are blissed out…', 1200);
+    return;
+  }
+  if(th.k==='box'){
+    // the nearest cats (not the big ones) simply have to sit in it
+    const b = {x:th.x, y:th.y, life:6, max:6, R:ITEM_R.box, n:0};
+    boxes.push(b);
+    const near = cats.filter(c=>!c.prop && !c.dying && !c.isBoss && !c.elite && !c.def.royal && areaDist(b.x, b.y, c.x, c.y) < b.R)
+      .sort((p, q)=>areaDist(b.x, b.y, p.x, p.y) - areaDist(b.x, b.y, q.x, q.y)).slice(0, 8);
+    near.forEach((c, i)=>{ c.boxed = b; c.boxSlot = i; b.n++; });
+    spawnPoof(th.x, th.y, '#d2a064');
+    spawnBigText(th.x, th.y-30, near.length ? 'If it fits, it sits!' : 'Hmm, nobody nearby…', '#ffd9a0');
+    showBanner('📦 A box! The cats have to sit in it…', 1200);
+    return;
+  }
   if(th.k==='yarnball'){
     yarns.push({x:th.x, y:th.y, life:7, max:7, R:ITEM_R.yarnball});
     for(let i=0;i<2;i++) addP({x:th.x, y:th.y, life:0.6, max:0.6, type:'pring', r:16, sp:360+i*140, col:'#b06eeb', lw:6, delay:i*0.1});
@@ -6797,10 +6863,36 @@ function updateItems(dt){
   for(let i=thrown.length-1;i>=0;i--){ const th = thrown[i]; th.t += dt; if(th.t >= th.max){ thrown.splice(i,1); landItem(th); } }
   for(let i=yarns.length-1;i>=0;i--){ const y = yarns[i]; y.life -= dt; if(y.life <= 0){ yarns.splice(i,1); spawnPoof(y.x, y.y, '#b06eeb'); } }
   for(let i=cucumbers.length-1;i>=0;i--){ const u = cucumbers[i]; u.life -= dt; if(u.life <= 0){ cucumbers.splice(i,1); spawnPoof(u.x, u.y, '#6ec85a'); } }
+  for(let i=nips.length-1;i>=0;i--){ const n = nips[i]; n.life -= dt;
+    if(Math.random() < dt*8){ const a = Math.random()*Math.PI*2, r = Math.random()*n.R*0.8; addP({x:n.x + Math.cos(a)*r, y:n.y + Math.sin(a)*r*AREA_FLAT, vx:rand(-10,10), vy:rand(-40,-20), life:0.8, max:0.8, type:'smoke', r:6, gr:10}); }
+    if(n.life <= 0) nips.splice(i,1); }
+  for(let i=boxes.length-1;i>=0;i--){ const b = boxes[i]; b.life -= dt; if(b.life <= 0){ boxes.splice(i,1); spawnPoof(b.x, b.y, '#d2a064'); for(const c of cats) if(c.boxed === b) c.boxed = null; } }
 }
 // Items override a cat's own plan: cucumbers scare cats away, yarn grabs nearby cats, treats pull everyone in.
 function itemSteer(c, dx, dy, d, spd, dt){
   if(c.jumpT > 0) c.jumpT -= dt;
+  if(c.soakT > 0) c.soakT -= dt;
+  // a cat that's claimed a spot in a cardboard box goes there and sits
+  if(c.boxed){
+    const b = c.boxed;
+    if(b.life <= 0){ c.boxed = null; }
+    else {
+      const a = (c.boxSlot||0)/Math.max(1, b.n)*Math.PI*2, tx = b.x + Math.cos(a)*(b.n > 1 ? 26 : 0), ty = b.y + Math.sin(a)*(b.n > 1 ? 12 : 0);
+      const bx = tx - c.x, by = ty - c.y, bd = Math.hypot(bx, by) || 1;
+      c.lured = true; c.mode = 'walk';
+      if(bd > 6){ const sp = Math.max(spd*2.2, 240); return [bx/bd*sp, by/bd*sp]; }
+      return [0, 0];
+    }
+  }
+  // catnip: cats in the cloud roll about, blissed out (bosses just get dopey and slow)
+  c.dazeT = Math.max(0, (c.dazeT||0) - dt);
+  for(const n of nips){
+    if(areaDist(n.x, n.y, c.x, c.y) < n.R + c.r){
+      if(c.isBoss){ c.slowT = Math.max(c.slowT, 0.3); c.slowMul = 0.6; break; }
+      c.dazeT = 0.35; c.lured = true;
+      const a = runT*3 + c.seed; return [Math.cos(a)*22, Math.sin(a)*12];
+    }
+  }
   // a cat inside a cucumber's circle startles (once) and runs out of it
   for(const u of cucumbers){
     if(areaDist(u.x, u.y, c.x, c.y) < u.R + c.r){
@@ -6851,6 +6943,19 @@ function drawItemGround(t){
     drawItemModel('cucumber', 0, 0);
     ctx.restore();
     ctx.save(); ctx.globalAlpha = a; timerRing(u.x, u.y-50, u.life/u.max, '#bff0a8'); ctx.restore();
+  }
+  // catnip clouds: a soft green haze over the circle, the bomb in the middle
+  for(const n of nips){
+    const a = Math.min(1, n.life/0.6, (n.max-n.life)/0.3);
+    drawArea(n.x, n.y, n.R*(1 + 0.03*Math.sin(t*4 + n.x)), '150,220,90', 0.6*a, {dash:[6,10], dashOff:-t*20, lw:2.5, edge:'210,255,170'});
+    ctx.save(); ctx.globalAlpha = a; drawItemModel('catnip', n.x, n.y + 6); ctx.restore();
+    ctx.save(); ctx.globalAlpha = a; timerRing(n.x, n.y-48, n.life/n.max, '#d6ffb0'); ctx.restore();
+  }
+  // cardboard boxes, with their timer
+  for(const b of boxes){
+    const a = Math.min(1, b.life/0.6, (b.max-b.life)/0.3);
+    ctx.save(); ctx.globalAlpha = a; ctx.translate(b.x, b.y + 8); ctx.rotate(Math.sin(t*10)*0.03*(b.n ? 1 : 0)); drawItemModel('box', 0, 0); ctx.restore();
+    ctx.save(); ctx.globalAlpha = a; timerRing(b.x, b.y-64, b.life/b.max, '#ffe2b8'); ctx.restore();
   }
   // where a thrown item will land
   for(const th of thrown){
@@ -8393,7 +8498,7 @@ function startRun(opts){
   recomputeStats();
   player.hp = player.maxHp;
   cats = []; fish = []; orbs = []; pickups = []; zones = []; drops = []; shots = []; particles = []; fireflies = []; pending = [];
-  hazards = []; yarns = []; cucumbers = []; thrown = []; treatT = 0; placing = null; obstacles = [];
+  hazards = []; yarns = []; cucumbers = []; nips = []; boxes = []; thrown = []; treatT = 0; placing = null; obstacles = [];
   decoState.clear();
   runT = 0; fedCount = 0; runGold = 0; spawnTimer = 0.5; eventIdx = 0; propTimer = 0; bossCountRun = 0;
   runOver = false; levelQueue = 0; chestQueue = 0; bossFedRun = 0; chestTiers = []; huntT = 10; spottedNew = new Set(); lastProjShown = 0; lastDiscShown = -1; $('lvl-label').textContent = '';
@@ -12533,6 +12638,15 @@ if(DEBUG) window.CS = {
   run:()=>startRun(),
   runAt:k=>{ const o = save.stage; save.stage = k; if(!save.unlocked.includes(k)) save.unlocked.push(k); startRun(); save.stage = o; return stage.key; },
   sim:(k, secs, auto)=>{ CS.runAt(k); const seen = new WeakSet(), got = {}; let kills = 0; for(let s = 0; s < secs*6; s++){ player.hp = player.maxHp; for(let i=0;i<10;i++){ update(1/60); for(const p of pickups) if(!seen.has(p)){ seen.add(p); got[p.kind] = (got[p.kind]||0) + 1; } } if(!auto && s % 12 === 0){ const before = fedCount; for(const c of cats) if(!c.prop && !c.dying && !c.isBoss && Math.hypot(c.x-player.x, c.y-player.y) < 500) damageCat(c, 1e6, 0, null); kills += fedCount - before; } } return {k, fed:fedCount, props:got, lvl:player.level, t:Math.round(runT)}; },
+  // levelling pace: an active player (every gem vacuumed up, level-ups auto-picked) sampled each minute
+  levelCurve:(k, mins)=>{ CS.runAt(k || 'meadow'); window._xpDropped = 0; const rows = [];
+    for(let m = 1; m <= (mins || 15); m++){
+      for(let s = 0; s < 3600; s++){
+        if(state === 'levelup' && lvlOpen){ const ch = buildChoices(); if(ch.length) applyChoice(ch[0]); lvlOpen = false; $('levelup').style.display = 'none'; if(levelQueue > 0) showLevelUp(); else resumePlay(); }   // (auto-pick the first card)
+        if(state !== 'playing' && state !== 'levelup'){ state = 'playing'; chestQueue = 0; hideSidePanels(); }   // (skip chest screens)
+        player.hp = player.maxHp; update(1/60); for(const o of orbs){ o.x = player.x; o.y = player.y; o.settled = true; } }
+      rows.push([m, player.level, Math.round(window._xpDropped), fedCount]);
+    } return rows; },
   propsAt:()=>cats.filter(c=>c.prop).map(c=>[c.prop, Math.round(c.x-player.x), Math.round(c.y-player.y), inView(c)]),
   probe:()=>{ const kinds = {}; for(const p of pickups) kinds[p.kind] = (kinds[p.kind]||0) + 1; return {stage:stage.key, state, t:Math.round(runT), props:cats.filter(c=>c.prop && !c.dying).length, cats:cats.filter(c=>!c.prop).length, kinds, chestQueue, levelQueue, lvlOpen, chestT:+chestT.toFixed(1), lvl:player.level}; },
   fish:()=>{ if(state==='harbor'){ openFishing(); } },
